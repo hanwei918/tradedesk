@@ -79,7 +79,7 @@ state/board.json（看板状态）  ← 批量生成 / 主图检查 / 标记上�
 <tr><td>合规审核员</td><td>按“模型判断”类规则审核，须带编号和原文</td><td>每次生成后</td></tr>
 <tr><td>主图审核员</td><td>看图判断文字、徽章、道具、是否实拍，须写出看到的内容</td><td>上传主图后</td></tr>
 </table>
-<p class="muted">模型接口可配置：OpenAI 兼容 Chat Completions（如赛事 Tokenhub）或 Claude Messages API（官方 SDK）。三种模式：实时 / 录制 / 回放（断网演示）。完整配置导出见 app/config/agents.json；每一次调用的触发条件、输入、返回、校验结果写入调用日志。</p>
+<p class="muted">模型接口可配置：OpenAI 兼容 Chat Completions（如赛事 Tokenhub）或 Claude Messages API（官方 SDK）。三种模式：实时 / 录制 / 回放（断网演示）。完整配置导出见 app/config/agents.json；每一次调用的触发条件、输入、返回、校验结果写入调用日志。按 Claude 官方价和实测用量，一条询盘回复加改一轮（5 次调用）约 0.24 美元。</p>
 
 <h2>反馈方式</h2>
 <p>① 原文高亮批注（点高亮跳到依据）② 红/黄/绿风险等级 ③ 与上一轮的逐词对比 ④ 模型审核没跑成时明确提示，并且风险等级不会显示为绿色。</p>

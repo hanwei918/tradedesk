@@ -4,3 +4,6 @@ __pycache__/
 .DS_Store
 app/logs/
 app/state/
+
+# 真实试用的指南、记录和对方资料：内部用，不进仓库和提交包
+试用/

@@ -8,6 +8,7 @@
 - **询盘收件箱 + 跨岗位任务**：理解每条询盘，按公开公式打优先级（每一分挂询盘原文）；回复时把需要采购、生产、美工跟进的事派成任务，任务同样必须挂询盘原文。
 - **评测**：两份由没看过检查代码的人写的盲测集，首次运行精确率 97.1% / 92.3%、召回率 94.4% / 82.8%（修复前冻结在 `app/eval/*_first_run.json`）；评测页逐条展示。
 - **对照实验**：同样 8 条询盘、同一个模型、同一套检查，比较四组回复。直接用通用 AI：8 条回复 8 条带红色问题（声称有 UL/ETL/NOM 认证、承诺免费样品、按低于起订量报价）；附上工厂资料：0 条红、20 条需确认；TradeDesk 第 1 轮：0 条红、13 条需确认；改一轮后：0 条红、8 条需确认、3 条可直接发。**差距主要来自工厂资料**，TradeDesk 的作用是每次自动带上资料、减少需人工确认的地方。结果在 `app/eval/baseline_run.json`，评测页可逐条查看回复全文。
+- **调用成本**：按 Claude 官方价和录制时的实测用量，每条询盘第 1 轮 3 次调用 0.087–0.150 美元（中位数 0.135），加改一轮中位数 0.236 美元（`python3 tools/cost_report.py`，结果在 `app/eval/cost_run.json`）。
 - **红队测试**：往审核结果里注入编造的模型提示（不存在的规则编号、原文里没有的话、不适用的规则、空引用），出处守卫逐条拦下并说明原因；评测页上可以自己改 JSON 再试。
 - **自动演示**：右上角一键播放 12 步带字幕的走查，`#tour=loop` 可在摊位循环播放。
 - **游园会找茬**：`python3 server.py --lan` 后手机扫码答题，答案由代码规则计算；局域网访问只开放找茬页面，其余接口一律 403。
@@ -55,7 +56,8 @@ LLM_MODEL=claude-opus-5-5
 cd app
 TRADEDESK_MODE=record python3 tools/record_demo.py   # 把固定演示输入跑一遍并缓存
 TRADEDESK_MODE=replay python3 server.py              # 断网也能演示
-python3 -m unittest discover -s tests -v             # 测试（46 项）
+python3 -m unittest discover -s tests -v             # 测试（47 项）
+python3 tools/cost_report.py                         # 每条询盘的调用成本（先跑 record_demo 生成日志）
 TRADEDESK_MODE=replay python3 tools/run_baseline.py  # 对照实验（缓存齐全时不联网）
 TRADEDESK_MODE=replay python3 server.py --lan        # 游园会：手机扫码访问 /play，大屏打开 /play#screen
 python3 tools/export_config.py                       # 导出平台配置 → app/config/agents.json
@@ -75,6 +77,7 @@ app/
   tradedesk/inbox.py     收件箱优先级打分 + 跨岗位任务
   tradedesk/evaluate.py  评测：开发集 + 两份盲测集（eval/）
   tradedesk/compare.py   对照实验汇总：通用 AI vs TradeDesk
+  tradedesk/cost.py      从调用日志统计每条询盘的 token 与费用
   data/redteam.json      红队测试的注入样例
   prompts/*.md           各角色提示词（含主图审核员、对照组的通用助手）
   kb/rules.json          规则知识库（38 条，每条带原文摘录与来源 URL）
@@ -90,8 +93,9 @@ docs/                    交付文档（方案说明、配置与调用说明、�
 
 ## 诚信说明
 
-- 示例工厂、产品、询盘、买家都是**虚构的**，不对应任何真实企业或个人。示例主图是团队画的示意图，系统会把它们判为"不是实拍照片"。
+- 示例工厂、产品、询盘、买家都是**虚构的**，不对应任何真实企业或个人。示例主图是用程序画的示意图，系统会把它们判为"不是实拍照片"。
 - 知识库里的每条规则都附有原文摘录和来源链接，抓取日期为 2026-10-26。没有对照原文核实过的规则**不参与检查**。规则以来源页面的最新版本为准，本工具不构成法律或合规意见。
+- 开发过程中使用了 AI 编程助手辅助编写代码和文档。
 - 第三方组件见 [THIRD_PARTY.md](THIRD_PARTY.md)。
 
 ## 许可

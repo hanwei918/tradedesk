@@ -1,0 +1,186 @@
+{
+ "computed": "2026-10-27 11:34",
+ "prices_usd_per_mtok": {
+  "claude-opus-5-5": {
+   "input": 4.0,
+   "output": 20.0
+  }
+ },
+ "note_zh": "工作流 A：第 1 轮 = 理解询盘 + 生成回复 + 合规审核（3 次调用）；改一轮 = 生成回复 + 合规审核（2 次调用）。token 数是录制演示时模型返回的真实用量，输出 token 含思考过程。价格按 Anthropic 官方价目表；现场换成 Tokenhub 的模型后价格不同。",
+ "summary": {
+  "inquiries": 8,
+  "calls_round1": [
+   3
+  ],
+  "tokens_round1": {
+   "min": 10735,
+   "median": 14049.5,
+   "max": 16296
+  },
+  "usd_round1": {
+   "min": 0.0866,
+   "median": 0.135,
+   "max": 0.1499
+  },
+  "inquiries_with_revision": 7,
+  "usd_round1_plus_revision": {
+   "min": 0.2112,
+   "median": 0.2357,
+   "max": 0.2665
+  }
+ },
+ "unmatched_runs": 0,
+ "inquiries": {
+  "INQ-MX-01": {
+   "round1": [
+    {
+     "calls": 3,
+     "input_tokens": 11083,
+     "output_tokens": 5062,
+     "model": "claude-opus-5-5",
+     "usd": 0.1456
+    }
+   ],
+   "revise": [
+    {
+     "calls": 2,
+     "input_tokens": 10894,
+     "output_tokens": 3864,
+     "model": "claude-opus-5-5",
+     "usd": 0.1209
+    }
+   ]
+  },
+  "INQ-MX-02": {
+   "round1": [
+    {
+     "calls": 3,
+     "input_tokens": 9993,
+     "output_tokens": 4134,
+     "model": "claude-opus-5-5",
+     "usd": 0.1227
+    }
+   ],
+   "revise": [
+    {
+     "calls": 2,
+     "input_tokens": 10176,
+     "output_tokens": 3791,
+     "model": "claude-opus-5-5",
+     "usd": 0.1165
+    }
+   ]
+  },
+  "INQ-MX-03": {
+   "round1": [
+    {
+     "calls": 3,
+     "input_tokens": 11005,
+     "output_tokens": 5291,
+     "model": "claude-opus-5-5",
+     "usd": 0.1498
+    }
+   ],
+   "revise": [
+    {
+     "calls": 2,
+     "input_tokens": 10955,
+     "output_tokens": 3025,
+     "model": "claude-opus-5-5",
+     "usd": 0.1043
+    }
+   ]
+  },
+  "INQ-US-01": {
+   "round1": [
+    {
+     "calls": 3,
+     "input_tokens": 9480,
+     "output_tokens": 5599,
+     "model": "claude-opus-5-5",
+     "usd": 0.1499
+    }
+   ],
+   "revise": [
+    {
+     "calls": 2,
+     "input_tokens": 8933,
+     "output_tokens": 2504,
+     "model": "claude-opus-5-5",
+     "usd": 0.0858
+    }
+   ]
+  },
+  "INQ-US-02": {
+   "round1": [
+    {
+     "calls": 3,
+     "input_tokens": 8745,
+     "output_tokens": 4580,
+     "model": "claude-opus-5-5",
+     "usd": 0.1266
+    }
+   ],
+   "revise": [
+    {
+     "calls": 2,
+     "input_tokens": 8411,
+     "output_tokens": 2621,
+     "model": "claude-opus-5-5",
+     "usd": 0.0861
+    }
+   ]
+  },
+  "INQ-US-03": {
+   "round1": [
+    {
+     "calls": 3,
+     "input_tokens": 8629,
+     "output_tokens": 4851,
+     "model": "claude-opus-5-5",
+     "usd": 0.1315
+    }
+   ],
+   "revise": [
+    {
+     "calls": 2,
+     "input_tokens": 8239,
+     "output_tokens": 2335,
+     "model": "claude-opus-5-5",
+     "usd": 0.0797
+    }
+   ]
+  },
+  "INQ-US-04": {
+   "round1": [
+    {
+     "calls": 3,
+     "input_tokens": 8005,
+     "output_tokens": 2730,
+     "model": "claude-opus-5-5",
+     "usd": 0.0866
+    }
+   ]
+  },
+  "INQ-US-05": {
+   "round1": [
+    {
+     "calls": 3,
+     "input_tokens": 8815,
+     "output_tokens": 5157,
+     "model": "claude-opus-5-5",
+     "usd": 0.1384
+    }
+   ],
+   "revise": [
+    {
+     "calls": 2,
+     "input_tokens": 8613,
+     "output_tokens": 2786,
+     "model": "claude-opus-5-5",
+     "usd": 0.0902
+    }
+   ]
+  }
+ }
+}

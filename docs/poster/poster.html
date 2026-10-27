@@ -8,34 +8,39 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:#fff}
 .poster{width:800px;height:1800px;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);display:flex;flex-direction:column;overflow:hidden}
-.hero{background:linear-gradient(150deg,#0b5fff 0%,#10203f 85%);color:#fff;padding:44px 50px 36px}
+.hero{background:linear-gradient(150deg,#0b5fff 0%,#10203f 85%);color:#fff;padding:36px 50px 28px}
 .tag{font-size:15px;letter-spacing:.12em;color:#cfe0ff;font-weight:700}
-.hero h1{font-size:76px;margin:14px 0 6px;letter-spacing:.02em}
+.hero h1{font-size:68px;margin:10px 0 4px;letter-spacing:.02em}
 .hero .sub{font-size:28px;font-weight:700;margin:0}
 .hero p{font-size:18px;line-height:1.55;color:#dbe6ff;margin:12px 0 0}
-section{padding:18px 50px 2px}
-h2{font-size:28px;margin:0 0 10px;display:flex;gap:12px;align-items:center}
+section{padding:13px 50px 0}
+h2{font-size:27px;margin:0 0 8px;display:flex;gap:12px;align-items:center}
 h2 i{font-style:normal;display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--brand);color:#fff;font-size:20px}
 .quote{font-family:ui-monospace,Menlo,monospace;font-size:15px;line-height:1.55;background:var(--bg);border-left:6px solid var(--brand);padding:14px 18px;border-radius:8px}
 .quote u{text-decoration:none;background:#ffe58a}
-.pits{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.pits{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
 .pit{border-top:5px solid var(--red);background:var(--bg);border-radius:8px;padding:10px 8px;font-size:15px;line-height:1.35}
 .pit b{display:block;font-size:17px}
 .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
 .step{background:var(--bg);border-radius:10px;padding:12px;text-align:center;font-size:16px;line-height:1.4}
 .step b{display:block;font-size:21px;color:var(--brand)}
 .shot{width:100%;border:2px solid #dfe4ee;border-radius:12px;display:block;margin-top:10px}
-.cap{font-size:15px;color:var(--muted);margin:6px 0 0}
+.cap{font-size:15px;color:var(--muted);margin:5px 0 0;line-height:1.45}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .box{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.5}
 .box b{font-size:19px;display:block;margin-bottom:4px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
-.stat{background:var(--bg);border-radius:12px;padding:14px 8px}
-.stat .n{font-size:46px;font-weight:800;color:var(--brand);line-height:1.1}
-.stat .l{font-size:15px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.cmp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.arm{background:var(--bg);border-radius:10px;padding:10px 10px 9px;border-top:6px solid var(--brand);font-size:14px;line-height:1.35;color:var(--muted)}
+.arm b{display:block;font-size:15px;color:var(--ink)}
+.arm .n{font-size:40px;font-weight:800;color:var(--ink);line-height:1.15}
+.arm.bad{border-color:var(--red)}.arm.bad .n{color:var(--red)}.arm.mid{border-color:var(--amber)}
+.stat{background:var(--bg);border-radius:12px;padding:10px 6px}
+.stat .n{font-size:38px;font-weight:800;color:var(--brand);line-height:1.1}
+.stat .l{font-size:14px;color:var(--muted)}
 .risk{display:inline-block;border-radius:999px;padding:2px 12px;font-weight:700;font-size:15px}
 .r{background:#fdecec;color:var(--red)}.a{background:#fff4e0;color:var(--amber)}.g{background:#e7f6ec;color:var(--green)}
-.foot{margin-top:auto;background:var(--ink);color:#cfd8ea;padding:22px 50px;font-size:15px;line-height:1.6}
+.foot{margin-top:auto;background:var(--ink);color:#cfd8ea;padding:18px 50px;font-size:14.5px;line-height:1.55}
 .foot b{color:#fff}
 </style>
 </head>
@@ -69,31 +74,43 @@ h2 i{font-style:normal;display:inline-grid;place-items:center;width:40px;height:
       <div class="step"><b>反馈</b>高亮批注<br>红黄绿 · 逐词对比</div>
     </div>
     <img class="shot" src="../img/poster-inquiry.png" alt="询盘回复截图">
-    <p class="cap" id="cap-a">收件箱按优先级排序；中文一句“按风险提示全部修改”进入第 2 轮；需要采购、生产、美工跟进的事自动派成任务。</p>
+    <p class="cap" id="cap-a">中文一句“按风险提示全部修改”进入第 2 轮；采购、生产、美工要跟进的事自动派成任务。</p>
   </section>
 
   <section>
     <h2><i>3</i>工作流 B + C · 批量上品与商品看板</h2>
     <div class="two">
-      <div class="box"><b>多平台上架</b>一份中文资料 → Amazon 美国站英文 Listing + TikTok 墨西哥西语种草脚本，按各自平台规则检查（标题 ≤75 字符、禁用促销语、不留站外联系方式…）</div>
-      <div class="box"><b>商品看板 + 主图检查</b>所有产品 × 主图 / Amazon / TikTok 一屏看清；一键批量生成；主图按 Amazon 10 条要求检查：尺寸、白底、占比由代码测量，文字、徽章、道具、是否实拍由模型看图</div>
+      <div class="box"><b>多平台上架</b>一份中文资料 → Amazon 美国站英文 Listing + TikTok 墨西哥西语脚本，各按平台规则检查</div>
+      <div class="box"><b>商品看板 + 主图检查</b>一键批量生成；主图按 Amazon 10 条要求：尺寸、白底、占比由代码测，徽章、道具、实拍由模型看图</div>
     </div>
     <img class="shot" src="../img/poster-board.png" alt="商品看板截图">
   </section>
 
   <section>
-    <h2><i>4</i>为什么可信</h2>
+    <h2><i>4</i>对照实验：直接问通用 AI 行不行？</h2>
+    <div class="cmp">
+      <div class="arm bad"><b>直接用通用 AI</b><div class="n">8/8</div>回复带红色问题<br>共 32 条</div>
+      <div class="arm mid"><b>+ 工厂资料</b><div class="n">0/8</div>红色清零<br>20 条需确认</div>
+      <div class="arm"><b>TradeDesk 第 1 轮</b><div class="n">0/8</div>13 条需确认<br>1 条可直接发</div>
+      <div class="arm"><b>改一轮后</b><div class="n">0/8</div>8 条需确认<br>3 条可直接发</div>
+    </div>
+    <p class="cap">同样 8 条询盘、同一模型、同一套检查。通用 AI 会声称有 UL/NOM 认证、承诺免费样品；附上资料后红色清零，差距来自资料。TradeDesk 让资料每次自动带上，条条有出处。</p>
+  </section>
+
+  <section>
+    <h2><i>5</i>为什么可信</h2>
     <div class="stats">
       <div class="stat"><div class="n">38</div><div class="l">条规则<br>每条对照原文核实</div></div>
-      <div class="stat"><div class="n">2</div><div class="l">层校验<br>代码 + 模型（须带出处）</div></div>
       <div class="stat"><div class="n">92%</div><div class="l">盲测精确率（首次）<br>没看过代码的人出题</div></div>
+      <div class="stat"><div class="n">5/5</div><div class="l">编造的模型提示<br>被代码拦下（红队）</div></div>
+      <div class="stat"><div class="n">$0.24</div><div class="l">每条询盘模型费用<br>回复 + 改一轮（实测）</div></div>
     </div>
   </section>
 
   <div class="foot">
     <b>怎么用：</b>工厂填一张产品资料卡（价格阶梯、MOQ、交期、认证）→ 粘贴询盘 → 发出前看风险等级 <span class="risk r">红</span> <span class="risk a">黄</span> <span class="risk g">绿</span><br>
     Python 标准库即可运行 · 模型接口可换 · 断网可回放演示 · <b>摊位扫码玩“AI 找茬挑战”</b><br>
-    示例工厂、产品、询盘均为虚构；规则以来源页面为准，不构成法律意见。
+    数据：示例工厂、产品、询盘均为虚构；规则摘自公开页面，每条附链接；费用按 Claude 官方价与赛前实测用量计算。不构成法律意见。
   </div>
 </div>
 </body>

@@ -576,6 +576,27 @@ class CompareAndRedTeamTests(unittest.TestCase):
             server.App().redteam_run({"findings": "not a list"})
 
 
+class CostTests(unittest.TestCase):
+    def test_replayed_runs_count_once_and_price_per_million(self):
+        from tradedesk.cost import inquiry_runs, summarize, usd
+        self.assertEqual(usd("claude-opus-5-5", 1_000_000, 0), 4.0)
+        self.assertEqual(usd("claude-opus-5-5", 0, 1_000_000), 20.0)
+        self.assertIsNone(usd("some/tokenhub-model", 10, 10))
+
+        def step(run, name, key, i, o):
+            return {"run_id": run, "workflow": "A 询盘回复", "step": name, "input_preview": "Hi, need 500 kettles UL listed",
+                    "meta": {"cache_key": key, "model": "claude-opus-5-5", "usage": {"input_tokens": i, "output_tokens": o}}}
+        rows = [step("r1", "理解询盘", "k1", 1000, 500), step("r1", "生成回复 · 第 1 轮", "k2", 2000, 1000),
+                step("r9", "理解询盘", "k1", 1000, 500), step("r9", "生成回复 · 第 1 轮", "k2", 2000, 1000),  # replay
+                step("r2", "生成回复 · 第 2 轮", "k3", 3000, 500)]
+        per = inquiry_runs(rows, [{"id": "Q1", "text": "Hi, need 500 kettles UL listed"}])
+        self.assertEqual(len(per["Q1"]["round1"]), 1)
+        self.assertEqual(per["Q1"]["round1"][0]["usd"], round((3000 * 4 + 1500 * 20) / 1e6, 4))
+        s = summarize(per)
+        self.assertEqual((s["inquiries"], s["inquiries_with_revision"]), (1, 1))
+        self.assertEqual(s["usd_round1_plus_revision"]["median"], round(0.042 + 0.022, 4))
+
+
 class DiffTests(unittest.TestCase):
     def test_word_diff(self):
         ops = word_diff("UL listed kettle", "kettle without UL")

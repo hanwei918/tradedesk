@@ -117,24 +117,21 @@ p,li{font-size:38px;line-height:1.55}
     </div>
     <div>
       <div class="num" id="n-rules" style="font-size:96px">38</div><p style="font-size:32px">条规则，每条都对照原文核实<br><span class="muted" style="font-size:26px">Amazon 文案/主图 · 阿里 · TikTok · 美国/墨西哥合规 · Incoterms · 商务礼仪</span></p>
-      <div class="num" style="margin-top:24px;font-size:96px">97% / 92%</div><p style="font-size:32px">两份盲测集首次运行的精确率<br><span class="muted" style="font-size:26px">召回率 94% / 83% · 没看过代码的人出题 · 问题已修复 · 46 项测试</span></p>
+      <div class="num" style="margin-top:24px;font-size:96px">97% / 92%</div><p style="font-size:32px">两份盲测集首次运行的精确率<br><span class="muted" style="font-size:26px">召回率 94% / 83% · 没看过代码的人出题 · 问题已修复 · 47 项测试</span></p>
     </div>
   </div>
   <div class="foot"><span>Amazon 标题上限：网上多写 200 字符，官方页面现为 75（2026-10-26 核实）</span><span>7 / 9</span></div>
 </section>
 
 <section class="slide">
-  <div class="kicker">落地</div>
-  <h2>不改变工厂现有流程</h2>
-  <ul>
-    <li>工厂填一张<b>产品资料卡</b>：价格阶梯、MOQ、交期、已有/没有的认证</li>
-    <li>询盘直接从<b>阿里国际站后台</b>粘贴进来</li>
-    <li>模型接口可换（OpenAI 兼容 / Claude），<b>Python 标准库</b>即可运行，一台笔记本部署</li>
-    <li>商品看板<b>一键导出 CSV</b>，直接贴进批量上传表</li>
-    <li>断网可用<b>回放模式</b>演示和培训新业务员</li>
-  </ul>
-  <p class="big" style="margin-top:40px">下一步：接询盘接口 · 扩充品类认证知识 · 宁波工厂两周试用</p>
-  <div class="foot"><span>TradeDesk</span><span>8 / 9</span></div>
+  <div class="kicker">平台配置 · 数据合规 · 落地</div>
+  <h2>6 个智能体 + 38 条规则，一台笔记本就能跑</h2>
+  <div class="two" style="gap:40px">
+    <div class="layer" style="margin:0"><b>平台配置与调用</b><p>询盘分析员 → 外贸业务员 → 合规审核员；Amazon 运营、TikTok 内容运营、主图审核员。代码按工作流编排，配置导出在 <code>app/config/agents.json</code>。</p><p>模型接口可换（OpenAI 兼容 / Claude）。一条询盘回复加改一轮共 5 次调用，约 <b style="font-size:inherit">0.24 美元</b>。</p></div>
+    <div class="layer" style="margin:0"><b>数据来源与合规</b><p>演示用的工厂、产品、询盘全部虚构。规则摘自 Amazon、FTC、ICC、墨西哥经济部等公开页面，每条附链接和抓取日期；不爬取付费数据。</p><p>真实询盘先脱敏、经对方同意才使用；API key 只存在本机。</p></div>
+  </div>
+  <p class="big" style="margin-top:44px">落地：工厂填一张资料卡 · 询盘从阿里后台粘贴 · 看板一键导出 CSV<br><span class="muted" style="font-size:36px">下一步：接询盘接口 · 扩充品类认证知识 · 宁波工厂两周试用</span></p>
+  <div class="foot"><span>费用按 Claude 官方价（输入 4 / 输出 20 美元每百万 token）和赛前实测用量计算；现场换 Tokenhub 模型后另算</span><span>8 / 9</span></div>
 </section>
 
 <section class="slide title-slide">
