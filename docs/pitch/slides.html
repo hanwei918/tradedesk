@@ -29,6 +29,14 @@ p,li{font-size:38px;line-height:1.55}
 .foot{position:absolute;left:120px;right:120px;bottom:40px;display:flex;justify-content:space-between;font-size:22px;color:var(--muted)}
 .title-slide{background:linear-gradient(135deg,#0b5fff,#10203f);color:#fff}
 .title-slide .muted,.title-slide .kicker{color:#cfe0ff}
+.cmp4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin:10px 0 44px}
+.arm{background:var(--bg);border-radius:18px;padding:30px 30px 26px;border-top:10px solid var(--brand)}
+.arm span{display:block;font-size:28px;font-weight:700;color:var(--muted)}
+.arm b{display:block;font-size:104px;line-height:1.1;margin:14px 0 4px;color:var(--ink)}
+.arm em{display:block;font-style:normal;font-size:28px;font-weight:700}
+.arm small{display:block;font-size:24px;color:var(--muted);margin-top:12px;line-height:1.45}
+.arm.bad{border-color:var(--red)}.arm.bad b,.arm.bad em{color:var(--red)}
+.arm.mid{border-color:var(--amber)}
 .dots{position:fixed;bottom:12px;left:0;right:0;text-align:center;color:#8da0c8;font-size:13px}
 @media print{body{background:#fff}.deck{position:static;display:block}.slide{display:block!important;position:relative;transform:none!important;page-break-after:always}.dots{display:none}@page{size:1920px 1080px;margin:0}}
 </style>
@@ -59,21 +67,21 @@ p,li{font-size:38px;line-height:1.55}
     <li>或者工厂<b>自己资料卡上的那个字段</b>（价格、MOQ、交期、认证）</li>
   </ul>
   <p class="big" style="margin-top:50px">说不出出处的话，系统不让 AI 说。</p>
-  <div class="foot"><span>TradeDesk</span><span>2 / 8</span></div>
+  <div class="foot"><span>TradeDesk</span><span>2 / 9</span></div>
 </section>
 
 <section class="slide">
   <div class="kicker">收件箱 → 询盘回复 → 跨岗位任务</div>
   <h2>理解 → 生成 → 校验 → 反馈</h2>
   <img class="shot" src="../img/slide-inquiry.png" alt="询盘回复界面截图">
-  <div class="foot"><span>收件箱按优先级排序（每一分有依据）· 英/西语回复 · 自动派发采购/生产/美工任务 · 中文多轮修改</span><span>3 / 8</span></div>
+  <div class="foot"><span>收件箱按优先级排序（每一分有依据）· 英/西语回复 · 自动派发采购/生产/美工任务 · 中文多轮修改</span><span>3 / 9</span></div>
 </section>
 
 <section class="slide">
   <div class="kicker">工作流 B · 多平台上架</div>
   <h2>一份中文资料，两个平台、两种语言</h2>
   <img class="shot" src="../img/slide-listing.png" alt="多平台上架界面截图">
-  <div class="foot"><span>Amazon 美国站（英语）· TikTok Shop 墨西哥（西语）· 各按各的平台规则检查</span><span>4 / 8</span></div>
+  <div class="foot"><span>Amazon 美国站（英语）· TikTok Shop 墨西哥（西语）· 各按各的平台规则检查</span><span>4 / 9</span></div>
 </section>
 
 <section class="slide">
@@ -83,7 +91,20 @@ p,li{font-size:38px;line-height:1.55}
     <img class="shot" style="max-height:640px" src="../img/slide-board.png" alt="商品看板截图">
     <img class="shot" style="max-height:640px" src="../img/slide-image.png" alt="主图检查截图">
   </div>
-  <div class="foot"><span>批量生成上品 · 主图按 Amazon 10 条要求检查（像素由代码测量，文字/徽章/道具/实拍由模型看图）· 导出 CSV</span><span>5 / 8</span></div>
+  <div class="foot"><span>批量生成上品 · 主图按 Amazon 10 条要求检查（像素由代码测量，文字/徽章/道具/实拍由模型看图）· 导出 CSV</span><span>5 / 9</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">对照实验 · 同一把尺子</div>
+  <h2>直接问通用 AI：8 条回复，8 条不能发</h2>
+  <div class="cmp4">
+    <div class="arm bad"><span>直接用通用 AI</span><b>8 / 8</b><em>带红色问题，共 32 条</em><small>声称有 UL / ETL / NOM 认证、承诺免费样品、按低于起订量报价</small></div>
+    <div class="arm mid"><span>通用 AI + 工厂资料</span><b>0 / 8</b><em>红色清零</em><small>20 条需人工确认<br>0 条可直接发</small></div>
+    <div class="arm"><span>TradeDesk 第 1 轮</span><b>0 / 8</b><em>&nbsp;</em><small>13 条需人工确认<br>1 条可直接发</small></div>
+    <div class="arm"><span>TradeDesk 改一轮后</span><b>0 / 8</b><em>&nbsp;</em><small>8 条需人工确认<br>3 条可直接发</small></div>
+  </div>
+  <p class="big">差距主要来自<b>工厂资料</b>。TradeDesk 让资料每次自动带上，需人工确认的从 20 条降到 8 条，每条提示都有出处。</p>
+  <div class="foot"><span>8 条示例询盘 · 同一个模型 claude-opus-5-5 · 四组用同一套代码规则 + 同一个合规审核员检查 · 每条回复在评测页可逐条查看</span><span>6 / 9</span></div>
 </section>
 
 <section class="slide">
@@ -92,14 +113,14 @@ p,li{font-size:38px;line-height:1.55}
   <div class="two">
     <div>
       <div class="layer"><b>① 代码规则</b><p>价格、MOQ、交期、认证、付款方式、FOB 运输方式、标题长度、禁用词 —— 用代码和资料卡比对，不让大模型算数。</p></div>
-      <div class="layer"><b>② 模型审核 + 出处守卫</b><p>模型提出的问题必须带<b>知识库规则编号</b>，并且<b>原文里真的有那句话</b>，否则代码直接丢弃。</p></div>
+      <div class="layer"><b>② 模型审核 + 出处守卫</b><p>模型提出的问题必须带<b>知识库规则编号</b>，并且<b>原文里真的有那句话</b>，否则代码直接丢弃。</p><p><b>红队测试：</b>注入 6 条模型提示，5 条编造的（假规则编号、回复里没有的原话…）全部拦下。</p></div>
     </div>
     <div>
       <div class="num" id="n-rules" style="font-size:96px">38</div><p style="font-size:32px">条规则，每条都对照原文核实<br><span class="muted" style="font-size:26px">Amazon 文案/主图 · 阿里 · TikTok · 美国/墨西哥合规 · Incoterms · 商务礼仪</span></p>
-      <div class="num" style="margin-top:24px;font-size:96px">97% / 92%</div><p style="font-size:32px">两份盲测集首次运行的精确率<br><span class="muted" style="font-size:26px">召回率 94% / 83% · 没看过代码的人出题 · 问题已修复 · 35 项测试</span></p>
+      <div class="num" style="margin-top:24px;font-size:96px">97% / 92%</div><p style="font-size:32px">两份盲测集首次运行的精确率<br><span class="muted" style="font-size:26px">召回率 94% / 83% · 没看过代码的人出题 · 问题已修复 · 46 项测试</span></p>
     </div>
   </div>
-  <div class="foot"><span>Amazon 标题上限：网上多写 200 字符，官方页面现为 75（2026-10-26 核实）</span><span>6 / 8</span></div>
+  <div class="foot"><span>Amazon 标题上限：网上多写 200 字符，官方页面现为 75（2026-10-26 核实）</span><span>7 / 9</span></div>
 </section>
 
 <section class="slide">
@@ -113,7 +134,7 @@ p,li{font-size:38px;line-height:1.55}
     <li>断网可用<b>回放模式</b>演示和培训新业务员</li>
   </ul>
   <p class="big" style="margin-top:40px">下一步：接询盘接口 · 扩充品类认证知识 · 宁波工厂两周试用</p>
-  <div class="foot"><span>TradeDesk</span><span>7 / 8</span></div>
+  <div class="foot"><span>TradeDesk</span><span>8 / 9</span></div>
 </section>
 
 <section class="slide title-slide">

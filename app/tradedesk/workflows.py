@@ -35,6 +35,7 @@ ROLES = {
     "ops_tiktok": "TikTok 内容运营",
     "compliance": "合规审核员",
     "image_reviewer": "主图审核员",
+    "generic": "通用 AI 助手（对照组）",
 }
 
 
@@ -204,6 +205,34 @@ class Runner:
             data[key] = keep
         data["dropped_without_quote"] = dropped
         return data
+
+    # ------------------------------------------------------------ comparison arms
+    BASELINE_ASK = "我是做小家电的外贸业务员，帮我回复这条阿里巴巴国际站的询盘，用买家的语言，尽量拿下订单：\n\n"
+
+    def baseline(self, payload):
+        """A general-purpose AI reply to the same inquiry, measured by exactly the same checks.
+
+        variant "plain":      what a salesperson does today — paste the inquiry into a chat AI.
+        variant "with_facts": the same, plus the factory card and the salesperson's intent.
+        """
+        run_id = uuid.uuid4().hex[:8]
+        trace = []
+        q = next(x for x in self.kb.inquiries if x["id"] == payload["inquiry_id"])
+        variant = payload["variant"]
+        product = self.kb.product(q["product_id"])
+        market = MARKET_BY_LANGUAGE.get(q.get("language"), "US")
+        user = self.BASELINE_ASK + q["text"].strip()
+        if variant == "with_facts":
+            user += (f"\n\n我们工厂和产品的资料如下，请按资料回复：\n{dumps({'factory': self.kb.factory, 'product': product})}"
+                     f"\n\n我的意图：{q.get('intent_zh', '')}")
+        elif variant != "plain":
+            raise ValueError("variant 只能是 plain 或 with_facts")
+        data = self._step(trace, run_id, f"对照组 · {variant}", "生成回复", "generic",
+                          prompt("baseline_assistant"), user, "对照实验")
+        reply = data.get("reply", "")
+        review = self.review(trace, run_id, f"对照组 · {variant}", "alibaba_rfq", {"reply": reply},
+                             product, "对照实验", market)
+        return {"run_id": run_id, "variant": variant, "inquiry_id": q["id"], "reply": reply, "trace": trace, **review}
 
     # ------------------------------------------------------------ workflow B
     def listing(self, payload):

@@ -1,0 +1,19 @@
+{
+ "request": {
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "system": "你是一个乐于助人的 AI 助手。\n\n只输出一个 JSON 对象：{\"reply\": \"给买家的回复全文\"}\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "我是做小家电的外贸业务员，帮我回复这条阿里巴巴国际站的询盘，用买家的语言，尽量拿下订单：\n\nBuen día, somos un distribuidor de línea blanca en Monterrey con 12 sucursales. Nos interesa la freidora de aire digital de 4.5 L, 1,500 unidades para la temporada de diciembre. Necesitamos que cumpla con la NOM y el manual en español. ¿Pueden cotizar CIF Veracruz? Pago 30% anticipo y 70% contra copia de B/L. Saludos, Jorge Treviño, Compras"
+   }
+  ]
+ },
+ "content": "{\"reply\": \"Estimado Jorge:\\n\\nBuen día y muchas gracias por su interés en nuestra freidora de aire digital de 4.5 L. Nos da mucho gusto la oportunidad de colaborar con una red de 12 sucursales en Monterrey, y entendemos que para la temporada de diciembre los tiempos son clave. Le comparto nuestra propuesta:\\n\\n1. COTIZACIÓN CIF VERACRUZ\\n- Modelo: [Modelo], freidora de aire digital 4.5 L, panel táctil, [X] programas preestablecidos, [potencia] W\\n- Cantidad: 1,500 unidades\\n- Precio unitario CIF Veracruz: USD [precio]/pza\\n- Total: USD [total]\\n- Empaque: caja de color individual + caja master de [X] pzas. Estimamos aprox. 1 contenedor 40' HQ (se confirma con el empaque final).\\n- Validez de la cotización: [X] días\\n\\n2. ESPECIFICACIONES PARA MÉXICO\\n- Voltaje 127 V / 60 Hz con clavija tipo americana, compatible con la red mexicana.\\n- Producto diseñado para cumplir con NOM-003-SCFI (seguridad eléctrica) y NOM-024-SCFI (información comercial). También cumplimos con los límites de consumo en espera aplicables.\\n- Manual, guía rápida, etiquetado, caja y póliza de garantía en español, con los datos del importador.\\n- Le enviamos nuestros reportes de prueba [CB/IEC u otros] para agilizar el proceso. Como el certificado NOM debe emitirse a nombre del importador mexicano, apoyamos con muestras, documentación técnica y diagramas al organismo certificador de su preferencia (ANCE, NYCE u otro).\\n\\n3. CONDICIONES DE PAGO\\nAceptamos sus condiciones: 30% de anticipo por T/T y 70% contra copia del B/L.\\n\\n4. TIEMPOS PARA LLEGAR A DICIEMBRE\\n- Producción: [X] días tras recibir el anticipo y aprobar los artes.\\n- Tránsito marítimo a Veracruz: aprox. 30–40 días.\\nPara tener la mercancía en sus almacenes con margen para distribuir en las 12 sucursales, recomendamos confirmar el pedido a más tardar el [fecha]. Si nos confirma pronto, podemos reservar capacidad de producción y espacio en buque.\\n\\n5. VALOR AGREGADO\\n- OEM sin costo adicional: su marca en el producto, la caja y el manual.\\n- [1–2]% de piezas de repuesto gratis (canastillas, perillas, etc.) para su servicio posventa.\\n- Garantía de [12] meses e inspección previa al embarque. Aceptamos inspección de un tercero designado por ustedes.\\n- Muestra disponible en [X] días para su evaluación y para iniciar la certificación NOM.\\n\\nPara afinar la cotización, ¿nos podría confirmar lo siguiente?\\n1. ¿Requiere el producto con su marca (OEM) o con la nuestra?\\n2. ¿Color o acabado preferido? (negro, blanco, acero inoxidable)\\n3. ¿Ya cuentan con un organismo certificador o desean que les apoyemos con el proceso?\\n4. ¿Cuál es la fecha límite para tener la mercancía en su almacén?\\n\\nAdjunto ficha técnica, fotos y video del producto. Con gusto podemos agendar una videollamada esta semana para revisar los detalles y mostrarle nuestra línea de producción.\\n\\nQuedo atento a sus comentarios.\\n\\nSaludos cordiales,\\n[Nombre]\\n[Cargo] | [Empresa]\\nWhatsApp/WeChat: [número]\\nCorreo: [correo]\"}",
+ "usage": {
+  "input_tokens": 299,
+  "output_tokens": 2023
+ }
+}

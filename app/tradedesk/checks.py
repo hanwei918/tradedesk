@@ -85,6 +85,8 @@ OPEN_ACCOUNT = re.compile(
     r"después de la entrega|tras la entrega|货到付款|到货后\s*\d+\s*天)")
 OFF_PLATFORM = re.compile(
     r"(?i)([\w.+-]+@[\w-]+\.[\w.]+|\+?\d[\d\s-]{8,}\d|whats\s?app|wechat|微信)")
+# Talking about terms for later ("discuss … for repeat orders") is not accepting them now.
+LATER = re.compile(r"(?i)\b(discuss|consider|in the future|once we|later|repeat orders?)\b|más adelante|en el futuro|pedidos recurrentes|以后|今后")
 FOB_AIR = re.compile(r"(?i)\bFOB\b[^.。\n]{0,40}(by air|air ?freight|air shipment|air cargo|vía aérea|aére[oa]|por avi[oó]n|空运)"
                      r"|(by air|air ?freight|air shipment|air cargo|vía aérea|por avi[oó]n|空运)[^.。\n]{0,40}\bFOB\b")
 
@@ -224,12 +226,18 @@ def check_numbers(fields, product, factory):
                             card_source("产品资料：MOQ", f"products[{product['id']}].moq_units", moq)))
             m = OPEN_ACCOUNT.search(sent)
             if m and not NEGATION.search(sent):
-                out.append(finding(
-                    "fact_payment", "red", field, m.group(0),
-                    "接受了货到后付款，工厂只接受定金 + 见提单付尾款或即期信用证",
-                    "改成 30% 定金、70% 见提单副本付款，或即期 L/C",
-                    card_source("工厂资料：可接受的付款方式", "factory.payment_terms_accepted",
-                                factory.get("payment_terms_accepted"))))
+                src = card_source("工厂资料：可接受的付款方式", "factory.payment_terms_accepted",
+                                  factory.get("payment_terms_accepted"))
+                if LATER.search(sent):  # "we'd be glad to discuss open account for repeat orders"
+                    out.append(finding(
+                        "fact_payment", "amber", field, m.group(0),
+                        "提到以后可以谈货到付款/赊账，工厂目前只接受定金 + 见提单付尾款或即期信用证，需老板确认",
+                        "确认老板是否同意以后谈赊账；不同意就删掉这句", src, context=sent))
+                else:
+                    out.append(finding(
+                        "fact_payment", "red", field, m.group(0),
+                        "接受了货到后付款，工厂只接受定金 + 见提单付尾款或即期信用证",
+                        "改成 30% 定金、70% 见提单副本付款，或即期 L/C", src, context=sent))
     return out
 
 
@@ -328,6 +336,8 @@ def guard_model_findings(raw, allowed_rules, fields):
             dropped.append({"reason_zh": "引用的原文在待审文本里找不到", "item": item})
             continue
         severity = item.get("severity") if item.get("severity") in ("red", "amber") else "amber"
+        if rule.get("category") == "culture":  # tone and greetings never block a reply
+            severity = "amber"
         kept.append(finding("model_review", severity, field, quote,
                             item.get("problem_zh") or rule.get("title_zh"),
                             item.get("suggestion_zh") or "", kb_source(rule), by="model"))

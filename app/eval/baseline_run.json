@@ -1,0 +1,2339 @@
+{
+ "recorded": "2026-10-27 10:11",
+ "model": "claude-opus-5-5",
+ "provider": "anthropic",
+ "arms": {
+  "plain": {
+   "name_zh": "直接用通用 AI",
+   "desc_zh": "把询盘贴进通用 AI，请它帮忙回复（业务员现在的常见做法）"
+  },
+  "with_facts": {
+   "name_zh": "通用 AI + 工厂资料",
+   "desc_zh": "同上，再附上工厂/产品资料卡和业务员意图"
+  },
+  "tradedesk": {
+   "name_zh": "TradeDesk 第 1 轮",
+   "desc_zh": "TradeDesk 生成的第一版回复，未经人工修改"
+  },
+  "tradedesk_fixed": {
+   "name_zh": "TradeDesk 改一轮后",
+   "desc_zh": "业务员点一次“按风险提示全部修改”之后"
+  }
+ },
+ "baseline_ask_zh": "我是做小家电的外贸业务员，帮我回复这条阿里巴巴国际站的询盘，用买家的语言，尽量拿下订单：",
+ "note_zh": "四组用同一把尺子测：同一套代码规则 + 同一个合规审核员（带出处守卫）。红色 = 明确违反资料卡或规则；黄色 = 需人工确认。",
+ "summary": {
+  "plain": {
+   "replies": 8,
+   "replies_with_red": 8,
+   "replies_green": 0,
+   "red": 32,
+   "amber": 58,
+   "red_by_rules": 5,
+   "red_by_model": 27,
+   "dropped": 0,
+   "red_by_label": {
+    "模型:ALI-03": 14,
+    "模型:ALI-02": 8,
+    "MATERIAL": 3,
+    "模型:ALI-01": 3,
+    "CERT": 2,
+    "模型:MX-03": 2
+   }
+  },
+  "with_facts": {
+   "replies": 8,
+   "replies_with_red": 0,
+   "replies_green": 0,
+   "red": 0,
+   "amber": 20,
+   "red_by_rules": 0,
+   "red_by_model": 0,
+   "dropped": 0,
+   "red_by_label": {}
+  },
+  "tradedesk": {
+   "replies": 8,
+   "replies_with_red": 0,
+   "replies_green": 1,
+   "red": 0,
+   "amber": 13,
+   "red_by_rules": 0,
+   "red_by_model": 0,
+   "dropped": 0,
+   "red_by_label": {}
+  },
+  "tradedesk_fixed": {
+   "replies": 8,
+   "replies_with_red": 0,
+   "replies_green": 3,
+   "red": 0,
+   "amber": 8,
+   "red_by_rules": 0,
+   "red_by_model": 0,
+   "dropped": 0,
+   "red_by_label": {}
+  }
+ },
+ "rows": {
+  "plain": [
+   {
+    "reply": "Hi Mark,\n\nThank you for your inquiry and your interest in our 1.7L stainless steel kettle. It is one of our best sellers for the US market and a strong fit for Amazon sellers. Here is our initial proposal.\n\n1. Product & Compliance\n- Model: [Model No.], 1.7L, food-grade 304 stainless steel inner body, 120V/60Hz, [1500W], auto shut-off and boil-dry protection.\n- UL: [This model is UL listed under file no. XXXXX. We can send the certificate and listing link for your verification.] / [This model is currently ETL listed. A new UL listing usually takes several weeks, so it would not fit a 20-day schedule. Please let me know if ETL is acceptable for your Amazon listing.]\n- BPA free: All plastic parts in contact with water are BPA free. We can provide [FDA / LFGB] food-contact test reports from [SGS/Intertek].\n- Custom branding: Your logo printed on a custom color box, plus logo on the kettle body (silk-screen or laser) at no extra charge for 1,200 pcs. We can also apply FNSKU labels and pack to Amazon FBA requirements, including carton labels, carton weight under 50 lb and suffocation warnings if needed.\n\n2. Price for 1,200 pcs\n- FOB Ningbo (sea): USD [X.XX]/pc\n- FCA Ningbo Airport (air): USD [X.XX]/pc\n- Air freight to Houston/Dallas, for reference: about USD [X.XX]/kg. The total shipment is about [XXX] kg / [X.X] CBM. We can also quote DDP by air to your warehouse or directly to an Amazon FBA center, which saves you from handling customs clearance.\n\nA note on terms: FOB applies to sea shipments. For air freight, FCA (Ningbo airport) is the matching term. Either way, we will make the export process easy for you.\n\n3. Lead Time\n- Custom printed boxes: about [7] days after artwork approval.\n- Mass production: [X] days. We have [some stock of the base model / reserved line capacity], so we will make every effort to meet your schedule.\n- Air freight: about 3–5 days to Texas.\n- Realistic total: about [XX] days from deposit and artwork confirmation to delivery in Texas. To get as close to 20 days as possible, we suggest sending your logo file (AI/PDF) right away so we can start the box artwork today.\n\n4. Payment\nWe understand and respect your usual 60-day terms. For a first order, our standard is 30% deposit and 70% balance against B/L or AWB copy before release. We are also happy to process the order through Alibaba Trade Assurance, which fully protects your payment for quality and on-time delivery. Once we build a steady relationship, we would be glad to discuss open account terms for repeat orders.\n\n5. Next Steps\n- We can send a pre-production sample with your logo by express in about [X] days. The sample fee will be refunded when the order is placed.\n- Please confirm your preferred delivery address (warehouse or FBA center) so I can finalize the freight quote.\n- Do you also need a plug, voltage or color variation? We offer [matte black / brushed steel / white] options for Amazon variation listings.\n\nWe have supplied many Amazon sellers in the US and know how much reviews depend on consistent quality. Every unit gets a 100% water-leak and power test before packing, and we can arrange third-party inspection at your request.\n\nLooking forward to working with you. Feel free to reach me on WhatsApp/WeChat at [number] for a faster response.\n\nBest regards,\n[Your Name]\n[Sales Manager], [Company Name]\nTel/WhatsApp: [number] | Email: [email]",
+    "risk": "red",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "red",
+      "field": "reply",
+      "quote": "ETL",
+      "context": "We can send the certificate and listing link for your verification.] / [This model is currently ETL listed.",
+      "problem_zh": "文本写成具备 ETL，但工厂没有这项认证",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[KET-17S].certifications_not_held",
+       "value": "UL, ETL, NOM, FDA registration"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "fact_material",
+      "severity": "red",
+      "field": "reply",
+      "quote": "BPA free",
+      "context": "- BPA free: All plastic parts in contact with water are BPA free.",
+      "problem_zh": "文本宣称 BPA free，但工厂没有对应检测报告，无法证明",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：材料与检测",
+       "path": "products[KET-17S].material_tests",
+       "value": "未做 BPA 检测报告"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "fact_lead",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "20 days",
+      "problem_zh": "承诺 20 天，短于工厂标准交期 35 天",
+      "source": {
+       "type": "product_card",
+       "label_zh": "工厂资料：标准交期（天）",
+       "path": "factory.standard_lead_time_days",
+       "value": 35
+      },
+      "by": "rule"
+     },
+     {
+      "check": "fact_payment",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "open account",
+      "context": "Once we build a steady relationship, we would be glad to discuss open account terms for repeat orders.",
+      "problem_zh": "提到以后可以谈货到付款/赊账，工厂目前只接受定金 + 见提单付尾款或即期信用证，需老板确认",
+      "source": {
+       "type": "product_card",
+       "label_zh": "工厂资料：可接受的付款方式",
+       "path": "factory.payment_terms_accepted",
+       "value": [
+        "30% T/T deposit, 70% against B/L copy",
+        "L/C at sight"
+       ]
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "This model is UL listed under file no. XXXXX.",
+      "problem_zh": "资料明确显示该型号没有 UL 认证，这里声称已获 UL 列名，属于虚假认证声明。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "This model is currently ETL listed.",
+      "problem_zh": "资料显示该型号也没有 ETL 认证，声称已获 ETL 列名属于虚假信息。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "All plastic parts in contact with water are BPA free.",
+      "problem_zh": "工厂没有做过 BPA 检测，无法证明不含 BPA，属于无依据的声明。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "We can provide [FDA / LFGB] food-contact test reports from [SGS/Intertek].",
+      "problem_zh": "资料显示没有 FDA 注册，也没有做过 LFGB 检测，无法提供这些报告。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "plus logo on the kettle body (silk-screen or laser) at no extra charge",
+      "problem_zh": "资料只说明 1000 个以上彩盒印 logo 免费，没有提到壶身丝印或镭雕 logo，也没有说明是否免费。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We can also apply FNSKU labels and pack to Amazon FBA requirements",
+      "problem_zh": "资料中没有 FBA 贴标和包装服务的记录，承诺可能超出工厂实际能力。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We can also quote DDP by air to your warehouse or directly to an Amazon FBA center",
+      "problem_zh": "资料只有 FOB 宁波报价，没有空运、FCA 或 DDP 的服务能力和价格依据。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We have [some stock of the base model / reserved line capacity]",
+      "problem_zh": "资料显示标准交期为 35 天，没有现货或预留产能的信息，此说法可能误导买家对交期的判断。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "70% balance against B/L or AWB copy before release",
+      "problem_zh": "资料中的付款方式为“30% T/T 定金，70% 见提单副本”或即期信用证，没有包括见空运单（AWB）付款。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We are also happy to process the order through Alibaba Trade Assurance",
+      "problem_zh": "资料中没有提到信保（Trade Assurance），“fully protects”的说法也可能夸大保障范围。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "we would be glad to discuss open account terms for repeat orders",
+      "problem_zh": "资料中可接受的付款方式不包括赊账（O/A），此承诺缺乏依据。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We offer [matte black / brushed steel / white] options",
+      "problem_zh": "资料中没有颜色或外观变体的信息，可能与实际产品不符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We have supplied many Amazon sellers in the US",
+      "problem_zh": "资料中没有美国亚马逊客户的案例，此说法无法证实。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Every unit gets a 100% water-leak and power test before packing",
+      "problem_zh": "资料中没有 100% 漏水和通电测试的质检记录，此说法无法证实。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "It is one of our best sellers for the US market",
+      "problem_zh": "资料中没有销量或市场数据支持“美国市场畅销款”的说法。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-01"
+   },
+   {
+    "reply": "Buenas tardes, Lucía:\n\nMuchas gracias por su interés en nuestro hervidor eléctrico de acero inoxidable de 1.7 L. Es un placer saludarla, y nos da mucho gusto saber de un distribuidor de Guadalajara.\n\nLe respondo a sus preguntas:\n\n1. Certificación NOM\n[Opción A, si ya cuentan con ella: Este modelo cuenta con certificación NOM-003-SCFI vigente, emitida por (nombre del organismo certificador). Con gusto le enviamos una copia del certificado y del reporte de pruebas.]\n[Opción B, si aún no la tienen: Actualmente el modelo cuenta con certificaciones (CE / CB / UL, etc.). Para el mercado mexicano podemos apoyarles en el proceso de certificación NOM-003-SCFI: proporcionamos las muestras, los diagramas eléctricos, el manual y la documentación técnica que requiera el organismo certificador.]\nAdemás, podemos adaptar el producto al mercado mexicano: clavija tipo A/B, voltaje de 127 V / 60 Hz, etiquetado en español conforme a la NOM-050-SCFI e instructivo en español.\n\n2. Precio CIF Manzanillo\nPara 3,000 piezas al año, le ofrecemos:\n- Hervidor de acero inoxidable 1.7 L, modelo [modelo]: USD [precio] por pieza, CIF Manzanillo\n- Potencia: [xxxx] W | Material: acero inoxidable [grado, p. ej. 304]\n- Funciones: apagado automático, protección contra funcionamiento en seco, base giratoria de 360°\n- Cantidad mínima por pedido: [MOQ] piezas (podemos dividir su volumen anual en varios embarques)\n- Tiempo de producción: [xx] días después de la confirmación del pedido y el anticipo\n- Forma de pago: [30% de anticipo y 70% contra copia del B/L, o según se acuerde]\n- Vigencia de la cotización: [xx] días\n\nTambién ofrecemos servicio OEM: su logotipo en el producto, empaque personalizado y diseño de caja a color.\n\n3. Catálogo\nLe adjunto nuestro catálogo actualizado de hervidores y otros pequeños electrodomésticos. Si le interesan otras líneas de producto, con gusto se las cotizamos también.\n\nPara preparar la propuesta más adecuada, ¿podría indicarnos lo siguiente?\n- ¿Prefieren venderlo con su propia marca (OEM) o con la nuestra?\n- ¿Les interesa algún color o acabado en particular?\n- ¿Cuál sería la cantidad de su primer pedido?\n\nPodemos enviarle una muestra para que compruebe la calidad antes de realizar el pedido. Si lo prefiere, también podemos tener una videollamada para mostrarle nuestra fábrica y el producto en vivo.\n\nQuedo atento a sus comentarios. ¡Será un gusto trabajar con ustedes!\n\nSaludos cordiales,\n\n[Su nombre]\n[Cargo] | [Nombre de la empresa]\nWhatsApp / WeChat: [número]\nCorreo: [correo]\n[Sitio web / tienda en Alibaba]",
+    "risk": "red",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Este modelo cuenta con certificación NOM-003-SCFI vigente",
+      "problem_zh": "工厂资料明确列出该型号未获得 NOM 认证。“选项A”声称已持有有效 NOM-003 证书并可提供证书副本，属于虚假认证声明。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-03",
+       "title_zh": "电器安全须符合 NOM-003-SCFI-2014",
+       "excerpt": "aplica a los productos eléctricos que utilizan para su alimentación la energía eléctrica del servicio público",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/003scfi2015.pdf"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Actualmente el modelo cuenta con certificaciones (CE / CB / UL, etc.).",
+      "problem_zh": "该产品只持有 CB 报告（IEC 60335-2-15）和 CE（LVD/EMC），没有 UL。写 UL 和“etc.”会误导买家，以为还有其他认证。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Buenas tardes, Lucía:",
+      "problem_zh": "给墨西哥买家的正式商务回复直接用名字称呼，没有用 Señora 加姓。",
+      "source": {
+       "type": "kb",
+       "rule_id": "CUL-03",
+       "title_zh": "称呼用 Señor/Señora 加姓",
+       "excerpt": "addressing them using appropriate titles like 'Señor' (Mr.) or 'Señora' (Mrs.), followed by their last name",
+       "url": "https://cibtvisas.com/blog/business-etiquette-mexico"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "USD [precio] por pieza, CIF Manzanillo",
+      "problem_zh": "供应商资料里只有 FOB Ningbo 的阶梯价（3000 件对应 USD 9.2），没有 CIF Manzanillo 的价格、运费和保险数据。CIF 单价需要有实际依据，不能随意填写。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Material: acero inoxidable [grado, p. ej. 304]",
+      "problem_zh": "资料显示内胆是 304 不锈钢，壶盖和手柄是 PP 塑料。只写“不锈钢”容易让买家以为整壶都是不锈钢。功率占位符也应按资料填写 1500W。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "etiquetado en español conforme a la NOM-050-SCFI",
+      "problem_zh": "电器产品的包装信息适用 NOM-024-SCFI-2013，引用 NOM-050 可能不准确。回复也没有说明包装上需要用西班牙语标注的具体内容。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-01",
+       "title_zh": "电器包装信息须用西班牙语（NOM-024-SCFI-2013）",
+       "excerpt": "en el empaque o envase, de manera clara y legible, como mínimo, los siguientes datos en idioma español",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "clavija tipo A/B",
+      "problem_zh": "工厂资料没有提到插头类型的定制能力（只确认了 127V 60Hz 墨西哥版本），这项承诺缺少依据。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "su logotipo en el producto, empaque personalizado y diseño de caja a color",
+      "problem_zh": "资料只说明彩盒可印买家 logo：1000 个以上免费，以下每个加收 USD 0.15，需买家提供矢量稿。资料没有提到可在产品本体印 logo 或做其他包装定制。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "proporcionamos las muestras, los diagramas eléctricos, el manual y la documentación técnica",
+      "problem_zh": "资料没有说明工厂能配合 NOM 认证、提供电路图和技术文件。这项服务承诺需要工厂确认。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-01"
+   },
+   {
+    "reply": "Hi [Buyer Name],\n\nThank you for your inquiry about our 4.5L air fryer. Here are answers to each of your questions.\n\n1. Certifications (FCC & ETL)\nOur 4.5L model holds [FCC certificate/report No. ___] and [ETL listing No. ___], issued by [testing lab]. I can send you copies of both today so your team can verify them before you order. Since these certifications are for the North American market, the unit runs on 120V/60Hz with a US plug.\n\n2. PTFE-free basket\nWe offer two PTFE-free options for this model:\n- Ceramic-coated basket: non-stick, easy to clean, and the most popular choice with US retailers\n- Stainless steel basket: very durable and fully coating-free\nBoth are food-contact safe, and we can provide [FDA / LFGB] test reports.\n\n3. Price for 800 units, FOB [Port]\n- Standard version: USD [__]/unit\n- Ceramic-coated PTFE-free basket: USD [__]/unit\n- Stainless steel basket: USD [__]/unit\nI understand your target is USD 20. If we [adjust the color box packaging / simplify the accessories / use our standard housing color], we can bring the PTFE-free version to USD [__], close to your target. I'm happy to work through these options with you.\n\n4. Delivery\nWe can ship within [__] days after we receive your deposit and you confirm the artwork. Keeping a standard color and simple logo printing makes a 30-day schedule easier to meet. If your timeline is tight, I can reserve production capacity for your order now.\n\nTo send you an exact quotation, could you please confirm:\n- Which basket type you prefer (ceramic or stainless steel)\n- Housing color, and whether you need your logo on the unit or packaging\n- Packaging requirements (color box, retail-ready, Amazon FBA labeling, etc.)\n- Your preferred payment terms\n\nWe can also send a pre-production sample so you can check quality before placing the order. If it helps, I'm available for a quick video call to show you the product and our factory.\n\nI look forward to working with you on this order.\n\nBest regards,\n[Your Name]\n[Company Name]\nWhatsApp/WeChat: [__]\nEmail: [__]",
+    "risk": "red",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_material",
+      "severity": "red",
+      "field": "reply",
+      "quote": "PTFE-free",
+      "context": "PTFE-free basket",
+      "problem_zh": "文本宣称无 PTFE，但产品资料写明篮子是 PTFE 涂层",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：材料与检测",
+       "path": "products[AF-45D].material_tests",
+       "value": "PTFE non-stick coating"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Our 4.5L model holds [FCC certificate/report No. ___] and [ETL listing No. ___]",
+      "problem_zh": "资料显示该型号未取得 ETL，也没有 FCC SDoC 测试报告。回复却声称已持有这两项认证，还承诺当天发送副本，属于虚假认证声明。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "I can send you copies of both today",
+      "problem_zh": "工厂并无 FCC/ETL 证书，承诺当天发送副本无法兑现，会误导买家。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "We offer two PTFE-free options for this model:",
+      "problem_zh": "资料中该型号炸篮只有 PTFE 不粘涂层，没有陶瓷涂层或不锈钢无涂层炸篮的选项。回复擅自增加了产品属性。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "we can provide [FDA / LFGB] test reports",
+      "problem_zh": "资料中没有任何 FDA 或 LFGB 食品接触测试报告，PFOA 也仅有供应商声明、无第三方报告。承诺提供这些报告缺乏依据。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Price for 800 units, FOB [Port]",
+      "problem_zh": "资料显示起订量为 1000 台，回复直接按 800 台报价，与工厂实际能力不符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "we can bring the PTFE-free version to USD [__], close to your target",
+      "problem_zh": "资料中最低单价为 3000 台以上 USD 22.8，买家目标价 USD 20 明显低于工厂底价，且无 PTFE 版本本身没有资料支撑。暗示可接近目标价缺乏依据。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "makes a 30-day schedule easier to meet",
+      "problem_zh": "资料显示标准交期为 35 天，回复暗示可 30 天交货，超出工厂实际能力。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "FOB [Port]",
+      "problem_zh": "该订单为批量集装箱出货（整柜或拼柜），使用 FOB 时未提示 FCA 可能更合适。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-02"
+   },
+   {
+    "reply": "Dear Dana,\n\nThank you for your inquiry and for considering us for your hotel group's guest-room garment steamer project. A rollout of about 3,200 units across 40 properties is the kind of hospitality order we handle well, and we would be glad to support you from samples through both Q1 deliveries.\n\n1. Quotation (FOB Ningbo, by sea)\n- Model: [Model No.], [handheld / standing] garment steamer, 120V/60Hz, US plug, [wattage]W\n- Unit price: USD [X.XX]/unit for 3,000+ units\n- Packing: [units per carton], carton size [L x W x H cm], [units per 20GP/40HQ container]\n- Production lead time: [XX] days after L/C receipt and sample approval\n- Price validity: [XX] days\n\nFor 3,200 units in two lots, we suggest about [1,600] units per lot, or a split that matches your property opening schedule. Please share your target arrival dates in Florida and your preferred port of discharge (for example, Jacksonville, Miami or Port Everglades), and we will plan production and shipping to meet them.\n\n2. Certification\n[Option A: This model is ETL/UL listed under file No. [XXXX]. We will send the certificate with the samples and can share it by email beforehand.]\n[Option B: This model is currently not ETL/UL listed. We can arrange ETL certification for your order, which takes about [X] weeks and costs about USD [X]. We can also recommend a comparable model that is already certified. Please let us know which you prefer.]\n\n3. Payment\nWe accept L/C at sight. Please send us your draft L/C terms in advance so we can confirm the documentary requirements and avoid any discrepancies.\n\n4. Samples\nWe will be happy to send 2 samples to your Orlando office. [The samples are free of charge, and we will cover express shipping.] / [The sample cost is USD [X], refundable against your bulk order, and courier freight is about USD [X], or you may provide your courier account.] Please confirm your full delivery address, recipient name and phone number. We can dispatch within [X] working days of confirmation.\n\n5. Hotel-specific options\nWe can also offer:\n- Automatic shut-off and anti-dry-boil protection for guest safety\n- Custom logo and branded gift box\n- Wall-mount bracket or storage bag for in-room placement\n- Spare parts and a [X]-year warranty with replacement support\n\nTo finalize the offer, could you tell us whether you prefer a handheld or standing unit, whether you need custom branding, and the target delivery date for each lot?\n\nWe look forward to working with you and your properties.\n\nBest regards,\n[Your Name]\n[Title] | [Company Name]\nEmail: [email] | WhatsApp/Tel: [number]\n[Website]",
+    "risk": "red",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "ETL",
+      "context": "We can arrange ETL certification for your order, which takes about [X] weeks and costs about USD [X].",
+      "problem_zh": "承诺办理 ETL，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[GS-12H].certifications_not_held",
+       "value": "UL, ETL, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "This model is ETL/UL listed under file No. [XXXX].",
+      "problem_zh": "资料显示该产品没有 UL、ETL 认证，只有 CB 报告和 CE。选项 A 声称已获 ETL/UL 列名，属于虚假认证声明。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We can arrange ETL certification for your order, which takes about [X] weeks and costs about USD [X].",
+      "problem_zh": "资料里没有可代办 ETL 认证的服务，也没有相关周期和费用。“推荐已获认证的同类型号”同样没有资料支撑。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "The samples are free of charge, and we will cover express shipping.",
+      "problem_zh": "工厂政策是样品按出厂单价收费，国际运费由买家承担，量产可抵扣。免费寄样、包运费与实际政策不符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "[handheld / standing] garment steamer",
+      "problem_zh": "资料中只有 GS-12H 手持挂烫机，没有立式机型。报价里留出 standing 选项，并在结尾询问买家偏好，暗示有立式产品可供。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Automatic shut-off and anti-dry-boil protection for guest safety",
+      "problem_zh": "资料功能中有 auto shut-off，但没有防干烧（anti-dry-boil）保护。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Wall-mount bracket or storage bag for in-room placement",
+      "problem_zh": "资料中没有壁挂支架或收纳袋配件服务。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Spare parts and a [X]-year warranty with replacement support",
+      "problem_zh": "资料没有提供备件、质保年限或换货政策，承诺缺乏依据。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Custom logo and branded gift box",
+      "problem_zh": "资料只支持彩盒印买家 logo（1000 个以上免费，以下每个加 USD 0.15，需矢量稿），没有提到定制礼盒。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Quotation (FOB Ningbo, by sea)",
+      "problem_zh": "3200 台按 20GP/40HQ 集装箱装运，却只报 FOB，没有提示集装箱货物用 FCA 可能更合适。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "we will plan production and shipping to meet them",
+      "problem_zh": "FOB 下由买方指定船只、负责海运，货物在宁波装上买方指定船只即完成交货、风险转移。“我们安排运输以满足到港日期”容易让买家误以为卖方负责运输和到港时间。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-03",
+       "title_zh": "FOB：装上买方指定船只即完成交货，风险同时转移",
+       "excerpt": "the seller delivers the goods loaded on board the vessel nominated by the buyer at the port of shipment",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-03"
+   },
+   {
+    "reply": "¡Hola! Muchas gracias por su interés en nuestros productos. 😊\n\nCon gusto le preparamos la mejor cotización para 100 piezas. Para darle un precio exacto, ¿podría confirmarnos estos datos?\n\n1. ¿Qué producto o modelo le interesa? (puede enviarnos el enlace, el número de modelo o una foto)\n2. ¿A qué país se enviará la mercancía?\n3. ¿Qué voltaje y tipo de enchufe necesita? (por ejemplo, 110V o 220V)\n4. ¿Desea su propio logotipo o empaque personalizado (OEM)?\n\nSobre la muestra: queremos que compruebe la calidad antes de hacer su pedido. Según el modelo, podemos ofrecerle la muestra gratis y usted solo cubre el costo del envío. En otros casos, el valor de la muestra se le reembolsa completamente al confirmar el pedido de 100 piezas. Le confirmaremos la opción exacta en cuanto sepamos qué modelo le interesa.\n\nEn cuanto recibamos su respuesta, le enviaremos en menos de 24 horas:\n✅ Precio para 100 piezas\n✅ Costo de envío hasta su país\n✅ Tiempo de entrega\n✅ Fotos y detalles del producto\n\nSi lo prefiere, también podemos atenderle por WhatsApp: [su número de WhatsApp].\n\n¡Quedamos atentos a su respuesta!\n\nSaludos cordiales,\n[Su nombre]\n[Nombre de la empresa]",
+    "risk": "red",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Muchas gracias por su interés en nuestros productos. 😊",
+      "problem_zh": "给墨西哥买家的商务回复使用了表情符号，不符合正式语气要求。",
+      "source": {
+       "type": "kb",
+       "rule_id": "CUL-01",
+       "title_zh": "墨西哥商务邮件用正式语气",
+       "excerpt": "E-mail communication should always be conducted in formal language.",
+       "url": "https://gringogazette.com/doing-business-in-mexico-dont-get-lost-in-translation/"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "✅ Precio para 100 piezas",
+      "problem_zh": "列表用 ✅ 表情符号，显得随意，不够正式。",
+      "source": {
+       "type": "kb",
+       "rule_id": "CUL-01",
+       "title_zh": "墨西哥商务邮件用正式语气",
+       "excerpt": "E-mail communication should always be conducted in formal language.",
+       "url": "https://gringogazette.com/doing-business-in-mexico-dont-get-lost-in-translation/"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "¡Hola!",
+      "problem_zh": "开头用随意的“¡Hola!”，没有用 Señor/Señora 加姓氏称呼对方。",
+      "source": {
+       "type": "kb",
+       "rule_id": "CUL-03",
+       "title_zh": "称呼用 Señor/Señora 加姓",
+       "excerpt": "addressing them using appropriate titles like 'Señor' (Mr.) or 'Señora' (Mrs.), followed by their last name",
+       "url": "https://cibtvisas.com/blog/business-etiquette-mexico"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Con gusto le preparamos la mejor cotización para 100 piezas.",
+      "problem_zh": "资料中起订量为 1000 个。回复按 100 个报价，暗示接受低于 MOQ 的订单，没有资料支撑。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "podemos ofrecerle la muestra gratis y usted solo cubre el costo del envío",
+      "problem_zh": "资料写明样品按出厂单价收费，国际运费由买家承担。回复承诺免费样品，与事实不符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "el valor de la muestra se le reembolsa completamente al confirmar el pedido de 100 piezas",
+      "problem_zh": "资料写的是样品费可在量产订单中抵扣，而量产起订量为 1000 个。“100 个订单全额退还”属于编造条件。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "le enviaremos en menos de 24 horas",
+      "problem_zh": "24 小时内回复报价、运费和交期的承诺，资料中没有支撑。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "¿Qué voltaje y tipo de enchufe necesita? (por ejemplo, 110V o 220V)",
+      "problem_zh": "资料中的产品 BL-35P 是 2000mAh 电池、USB-C 充电的便携榨汁杯，没有市电电压或插头选项。此问题可能误导买家，以为有不同电压/插头版本。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-02"
+   },
+   {
+    "reply": "Dear Sir/Madam,\n\nThank you for your inquiry and your interest in our small home appliances!\n\nWe are [Company Name], a professional manufacturer of small kitchen and home appliances with [X] years of export experience. Our main products include [e.g., electric kettles, blenders, air fryers, coffee makers, hair dryers]. All products can be supplied with CE / CB / RoHS / ETL certification upon request.\n\nOur latest catalog is attached for your reference. To quote you the most competitive price, could you please tell us:\n\n1. Which products or models are you most interested in?\n2. What is your estimated order quantity?\n3. Which market are the products for? (This determines the plug type, voltage and certifications.)\n4. Do you need OEM/ODM service, such as your own logo, color or packaging?\n\nOnce we have these details, we will send you a detailed quotation within 24 hours.\n\nWhy customers choose us:\n- Factory-direct prices with no middleman\n- Low MOQ for trial orders\n- Free samples available for qualified buyers\n- Strict QC with 100% inspection before shipment\n- [X]-month warranty and reliable after-sales service\n\nFor faster communication, please feel free to contact me on WhatsApp/WeChat: [Your Number].\n\nI look forward to your reply and to building a long-term partnership with you.\n\nBest regards,\n[Your Name]\nSales Manager\n[Company Name]\nEmail: [Your Email]\nWhatsApp/WeChat: [Your Number]\nWebsite: [Your Website]",
+    "risk": "red",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "All products can be supplied with CE / CB / RoHS / ETL certification upon request.",
+      "problem_zh": "资料显示产品只持有 CB 报告和 CE（LVD/EMC），并明确未获得 ETL；RoHS 也不在已持有认证中。声称可提供 ETL/RoHS 认证属于虚假、误导性说法。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Free samples available for qualified buyers",
+      "problem_zh": "资料写明样品按出厂单价收费，国际运费由买家承担，量产订单可抵扣样品费。\"免费样品\"与实际政策不符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Low MOQ for trial orders",
+      "problem_zh": "资料中起订量为 500 台。\"低起订量\"表述模糊，容易让买家误以为可小批量试单。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Our main products include [e.g., electric kettles, blenders, air fryers, coffee makers, hair dryers]",
+      "problem_zh": "资料只提供了 1.7L 不锈钢电热水壶 KET-17S。搅拌机、空气炸锅、咖啡机、吹风机均无资料支撑，且文本中仍保留占位符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "[X]-month warranty and reliable after-sales service",
+      "problem_zh": "资料中没有任何保修期信息，属于无依据的承诺，且仍是占位符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Strict QC with 100% inspection before shipment",
+      "problem_zh": "资料未提供出货前 100% 全检的质检流程信息，该说法无法证实。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "[X] years of export experience",
+      "problem_zh": "资料未提供出口年限，文本保留占位符，存在随意填写不实年限的风险。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-04"
+   },
+   {
+    "reply": "Hi Kevin,\n\nThank you for your inquiry, and nice to meet you! Portable blender cups are one of our best-selling items for Amazon sellers, and we'd be glad to support Brightline Home on this order.\n\nHere's how we can meet your requirements:\n\n1. Certification & Safety\n- FCC: Our portable blender [model no.] is FCC certified (Part 15B). We can send you the test report for review.\n- BPA Free: The cup body is made of [Tritan / food-grade PP], BPA free, with an [FDA / LFGB] food-contact test report available.\n- For Amazon compliance, we can also provide the UN38.3 report and MSDS for the lithium battery, which you'll need for FBA and shipping.\n\n2. Custom Logo\nWe offer [silk-screen printing / laser engraving] on the cup body or base. Please send your logo in AI or PDF format, and we'll send you a digital mockup within 24 hours for approval.\n\n3. Lead Time\nFor 2,000 units with your logo, our production time is about [XX] days after sample/artwork approval and deposit. Shipment within 25 days is [achievable / possible if we confirm the artwork and deposit by (date)]. We'll reserve a production slot for you once the details are confirmed.\n\n4. Price\nFor 2,000 units with a one-color logo and our standard packaging, our best price is USD [X.XX]/unit FOB [Shenzhen / Ningbo]. [If your price is below cost, add a line like this: To get closer to your USD 5.20 target, we can use (simplified packaging / a standard color / a slightly larger quantity).]\n\nTo finalize the quote, could you please confirm:\n- Capacity and color preference (we have [350ml / 380ml / 500ml] in [colors])\n- Packaging: standard box or custom-printed color box?\n- Do you need FBA labeling (FNSKU stickers, carton labels)? We can do this for free.\n- Your preferred FOB port\n\nWe can also send you a sample [within X days] so you can check the quality before you place the order.\n\nLooking forward to your reply and to working with you!\n\nBest regards,\n[Your Name]\n[Company Name]\n[WhatsApp / WeChat / Email]",
+    "risk": "red",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_material",
+      "severity": "red",
+      "field": "reply",
+      "quote": "BPA Free",
+      "context": "- BPA Free: The cup body is made of [Tritan / food-grade PP], BPA free, with an [FDA / LFGB] food-contact test report available.",
+      "problem_zh": "文本宣称 BPA Free，但工厂没有对应检测报告，无法证明",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：材料与检测",
+       "path": "products[BL-35P].material_tests",
+       "value": "杯体 Tritan 材料，有材料供应商的 BPA-free 声明，无成品第三方报告"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "fact_lead",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "25 days",
+      "problem_zh": "承诺 25 天，短于工厂标准交期 35 天",
+      "source": {
+       "type": "product_card",
+       "label_zh": "工厂资料：标准交期（天）",
+       "path": "factory.standard_lead_time_days",
+       "value": 35
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Our portable blender [model no.] is FCC certified (Part 15B). We can send you the test report for review.",
+      "problem_zh": "工厂没有 FCC SDoC 测试报告（资料中列为未持有），声称已获 FCC 认证并可提供报告属虚假信息。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "BPA free, with an [FDA / LFGB] food-contact test report available.",
+      "problem_zh": "只有材料供应商的 BPA-free 声明，没有成品第三方报告，也没有 FDA/LFGB 食品接触报告。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "The cup body is made of [Tritan / food-grade PP]",
+      "problem_zh": "资料显示杯体为 Tritan，备选项 PP 与实物不符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "we have [350ml / 380ml / 500ml] in [colors]",
+      "problem_zh": "BL-35P 只有 350ml 一种容量，380ml/500ml 无资料支撑。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Shipment within 25 days is [achievable",
+      "problem_zh": "工厂标准交期为 35 天，承诺 25 天出货没有依据。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "USD [X.XX]/unit FOB [Shenzhen / Ningbo]",
+      "problem_zh": "工厂只走宁波-舟山港，不能报 FOB 深圳。价格也未填写；按资料，1000-4999 件为 USD 6.20。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Your preferred FOB port",
+      "problem_zh": "工厂只能从宁波-舟山出货，让买家选 FOB 港口会误导。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We can do this for free.",
+      "problem_zh": "资料中没有免费 FBA 贴标服务。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "we can also provide the UN38.3 report and MSDS for the lithium battery",
+      "problem_zh": "资料只有 UN38.3 报告，未列出 MSDS。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "We offer [silk-screen printing / laser engraving] on the cup body or base.",
+      "problem_zh": "资料只写明彩盒可印 logo（1000 个以上免费），杯身丝印/镭雕能力无依据。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "we'll send you a digital mockup within 24 hours",
+      "problem_zh": "24 小时出效果图的承诺没有资料支撑；资料要求买家提供矢量稿。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Portable blender cups are one of our best-selling items for Amazon sellers",
+      "problem_zh": "\"亚马逊卖家热销款\"的说法没有资料证实，可能误导。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "FOB [Shenzhen / Ningbo]",
+      "problem_zh": "2,000 件约 50 箱，通常走拼柜集装箱，FCA 可能更合适，但回复未提示。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-05"
+   },
+   {
+    "reply": "Estimado Jorge:\n\nBuen día y muchas gracias por su interés en nuestra freidora de aire digital de 4.5 L. Nos da mucho gusto la oportunidad de colaborar con una red de 12 sucursales en Monterrey, y entendemos que para la temporada de diciembre los tiempos son clave. Le comparto nuestra propuesta:\n\n1. COTIZACIÓN CIF VERACRUZ\n- Modelo: [Modelo], freidora de aire digital 4.5 L, panel táctil, [X] programas preestablecidos, [potencia] W\n- Cantidad: 1,500 unidades\n- Precio unitario CIF Veracruz: USD [precio]/pza\n- Total: USD [total]\n- Empaque: caja de color individual + caja master de [X] pzas. Estimamos aprox. 1 contenedor 40' HQ (se confirma con el empaque final).\n- Validez de la cotización: [X] días\n\n2. ESPECIFICACIONES PARA MÉXICO\n- Voltaje 127 V / 60 Hz con clavija tipo americana, compatible con la red mexicana.\n- Producto diseñado para cumplir con NOM-003-SCFI (seguridad eléctrica) y NOM-024-SCFI (información comercial). También cumplimos con los límites de consumo en espera aplicables.\n- Manual, guía rápida, etiquetado, caja y póliza de garantía en español, con los datos del importador.\n- Le enviamos nuestros reportes de prueba [CB/IEC u otros] para agilizar el proceso. Como el certificado NOM debe emitirse a nombre del importador mexicano, apoyamos con muestras, documentación técnica y diagramas al organismo certificador de su preferencia (ANCE, NYCE u otro).\n\n3. CONDICIONES DE PAGO\nAceptamos sus condiciones: 30% de anticipo por T/T y 70% contra copia del B/L.\n\n4. TIEMPOS PARA LLEGAR A DICIEMBRE\n- Producción: [X] días tras recibir el anticipo y aprobar los artes.\n- Tránsito marítimo a Veracruz: aprox. 30–40 días.\nPara tener la mercancía en sus almacenes con margen para distribuir en las 12 sucursales, recomendamos confirmar el pedido a más tardar el [fecha]. Si nos confirma pronto, podemos reservar capacidad de producción y espacio en buque.\n\n5. VALOR AGREGADO\n- OEM sin costo adicional: su marca en el producto, la caja y el manual.\n- [1–2]% de piezas de repuesto gratis (canastillas, perillas, etc.) para su servicio posventa.\n- Garantía de [12] meses e inspección previa al embarque. Aceptamos inspección de un tercero designado por ustedes.\n- Muestra disponible en [X] días para su evaluación y para iniciar la certificación NOM.\n\nPara afinar la cotización, ¿nos podría confirmar lo siguiente?\n1. ¿Requiere el producto con su marca (OEM) o con la nuestra?\n2. ¿Color o acabado preferido? (negro, blanco, acero inoxidable)\n3. ¿Ya cuentan con un organismo certificador o desean que les apoyemos con el proceso?\n4. ¿Cuál es la fecha límite para tener la mercancía en su almacén?\n\nAdjunto ficha técnica, fotos y video del producto. Con gusto podemos agendar una videollamada esta semana para revisar los detalles y mostrarle nuestra línea de producción.\n\nQuedo atento a sus comentarios.\n\nSaludos cordiales,\n[Nombre]\n[Cargo] | [Empresa]\nWhatsApp/WeChat: [número]\nCorreo: [correo]",
+    "risk": "red",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "red",
+      "field": "reply",
+      "quote": "NOM",
+      "context": "- Muestra disponible en [X] días para su evaluación y para iniciar la certificación NOM.",
+      "problem_zh": "文本写成具备 NOM，但工厂没有这项认证",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[AF-45D].certifications_not_held",
+       "value": "UL, ETL, FCC SDoC test report, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "fact_lead",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "30–40 días",
+      "problem_zh": "承诺 30 天，短于工厂标准交期 35 天",
+      "source": {
+       "type": "product_card",
+       "label_zh": "工厂资料：标准交期（天）",
+       "path": "factory.standard_lead_time_days",
+       "value": 35
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Estimado Jorge:",
+      "problem_zh": "称呼直接用了买家的名字 Jorge，没有用 Señor 加姓氏，不符合墨西哥正式商务称呼习惯。",
+      "source": {
+       "type": "kb",
+       "rule_id": "CUL-03",
+       "title_zh": "称呼用 Señor/Señora 加姓",
+       "excerpt": "addressing them using appropriate titles like 'Señor' (Mr.) or 'Señora' (Mrs.), followed by their last name",
+       "url": "https://cibtvisas.com/blog/business-etiquette-mexico"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Voltaje 127 V / 60 Hz con clavija tipo americana",
+      "problem_zh": "产品资料标注的电压是 120V 60Hz，回复写成 127 V，与实际规格不一致。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "Producto diseñado para cumplir con NOM-003-SCFI (seguridad eléctrica) y NOM-024-SCFI",
+      "problem_zh": "供应商未持有 NOM 证书（资料明确列为 not held），回复却称产品按 NOM-003/NOM-024 设计并符合，可能误导买家以为产品已满足 NOM。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-03",
+       "title_zh": "电器安全须符合 NOM-003-SCFI-2014",
+       "excerpt": "aplica a los productos eléctricos que utilizan para su alimentación la energía eléctrica del servicio público",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/003scfi2015.pdf"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "red",
+      "field": "reply",
+      "quote": "También cumplimos con los límites de consumo en espera aplicables.",
+      "problem_zh": "资料中没有任何待机能耗测试或合规文件，这一合规声明无法证实，属于可能虚假的说法。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Precio unitario CIF Veracruz: USD [precio]/pza",
+      "problem_zh": "资料只提供 FOB 宁波价（1000-2999 件 USD 24.5），没有 CIF 价格，也没有确认工厂能安排海运和保险。CIF 价格需有实际运费和保险报价支撑。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Tránsito marítimo a Veracruz: aprox. 30–40 días.",
+      "problem_zh": "海运时效在资料中没有依据，属于自行估计的交付承诺。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "OEM sin costo adicional: su marca en el producto, la caja y el manual.",
+      "problem_zh": "资料只说明 1000 个以上彩盒印 logo 免费，没有说明产品本体和说明书印 logo 也免费。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "[1–2]% de piezas de repuesto gratis (canastillas, perillas, etc.)",
+      "problem_zh": "免费备件的承诺在资料中没有依据。另外产品是数显触摸面板，资料中没有旋钮（perillas），描述与产品不符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Aceptamos inspección de un tercero designado por ustedes.",
+      "problem_zh": "资料中未提及工厂接受第三方验货，属于未经确认的服务承诺。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-02",
+       "title_zh": "付款与发货条件须符合真实能力",
+       "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "(negro, blanco, acero inoxidable)",
+      "problem_zh": "资料中没有颜色或不锈钢外观可选的信息，提供“acero inoxidable”选项可能与实际产品材质不符。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-01",
+       "title_zh": "产品属性必须与实物一致",
+       "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+       "url": "https://rule.alibaba.com/rule/detail/11000682.htm"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-03"
+   }
+  ],
+  "with_facts": [
+   {
+    "reply": "Hi Mark,\n\nThank you for your inquiry about our 1.7L Stainless Steel Electric Kettle (model KET-17S). I'm glad to support your Amazon business in Texas. Here are our product details, quote, and some important points before you decide.\n\n1. Certification and material (please read first)\n- UL / ETL: We do not currently hold UL or ETL listing for this model. Our current certifications are a CB report (IEC 60335-2-15) and CE (LVD/EMC). If UL listing is a firm requirement for your US sales channel, I don't want you to place an order based on a wrong assumption. Please let me know how you'd like to proceed.\n- BPA: The water-contact inner body is 304 stainless steel, and the lid and handle are PP plastic. However, we do not have a BPA test report, so we cannot provide documentation to support a \"BPA free\" claim at this time.\n\n2. Product highlights\n- 1.7L capacity, 1500W, 120V 60Hz (US version)\n- 304 stainless steel inner body\n- Auto shut-off and boil-dry protection\n- 360° swivel base\n- Concealed heating element for easy cleaning\n- Boils 1.7L in about 5 minutes (based on our internal factory test, not a third-party report)\n\n3. Price\n- 1,200 pcs: USD 9.80 per unit, FOB Ningbo, by sea\n- For reference: 2,000 to 4,999 pcs at USD 9.20 per unit; 5,000+ pcs at USD 8.70 per unit\n- MOQ: 500 pcs, so your 1,200 pcs first order is no problem.\n- Packaging: color box, 6 units per carton\n\n4. Your logo on the box\nSince your order is over 1,000 pcs, printing your logo on the color box is free of charge. We just need your logo in vector format (AI, EPS, or PDF).\n\n5. Lead time\nOur standard production lead time is 35 days after we receive the deposit and approve the artwork. We cannot meet a 20-day delivery. FOB is a sea-freight term, so our quote is based on shipment from Ningbo-Zhoushan port. If you prefer air freight, your forwarder can arrange it, but the 35-day production time still applies.\n\n6. Payment terms\nWe are unable to accept 100% payment 60 days after delivery. We can offer either of these options:\n- 30% T/T deposit, with the 70% balance paid against a copy of the B/L\n- L/C at sight\n\n7. Ways to check our quality and factory\n- Samples: We charge samples at the ex-factory unit price, and you cover the international shipping. The sample cost will be deducted from your bulk order.\n- Video factory tour: We can arrange a live video call through Alibaba to show you our production line.\n\nIf the certification status and terms above work for you, I'd suggest starting with a sample so you can check the quality yourself. Just send me your logo file and shipping details and I'll prepare a formal PI right away. If UL listing is essential, please let me know and we can discuss what is possible.\n\nLooking forward to your reply.\n\nBest regards,\n[Your Name]\nSales Representative\nYongjiang Small Appliances\nNingbo, China",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "If you prefer air freight, your forwarder can arrange it",
+      "problem_zh": "回复已说明 FOB 是海运条款，但随后提出可改空运，却没有说明空运时需要换贸易术语。买家可能以为空运仍按 FOB Ningbo 成交，而 FOB 只适用于海运和内河运输。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-01",
+       "title_zh": "FOB / FAS 只适用于海运和内河运输",
+       "excerpt": "Both apply only to sea or inland waterway transport (i.e. port-to-to port shipments).",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "1,200 pcs: USD 9.80 per unit, FOB Ningbo, by sea",
+      "problem_zh": "1200 个（约 200 箱）属于集装箱货物（拼柜或整柜），报价只用了 FOB，没有提示 FCA 可能更合适。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-01"
+   },
+   {
+    "reply": "Buenas tardes, Lucía:\n\nMuchas gracias por su interés en nuestro hervidor eléctrico de acero inoxidable de 1.7 L (modelo KET-17S). Somos Yongjiang Small Appliances, fábrica ubicada en Ningbo, China. Con gusto le respondo a sus preguntas.\n\n1. Certificación NOM\nLe soy transparente: actualmente este modelo no cuenta con certificación NOM. Sí contamos con reporte CB (IEC 60335-2-15) y CE (LVD/EMC). Estamos en disposición de colaborar con ustedes en el proceso NOM: podemos proporcionar el reporte CB, la documentación técnica que se requiera y muestras para pruebas de laboratorio. Si ya trabajan con algún organismo certificador en México, con gusto coordinamos directamente con ellos.\n\n2. Versión para México\n- Capacidad: 1.7 L\n- Voltaje / potencia: 127V 60Hz / 1500 W\n- Interior de acero inoxidable 304; tapa y asa de plástico PP\n- Apagado automático y protección contra hervido en seco\n- Base giratoria de 360°\n- Resistencia oculta, fácil de limpiar\n- Empaque: caja a color, 6 piezas por caja master\n\n3. Precios FOB Ningbo (USD por pieza, según cantidad por pedido)\n- 500 – 1,999 pzas: USD 9.80\n- 2,000 – 4,999 pzas: USD 9.20\n- 5,000 pzas o más: USD 8.70\nPedido mínimo: 500 piezas.\n\n4. Precio CIF Manzanillo\nEstoy confirmando el flete marítimo actual a Manzanillo y le enviaré el precio CIF a la brevedad. Para cotizarle con precisión, ¿me podría indicar si planean comprar las 3,000 piezas en un solo embarque o en varios pedidos durante el año, y la cantidad aproximada del primer pedido? Esto también nos ayuda a ubicarlos en el mejor rango de precio.\n\n5. Catálogo\nLe compartiré nuestro catálogo por este medio.\n\n6. Otros detalles\n- Muestras: podemos enviarle muestra; se cobra al precio unitario de fábrica y el flete internacional corre por cuenta del comprador. El costo de la muestra se descuenta en su pedido de producción.\n- Marca propia: impresión de su logo en la caja a color sin costo a partir de 1,000 piezas (por debajo de esa cantidad, USD 0.15 adicionales por pieza); se requiere el archivo en vectores.\n- Tiempo de producción estándar: 35 días; capacidad de 20,000 piezas al mes.\n- Formas de pago: 30% T/T de anticipo y 70% contra copia del B/L, o carta de crédito a la vista (L/C at sight).\n- Si lo desea, podemos programar una videollamada de inspección de fábrica a través de Alibaba.\n\nQuedo atenta a sus comentarios y a los datos de cantidad por embarque para enviarle el CIF Manzanillo cuanto antes. Será un gusto trabajar con ustedes.\n\nSaludos cordiales,\n[Su nombre]\nYongjiang Small Appliances\nNingbo, China",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "NOM",
+      "context": "Estamos en disposición de colaborar con ustedes en el proceso NOM: podemos proporcionar el reporte CB, la documentación técnica que se requiera y muestras para pruebas de laboratorio.",
+      "problem_zh": "承诺办理 NOM，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[KET-17S].certifications_not_held",
+       "value": "UL, ETL, NOM, FDA registration"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Buenas tardes, Lucía:",
+      "problem_zh": "称呼只用了买家的名字 Lucía，没有按墨西哥商务习惯使用 Señora 加姓氏（或买家签名中的头衔），显得不够正式。",
+      "source": {
+       "type": "kb",
+       "rule_id": "CUL-03",
+       "title_zh": "称呼用 Señor/Señora 加姓",
+       "excerpt": "addressing them using appropriate titles like 'Señor' (Mr.) or 'Señora' (Mrs.), followed by their last name",
+       "url": "https://cibtvisas.com/blog/business-etiquette-mexico"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Empaque: caja a color, 6 piezas por caja master",
+      "problem_zh": "面向墨西哥的回复只描述了包装形式，没有提醒 NOM-024 要求包装上用西班牙语标注产品名、进口商名称和地址、原产国以及电压/功率/频率。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-01",
+       "title_zh": "电器包装信息须用西班牙语（NOM-024-SCFI-2013）",
+       "excerpt": "en el empaque o envase, de manera clara y legible, como mínimo, los siguientes datos en idioma español",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Empaque: caja a color, 6 piezas por caja master",
+      "problem_zh": "回复没有说明说明书和警示语会提供西班牙语版本。墨西哥法规要求说明书和警示须用西班牙语。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-02",
+       "title_zh": "说明书和警示须用西班牙语",
+       "excerpt": "Los instructivos y las advertencias deben redactarse en idioma español y en términos comprensibles y legibles",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Precios FOB Ningbo (USD por pieza, según cantidad por pedido)",
+      "problem_zh": "3,000 件约 500 箱，很可能以集装箱运输。集装箱货物用 FCA 往往比 FOB 更合适，回复中没有提示这一选项。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-01"
+   },
+   {
+    "reply": "Hello,\n\nThank you for your inquiry about our 4.5L Digital Air Fryer (Model AF-45D). Here are clear answers to each of your points.\n\n1. Certifications (FCC / ETL)\nThis model currently does NOT have FCC or ETL certification. We also do not hold UL. The certifications we have are:\n- CB report (IEC 60335-2-9)\n- CE (LVD/EMC)\nIf your market requires FCC and ETL, please let us know. We can discuss whether certification for your order is feasible, along with the cost and timeline. We cannot promise it yet.\n\n2. Basket coating\nThe basket uses a PTFE non-stick coating, so it is not PTFE-free. For PFOA, we currently have only a declaration from our coating supplier, not a third-party test report.\n\n3. Quantity and price\nOur MOQ is 1,000 units. FOB Ningbo prices:\n- 1,000–2,999 units: USD 24.50/unit\n- 3,000+ units: USD 22.80/unit\nWe cannot reach USD 20 FOB, and we cannot supply 800 units. Our best price for a 1,000-unit order is USD 24.50.\n\n4. Lead time\nOur standard lead time is 35 days after deposit and confirmation of all details, and we cannot guarantee 30 days. Once you confirm your order details, we will check our production schedule and give you the earliest realistic date.\n\nProduct highlights:\n- 4.5L capacity, 1400W, 120V 60Hz (US version)\n- Digital touch panel with 8 presets\n- 60-minute timer\n- Dishwasher-safe basket\n- Cooks with little or no oil\n- Packing: color box, 2 units per carton\n\nOther services:\n- Custom logo on the color box: free for 1,000 units or more (vector artwork required)\n- Samples: charged at the factory unit price, with international shipping paid by the buyer. The sample cost is deducted from your bulk order.\n- Video factory tour available via Alibaba video call\n- Payment terms: 30% T/T deposit and 70% against B/L copy, or L/C at sight\n- Shipping port: Ningbo-Zhoushan\n\nTo help us recommend the best option, could you tell us:\n- Your target market and its required certifications\n- Whether a PTFE-coated basket is acceptable\n- Whether you can order 1,000 units\n\nWe would be glad to send a sample or arrange a video call so you can see our production line.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Cooks with little or no oil",
+      "problem_zh": "产品资料中的卖点是“少油烹饪”。回复写成“少油或无油”，多出了“无油”的说法，资料无法证实，可能夸大产品功能、误导买家。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "FOB Ningbo prices:",
+      "problem_zh": "1,000 台以上的订单通常以集装箱（整柜或拼柜）出运。回复只报了 FOB 宁波，没有提示 FCA 可能更适合集装箱货物。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-02"
+   },
+   {
+    "reply": "Dear Dana,\n\nThank you for your inquiry and for considering Yongjiang Small Appliances for your hotel group's garment steamer program. Here is our offer and the details you asked for.\n\n1. Product: GS-12H Handheld Garment Steamer (US version)\n- 120V 60Hz, 1200W\n- 260 ml detachable water tank for easy refilling\n- Vertical and horizontal steaming\n- Auto shut-off\n- Fabric brush included\n- Steam ready in about 25 seconds (based on our internal factory testing)\n- Packing: color box, 12 units per carton\n\n2. Price\n- FOB Ningbo, by sea, 3,000+ units: USD 10.90 per unit\n- For reference, 800–2,999 units: USD 11.60 per unit\n- Since your order exceeds 1,000 units, we can print your hotel group's logo on the color box free of charge. We will just need your logo as a vector file (AI/EPS/PDF).\n\n3. Certifications (please read)\nThe GS-12H currently does NOT have UL or ETL certification. It currently holds:\n- CB report (IEC 60335-2-3)\n- CE (LVD/EMC)\nWe understand that UL or ETL listing is often required for products placed in US hotel guest rooms. If it is a requirement for your project, we are willing to evaluate obtaining ETL or UL certification for this model. We would need to confirm the cost and timeline with the testing lab before committing to any date. Please let us know whether ETL/UL is mandatory for you, and we will come back with a concrete assessment.\n\n4. Payment terms\nL/C at sight is acceptable to us. We also accept 30% T/T deposit with 70% against B/L copy, if that is ever more convenient for you.\n\n5. Lead time and delivery in two lots\n- Our standard lead time is 35 days.\n- Our capacity is about 20,000 units per month, so 3,200 units split into two lots is well within our capacity.\n- Please share your preferred quantity and target ship date for each lot in Q1, and we will plan production around them.\n- Note: if ETL/UL certification is required, the shipping schedule would depend on the certification timeline. We would confirm this with you before finalizing dates.\n\n6. Samples to your Orlando office\nWe are glad to send 2 samples. Our sample policy is:\n- Samples are charged at our factory unit price.\n- International courier cost is paid by the buyer.\n- The sample charge will be credited against your bulk order.\nIf you have a courier account (DHL/FedEx/UPS), please send us the account number and your Orlando delivery address. Otherwise, we can quote the shipping cost for you. Please note the samples are our current production model, which is not UL/ETL certified at this time.\n\n7. Factory verification\nIf helpful, we can arrange a live video factory tour via Alibaba video call, so your team can see our production lines and quality control.\n\nTo move forward, could you please confirm:\n(a) whether ETL or UL is mandatory for your properties;\n(b) the quantity and timing for each of the two lots;\n(c) your courier account and address for the samples;\n(d) whether you would like your logo printed on the color box.\n\nWe look forward to supporting your hotel group on this project.\n\nBest regards,\n[Your Name]\nSales Representative\nYongjiang Small Appliances\nNingbo, China",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "UL certification",
+      "context": "If it is a requirement for your project, we are willing to evaluate obtaining ETL or UL certification for this model.",
+      "problem_zh": "承诺办理 UL，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[GS-12H].certifications_not_held",
+       "value": "UL, ETL, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "ETL",
+      "context": "If it is a requirement for your project, we are willing to evaluate obtaining ETL or UL certification for this model.",
+      "problem_zh": "承诺办理 ETL，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[GS-12H].certifications_not_held",
+       "value": "UL, ETL, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "FOB Ningbo, by sea, 3,000+ units: USD 10.90 per unit",
+      "problem_zh": "3,200 台约 267 箱（每箱 12 台），分两批出运，很可能以集装箱（整柜或拼柜）方式运输。报价只用了 FOB，没有提示 FCA 可能更合适。集装箱货物通常在堆场或仓库交给承运人，而不是在船边装船，用 FOB 会让风险转移点与实际交货点不一致。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-03"
+   },
+   {
+    "reply": "¡Hola! Muchas gracias por su interés en nuestra Licuadora Portátil (Portable Blender Cup, modelo BL-35P).\n\nLe comparto la información principal:\n\n**Precio (FOB Ningbo, USD):**\n- 1,000 – 4,999 piezas: USD 6.20 / pieza\n- 5,000 piezas o más: USD 5.70 / pieza\n\n**Cantidad mínima (MOQ):** 1,000 piezas. Lamentablemente no podemos producir un pedido de 100 piezas, ya que el MOQ es de 1,000 unidades por pedido.\n\n**Muestra:** Con gusto le enviamos una muestra. Se cobra al precio de fábrica (USD 6.20 por pieza) y el envío internacional corre por cuenta del comprador. Si después realiza un pedido de producción, le descontamos el costo de la muestra.\n\n**Especificaciones principales:**\n- Capacidad: 350 ml\n- Batería: 2,000 mAh, carga por USB-C\n- 6 cuchillas de acero inoxidable\n- Operación con un solo botón\n- Bloqueo de seguridad: no funciona si el vaso está separado de la base\n- Aprox. 12 licuados por carga (prueba interna de fábrica)\n- Vaso de material Tritan, con declaración BPA-free del proveedor del material (no contamos con informe de laboratorio externo del producto terminado)\n- Empaque: caja de color, 40 piezas por cartón\n\n**Otros detalles:**\n- Tiempo de producción: aprox. 35 días\n- Formas de pago: 30% T/T de anticipo y 70% contra copia del B/L, o L/C a la vista\n- Logo en la caja de color: gratis a partir de 1,000 piezas (necesitamos su archivo en formato vectorial)\n- Puerto de embarque: Ningbo-Zhoushan\n- Podemos hacer una videollamada por Alibaba para que conozca nuestra fábrica\n\nPara ofrecerle la mejor solución, ¿podría indicarnos por favor:\n1. ¿En qué país venderá el producto?\n2. ¿Cuál es su canal de venta? (tienda física, Amazon / Mercado Libre, mayoreo, regalos promocionales, etc.)\n3. ¿Necesita alguna certificación específica?\n\nLe informamos con transparencia que actualmente contamos con CE (EMC) y el informe de prueba de batería UN38.3; no contamos con certificaciones UL, ETL, FCC ni NOM. Por eso es importante confirmar su mercado antes de avanzar.\n\nQuedamos atentos a su respuesta. ¡Será un gusto trabajar con usted!\n\nSaludos cordiales,\n[Su nombre]\nYongjiang Small Appliances\nNingbo, China",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "¡Hola! Muchas gracias por su interés",
+      "problem_zh": "开头只用了“¡Hola!”，没有按墨西哥商务习惯用 Señor/Señora 加姓氏称呼买家。这种开头也偏随意，不够正式。",
+      "source": {
+       "type": "kb",
+       "rule_id": "CUL-03",
+       "title_zh": "称呼用 Señor/Señora 加姓",
+       "excerpt": "addressing them using appropriate titles like 'Señor' (Mr.) or 'Señora' (Mrs.), followed by their last name",
+       "url": "https://cibtvisas.com/blog/business-etiquette-mexico"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "no contamos con certificaciones UL, ETL, FCC ni NOM",
+      "problem_zh": "回复面向西语买家，买家可能在墨西哥销售，但文中没有提醒：墨西哥要求电器包装用西班牙语标注产品名、进口商名称地址、原产国及电压/功率等信息（NOM-024-SCFI-2013），说明书和警示也须提供西班牙语版本。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-01",
+       "title_zh": "电器包装信息须用西班牙语（NOM-024-SCFI-2013）",
+       "excerpt": "en el empaque o envase, de manera clara y legible, como mínimo, los siguientes datos en idioma español",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-02"
+   },
+   {
+    "reply": "Dear Sir/Madam,\n\nThank you for your inquiry and your interest in Yongjiang Small Appliances, a small kitchen appliance manufacturer based in Ningbo, China.\n\nOur featured model is the KET-17S 1.7L Stainless Steel Electric Kettle:\n- 304 stainless steel inner body\n- Auto shut-off and boil-dry protection\n- 360° swivel base\n- Concealed heating element for easy cleaning\n- 1500W, available in 120V 60Hz and 127V 60Hz versions\n- Holds a CB report (IEC 60335-2-15) and CE (LVD/EMC)\n- Packed in a color box, 6 units per carton\n\nOur pricing depends on your quantity, market and packaging needs. To send you an accurate catalog and our best price list, could you please tell us:\n1. Your company name and business type (importer, wholesaler, retailer, brand owner, etc.)\n2. Your target market or country, so we can confirm the right voltage and plug and check the certification requirements\n3. Your estimated order quantity per model\n4. Whether you need your own logo on the color box\n\nFor your reference:\n- MOQ: 500 units\n- Monthly capacity: 20,000 units\n- Standard lead time: about 35 days\n- Shipping: FOB Ningbo\n- Payment: 30% T/T deposit with 70% against B/L copy, or L/C at sight\n- Samples: charged at the factory unit price. The sample cost is deductible from your bulk order, and international freight is paid by the buyer.\n- Factory audit: we can arrange a video factory tour through an Alibaba video call.\n\nOnce we receive these details, we will send you the catalog and a quotation here on Alibaba right away.\n\nWe look forward to working with you.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Shipping: FOB Ningbo",
+      "problem_zh": "电热水壶按纸箱装运，大批量通常走整柜或拼柜集装箱。回复只给了 FOB 宁波，没有提示集装箱货物用 FCA 可能更合适。这不算明确违规，但可以补充说明，避免买家对交货点和风险转移产生误解。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-04"
+   },
+   {
+    "reply": "Hi Kevin,\n\nThank you for your inquiry about our Portable Blender Cup (model BL-35P). Below are our offer and the certification and lead-time details.\n\n1. Price\n- 2,000 units (1,000–4,999 tier): USD 6.20/unit FOB Ningbo\n- 5,000 units and above: USD 5.70/unit FOB Ningbo\nI understand your target is USD 5.20, but we can't reach that price at this quantity. If you can combine orders or plan for 5,000+ units, the USD 5.70 tier applies.\n\n2. Your logo\nPrinting your logo on the color box is free for orders above 1,000 units, so it's included at 2,000 units. Please send your logo as a vector file (AI/EPS/PDF). If you'd also like the logo on the cup itself, let me know and I'll confirm the options and cost.\n\n3. Certifications and materials\n- FCC: We do not currently have an FCC SDoC test report for this model. Our current documents are a CE (EMC) report and a UN38.3 battery test report. The UN38.3 report is useful for shipping a battery-powered product. If you need FCC for Amazon US, we can discuss arranging testing with a third-party lab, either your designated lab or one we coordinate. Cost and timing would need to be confirmed first.\n- BPA-free: The cup body is made of Tritan, and we have the material supplier's BPA-free declaration. We do not have a third-party test report on the finished product. If Amazon or your compliance team requires one, we can discuss arranging that testing as well.\n\n4. Lead time\nOur standard lead time is 35 days after deposit and artwork confirmation, so we can't commit to 25 days. Our monthly capacity is about 20,000 units, so a 2,000-unit order fits comfortably within our schedule. If any FCC or third-party testing is required, please factor that into your launch timeline.\n\n5. Product highlights\n- 350 ml capacity, 2,000 mAh battery, USB-C charging\n- 6 stainless steel blades, one-button operation\n- Safety lock: the motor won't run when the cup is detached\n- About 12 blends per charge (based on our factory testing)\n- Packing: color box, 40 units per carton\n\n6. Payment terms\n30% T/T deposit with 70% against the B/L copy, or L/C at sight.\n\n7. Samples and factory audit\n- Samples are charged at the unit price, and you cover the international freight. The sample cost is credited back against your bulk order.\n- We can arrange a live video factory tour via Alibaba video call, so you can see our production line and quality control.\n\nIf you share your logo file and confirm whether you need FCC and finished-product BPA testing, I can send a formal PI and a sample arrangement right away. We look forward to working with Brightline Home.\n\nBest regards,\nSales Team\nYongjiang Small Appliances\nNingbo, China",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_material",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "BPA-free",
+      "context": "- BPA-free: The cup body is made of Tritan, and we have the material supplier's BPA-free declaration.",
+      "problem_zh": "引用了供应商的 BPA-free 声明，但没有成品第三方报告，能否对外宣称需人工确认",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：材料与检测",
+       "path": "products[BL-35P].material_tests",
+       "value": "杯体 Tritan 材料，有材料供应商的 BPA-free 声明，无成品第三方报告"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "2,000 units (1,000–4,999 tier): USD 6.20/unit FOB Ningbo",
+      "problem_zh": "2000 台按每箱 40 台计约 50 箱，大概率以拼柜或整柜集装箱方式出运。回复只报了 FOB，没有提示 FCA 可能更适合集装箱货物。按 FOB，卖方要承担货物交到集装箱堆场后、直到装上船之前的风险。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-05"
+   },
+   {
+    "reply": "Buen día, Sr. Treviño:\n\nMuchas gracias por su interés en nuestra freidora de aire digital de 4.5 L (modelo AF-45D). Somos Yongjiang Small Appliances, fábrica ubicada en Ningbo, China, con una capacidad de producción de 20,000 unidades al mes, por lo que un pedido de 1,500 unidades está perfectamente dentro de nuestra capacidad.\n\n1. Cotización\n- Precio FOB Ningbo: USD 24.50 por unidad (de 1,000 a 2,999 unidades)\n- Para 3,000 unidades o más: USD 22.80 por unidad\n- Pedido mínimo: 1,000 unidades\n- Empaque: caja a color, 2 unidades por caja master\n\nEn cuanto al precio CIF Veracruz, estamos confirmando la tarifa de flete marítimo actual con nuestro agente y le enviaremos la cotización CIF a la brevedad.\n\n2. Especificaciones principales\n- Capacidad: 4.5 L\n- Potencia: 1,400 W, 120 V / 60 Hz\n- Panel táctil digital con 8 menús preestablecidos\n- Temporizador de 60 minutos\n- Canasta con recubrimiento antiadherente PTFE, apta para lavavajillas\n- Cocción con poco aceite\n\n3. Certificación NOM\nLe informamos con toda transparencia que actualmente este modelo NO cuenta con certificación NOM. Contamos con reporte CB (IEC 60335-2-9) y CE (LVD/EMC), que pueden servir como base técnica para el proceso. Estamos dispuestos a colaborar plenamente en el trámite NOM: proporcionar muestras para pruebas, documentación técnica y realizar los ajustes necesarios en producto y etiquetado. Como el proceso normalmente se gestiona a través del importador en México, nos gustaría coordinar con ustedes el organismo certificador y el calendario. Dado que su objetivo es la temporada de diciembre, le recomendamos iniciar este proceso lo antes posible.\n\n4. Manual en español\nPodemos elaborar el manual de usuario en español. Le confirmaremos el plazo exacto de traducción e impresión en cuanto avancemos con los detalles del pedido.\n\n5. Forma de pago\nAceptamos su propuesta: 30% de anticipo por T/T y 70% contra copia del B/L.\n\n6. Tiempo de entrega y servicios adicionales\n- Tiempo de producción estándar: 35 días después de recibir el anticipo y confirmar los detalles finales.\n- Impresión de su logotipo en la caja a color: sin costo para pedidos de más de 1,000 unidades (solo necesitamos el archivo en formato vectorial).\n- Muestras: disponibles al precio unitario de fábrica, con flete internacional a cargo del comprador; el costo de la muestra se descuenta del pedido de producción.\n- Si lo desea, podemos agendar una auditoría virtual de la fábrica por videollamada a través de Alibaba.\n\nPara cumplir con la temporada de diciembre, le sugerimos enviar una muestra de inmediato, para que puedan evaluarla y avanzar con el trámite NOM en paralelo. ¿Le parece si le enviamos la muestra y le compartimos la cotización CIF Veracruz en cuanto la tengamos confirmada?\n\nQuedamos atentos a sus comentarios.\n\nSaludos cordiales,\n\nDepartamento de Ventas\nYongjiang Small Appliances\nNingbo, China",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "NOM",
+      "context": "Estamos dispuestos a colaborar plenamente en el trámite NOM: proporcionar muestras para pruebas, documentación técnica y realizar los ajustes necesarios en producto y etiquetado.",
+      "problem_zh": "承诺办理 NOM，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[AF-45D].certifications_not_held",
+       "value": "UL, ETL, FCC SDoC test report, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Precio FOB Ningbo: USD 24.50 por unidad (de 1,000 a 2,999 unidades)",
+      "problem_zh": "1,500 台（每箱 2 台）属于集装箱出运，报价只用了 FOB。按规则，集装箱货物用 FCA 往往更合适，但回复没有提示这一选项。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "realizar los ajustes necesarios en producto y etiquetado",
+      "problem_zh": "回复只笼统提到会调整“标签”，没有明确提醒墨西哥 NOM-024-SCFI-2013 的要求：包装上须用西班牙语标注产品名称、进口商名称和地址、原产国，以及电压、功率、频率等信息。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-01",
+       "title_zh": "电器包装信息须用西班牙语（NOM-024-SCFI-2013）",
+       "excerpt": "en el empaque o envase, de manera clara y legible, como mínimo, los siguientes datos en idioma español",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-03"
+   }
+  ],
+  "tradedesk": [
+   {
+    "reply": "Hi Mark,\n\nThank you for your inquiry about our 1.7L stainless steel kettle (model KET-17S). Before quoting, I need to be upfront about a few points so you can decide whether we are a good fit.\n\n1. UL listing\nThis model is not UL listed, and it does not have ETL either. Our current certifications are a CB report (IEC 60335-2-15) and CE (LVD/EMC). If UL or ETL is mandatory for your Amazon listing, please let me know. I will check with our team whether getting this model listed is feasible, and what the cost and timeline would be. I can't commit to it yet.\n\n2. BPA free\nThe inner body is 304 stainless steel. The lid and handle are PP plastic. We have not done a BPA test on this model, so we can't claim it is BPA free. We can check with our PP supplier for material documents. You are also welcome to have samples tested by a third-party lab of your choice.\n\n3. Price\n1,200 pcs: USD 9.80/pc, FOB Ningbo (sea freight, Ningbo-Zhoushan port).\nFOB is a sea-freight term, so this price is for shipment by sea. If you need air freight, we can discuss a different term, such as FCA, with your forwarder.\nYour logo on the color box is free of charge for this quantity. We just need your logo in vector format.\nMOQ is 500 pcs. Packing is a color box, 6 units per carton.\n\n4. Lead time\nOur production lead time is 35 days, so we are not able to deliver within 20 days. Shipping time is additional.\n\n5. Payment\nWe work with 30% T/T deposit and 70% against B/L copy, or L/C at sight. We are not able to accept 100% payment 60 days after delivery.\n\nProduct highlights: 120V 60Hz, 1500W, 304 stainless steel inner body, auto shut-off, boil-dry protection, 360° swivel base, and a concealed heating element that is easy to clean.\n\nNext steps:\n- Samples are available. They are charged at the unit price, and international freight is paid by you. The sample cost can be deducted from your bulk order.\n- We can also arrange a video factory tour through an Alibaba video call.\n\nPlease let me know whether the certification, lead time and payment terms above work for you. I'll be happy to move forward from there.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "1,200 pcs: USD 9.80/pc, FOB Ningbo (sea freight, Ningbo-Zhoushan port).",
+      "problem_zh": "1200 台、200 箱的海运货物大概率走拼柜或整柜集装箱。回复用 FOB 报价，但只在空运场景提到 FCA，没有提示集装箱货物用 FCA 可能更合适。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-01"
+   },
+   {
+    "reply": "Estimada Señora Ramírez:\n\nBuenas tardes y muchas gracias por su interés en nuestro hervidor eléctrico de acero inoxidable de 1.7 L (modelo KET-17S).\n\nSobre la certificación NOM, le informo con transparencia que este modelo todavía no cuenta con certificado NOM. Actualmente tenemos reporte CB (IEC 60335-2-15) y CE (LVD/EMC). Estamos en disposición de colaborar con ustedes para tramitar la certificación conforme a la NOM-003-SCFI-2014 ante el organismo certificador que ustedes elijan. Podemos aportar el reporte CB, la información técnica del producto y las muestras necesarias para las pruebas. Si le parece bien, revisemos juntos el esquema del trámite, incluyendo quién figuraría como titular del certificado, así como los tiempos y costos.\n\nDatos principales del producto:\n- Versión para México: 127V 60Hz, 1500 W\n- Interior de acero inoxidable 304; tapa y asa de plástico PP\n- Apagado automático y protección contra funcionamiento en seco\n- Base giratoria de 360° y resistencia oculta, fácil de limpiar\n- Empaque: caja de color, 6 piezas por caja master\n\nPrecios FOB Ningbo (USD por pieza):\n- 500 a 1,999 piezas: 9.80\n- 2,000 a 4,999 piezas: 9.20\n- 5,000 piezas o más: 8.70\n\nEl precio se determina según la cantidad de cada pedido. Por ejemplo, un solo pedido de 3,000 piezas aplicaría el precio de USD 9.20. El pedido mínimo es de 500 piezas.\n\nEn cuanto al precio CIF Manzanillo, estamos confirmando el flete marítimo y el seguro con nuestro agente de carga, y se lo enviaremos en cuanto lo tengamos. Para afinar la cotización, ¿podría indicarnos si prefieren un solo embarque al año o varios pedidos parciales?\n\nCondiciones:\n- Tiempo de entrega: aproximadamente 35 días después de confirmar el pedido\n- Forma de pago: 30% de anticipo por T/T y 70% contra copia del B/L, o carta de crédito a la vista\n\nLe compartimos por este medio la ficha del producto y nuestro catálogo.\n\nComo siguientes pasos, le ofrecemos lo siguiente:\n- Muestras: se cobran al precio unitario de fábrica y el flete internacional corre por cuenta del comprador. El costo de la muestra se descuenta en el pedido de producción.\n- Visita virtual a la fábrica por videollamada en Alibaba.\n- Impresión de su logotipo en la caja de color: sin costo a partir de 1,000 piezas; por debajo de esa cantidad, USD 0.15 adicionales por pieza. Se requiere el archivo en formato vectorial.\n\nTambién podemos preparar el empaque, el etiquetado y el instructivo en español para el mercado mexicano. Para ello, ustedes nos proporcionarían los datos del importador.\n\nQuedo atento a sus comentarios.\n\nSaludos cordiales,\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "NOM",
+      "context": "Estamos en disposición de colaborar con ustedes para tramitar la certificación conforme a la NOM-003-SCFI-2014 ante el organismo certificador que ustedes elijan.",
+      "problem_zh": "承诺办理 NOM，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[KET-17S].certifications_not_held",
+       "value": "UL, ETL, NOM, FDA registration"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Precios FOB Ningbo (USD por pieza):",
+      "problem_zh": "按 500–5000+ 件的数量海运到墨西哥，通常是整柜或拼柜的集装箱货。回复只报了 FOB 价，没有提示 FCA 可能更合适。集装箱货一般在码头堆场交给承运人，FOB 以装上船作为风险转移点，与实际交货环节不一致。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-01"
+   },
+   {
+    "reply": "Hi there,\n\nThank you for your inquiry about our 4.5L Digital Air Fryer (model AF-45D). Here are clear answers to each of your questions.\n\n1. Certifications\nWe do not currently hold ETL or an FCC SDoC test report for this model. Its current certifications are:\n- CB report (IEC 60335-2-9)\n- CE (LVD/EMC)\n\nThe CB report is a good basis for ETL testing. If you would like to go ahead, we can check the testing cost and timeline with a lab and come back to you. Please note that testing would add time and cost before shipment.\n\n2. Basket coating\nThe standard basket uses a PTFE non-stick coating, so it is not PTFE-free. For PFOA, we only have a declaration from our coating supplier, not a third-party test report. We are checking with our suppliers whether a PTFE-free basket option is possible, and we will share the details and price impact once confirmed.\n\n3. Quantity and price\nOur MOQ is 1,000 units. Our prices, FOB Ningbo-Zhoushan, are:\n- 1,000–2,999 units: USD 24.5/unit\n- 3,000+ units: USD 22.8/unit\n\nWe understand your target is USD 20. However, USD 22.8 at 3,000+ units is the best price we can offer for this model.\n\nThe price covers the US version: 120V 60Hz, 1400W, with 8 presets, a digital touch panel, a 60-minute timer and a dishwasher-safe basket. Packing is one color box per unit and 2 units per carton.\n\n4. Lead time\nOur standard lead time is 35 days after deposit, so we cannot promise shipment within 30 days. If ETL/FCC testing is needed, the lead time will be longer. We will confirm the exact schedule together with the testing plan.\n\nPayment terms\n- 30% T/T deposit, 70% against B/L copy, or\n- L/C at sight\n\nNext steps\n- Samples: Samples are charged at the ex-factory unit price, and international freight is paid by the buyer. The sample cost can be deducted from your bulk order.\n- Video factory audit: We can arrange one through an Alibaba video call.\n- Logo printing: We print your logo on the color box free of charge for 1,000 pcs or more. Please provide your artwork in vector format.\n\nCould you let me know two things?\n1. Would you consider 1,000 units?\n2. Should we check the ETL/FCC testing cost and timeline for you?\n\nI will follow up with the details as soon as possible.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Our prices, FOB Ningbo-Zhoushan, are:",
+      "problem_zh": "1000–3000 台空气炸锅（每箱 2 台）通常走整柜或拼柜海运。回复只报了 FOB，没有提示集装箱货物用 FCA 可能更合适。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-02"
+   },
+   {
+    "reply": "Dear Dana,\n\nThank you for your inquiry and for sharing the details of your project. Placing one steamer in each of 3,200 guest rooms is a clear plan, and we would be glad to support it.\n\nCertification (ETL/UL)\nOur GS-12H handheld steamer does not currently have ETL or UL certification. The unit holds a CB report (IEC 60335-2-3) and CE (LVD/EMC).\n\nWe understand that ETL or UL listing is usually required for a hotel installation in the US. We are willing to look into getting the GS-12H ETL or UL certified for your order. Once our team has checked the cost and timeline with a testing lab, I will share the details with you. Please also let me know if your group prefers one mark over the other.\n\nQuotation\n- Model: GS-12H Handheld Garment Steamer, 120V 60Hz, 1200W, 260 ml detachable water tank\n- Features: vertical and horizontal steaming, auto shut-off, fabric brush included\n- Price: USD 10.90 per unit, FOB Ningbo, by sea (3,000+ units tier)\n- Packaging: color box, 12 units per carton\n- Standard lead time: about 35 days per production run\n\nYou mentioned delivery in two lots in Q1. Could you share the planned quantity for each lot? I will then confirm how the 3,000+ pricing applies to your split and suggest a production schedule.\n\nPayment\nL/C at sight is acceptable to us.\n\nSamples\nWe can send 2 samples to your Orlando office. Samples are charged at our factory unit price, and international freight is paid by the buyer. The sample cost can be deducted from your bulk order. If you have a courier account, please share it. Otherwise, I can arrange a freight quote to Orlando.\n\nOther options\n- We can arrange a video factory audit through an Alibaba video call if your team would like to see our production line.\n- We can print your group's logo on the color box free of charge for orders over 1,000 units. A vector file of the logo is required.\n\nPlease confirm the lot quantities, your preferred certification mark, and the sample delivery details, and I will follow up promptly.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "UL certified",
+      "context": "We are willing to look into getting the GS-12H ETL or UL certified for your order.",
+      "problem_zh": "承诺办理 UL，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[GS-12H].certifications_not_held",
+       "value": "UL, ETL, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "ETL",
+      "context": "We are willing to look into getting the GS-12H ETL or UL certified for your order.",
+      "problem_zh": "承诺办理 ETL，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[GS-12H].certifications_not_held",
+       "value": "UL, ETL, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Price: USD 10.90 per unit, FOB Ningbo, by sea (3,000+ units tier)",
+      "problem_zh": "3,200 台约 267 箱，大概率以整柜或拼柜集装箱出运。按规则，集装箱货物更适合用 FCA，但回复只报了 FOB，没有提示 FCA 这一选项。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-03"
+   },
+   {
+    "reply": "Estimado(a) cliente:\n\nMuchas gracias por su interés en nuestro vaso licuadora portátil (modelo BL-35P).\n\nLe agradecemos que nos indique la cantidad que necesita. Por transparencia, debemos informarle que nuestro pedido mínimo es de 1,000 piezas, por lo que no podemos atender un pedido de 100 piezas.\n\nNuestros precios FOB Ningbo son:\n- 1,000 a 4,999 piezas: USD 6.20 por pieza\n- 5,000 piezas o más: USD 5.70 por pieza\n\nCaracterísticas principales:\n- Capacidad de 350 ml\n- Batería de 2,000 mAh con carga USB-C\n- 6 cuchillas de acero inoxidable\n- Operación con un solo botón\n- Bloqueo de seguridad: no funciona si el vaso está separado de la base\n- Aproximadamente 12 licuados por carga (según prueba interna de fábrica)\n\nEmpaque: caja de color, 40 piezas por caja master.\n\nCertificaciones: contamos con CE (EMC) y con el reporte de prueba de batería UN38.3. Actualmente no contamos con certificación NOM, UL, ETL ni con reporte FCC SDoC. Si su mercado es México, con gusto revisamos con usted los requisitos aplicables antes de cualquier pedido.\n\nCondiciones del pedido:\n- Tiempo de producción: aproximadamente 35 días.\n- Formas de pago: 30% de anticipo por T/T y 70% contra copia del B/L, o carta de crédito a la vista (L/C at sight).\n\nMuestras: no ofrecemos muestras gratuitas. La muestra se cobra al precio unitario de fábrica y el envío internacional corre por cuenta del comprador. El costo de la muestra se descuenta de su primer pedido de producción.\n\nTambién podemos organizar una videollamada por Alibaba para que conozca nuestra fábrica. Para pedidos de 1,000 piezas o más, imprimimos su logo en la caja de color sin costo adicional. Para ello necesitaríamos su archivo en formato vectorial.\n\nPara preparar una propuesta adecuada, le agradeceríamos que nos indicara:\n1. El nombre de su empresa y su canal de venta (tienda física, tienda en línea, marketplace, distribución, etc.).\n2. El país de destino.\n3. Si le interesa recibir una muestra con las condiciones mencionadas.\n\nQuedamos atentos a sus comentarios.\n\nSaludos cordiales,\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Si su mercado es México, con gusto revisamos con usted los requisitos aplicables antes de cualquier pedido.",
+      "problem_zh": "回复只笼统提到如果是墨西哥市场会一起确认适用要求，没有具体提醒包装需用西班牙语标注产品名、进口商名称地址、原产国以及电压/功率/频率等信息。买家若为墨西哥客户，可能会忽略这项强制标签要求。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-01",
+       "title_zh": "电器包装信息须用西班牙语（NOM-024-SCFI-2013）",
+       "excerpt": "en el empaque o envase, de manera clara y legible, como mínimo, los siguientes datos en idioma español",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Si su mercado es México, con gusto revisamos con usted los requisitos aplicables antes de cualquier pedido.",
+      "problem_zh": "回复没有说明能否提供西班牙语说明书和警示语。面向墨西哥市场时，说明书和警示语必须使用西班牙语，需要人工确认工厂能否提供。",
+      "source": {
+       "type": "kb",
+       "rule_id": "MX-02",
+       "title_zh": "说明书和警示须用西班牙语",
+       "excerpt": "Los instructivos y las advertencias deben redactarse en idioma español y en términos comprensibles y legibles",
+       "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-02"
+   },
+   {
+    "reply": "Dear Sir or Madam,\n\nThank you for your interest in Yongjiang Small Appliances. We are a small home appliance factory in Ningbo, China, with a capacity of about 20,000 units per month.\n\nOur main item is the 1.7L Stainless Steel Electric Kettle (model KET-17S):\n- 304 stainless steel inner body; lid and handle in PP plastic\n- 1500W, available in 120V 60Hz or 127V 60Hz\n- Auto shut-off and boil-dry protection\n- 360° swivel base and concealed heating element for easy cleaning\n- Packed in a color box, 6 units per carton\n- MOQ: 500 units\n\nOur pricing depends on order quantity and the requirements of your market. So that we can send you an accurate price list rather than a general one, could you please tell us:\n1. Your company name and business type (importer, wholesaler, retailer, etc.)\n2. Your target market or country\n3. Your estimated order quantity\n4. Any certification or voltage requirements\n\nOn certifications: the KET-17S currently has a CB report (IEC 60335-2-15) and CE (LVD/EMC). We do not hold UL, ETL or NOM. If your market requires one of these, please let us know early so we can discuss whether it is feasible.\n\nOnce we have these details, we will send you our catalog and a quotation (FOB Ningbo) through Alibaba. Our standard lead time is 35 days. We accept 30% T/T deposit with 70% against B/L copy, or L/C at sight.\n\nIf you would like to see our production line, we can arrange a video factory tour through an Alibaba video call. Samples are also available. They are charged at the factory unit price, and you would cover the international freight. The sample cost can be deducted from your bulk order.\n\nLooking forward to your reply.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "green",
+    "dropped": [],
+    "findings": [],
+    "inquiry_id": "INQ-US-04"
+   },
+   {
+    "reply": "Hi Kevin,\n\nThank you for your inquiry about our Portable Blender Cup (model BL-35P). An Amazon US launch needs the right compliance documents, so I'll start with certification and material status.\n\n1. FCC\nThis model does not have an FCC SDoC test report at the moment. Our current documents are CE (EMC) and the UN38.3 battery test report. If FCC is required for your listing, one option is to order samples and have them tested at a lab you nominate. If you would like us to look into testing on our side, please let me know and I will come back to you with the details. Testing time and cost would need to be agreed before the order is confirmed.\n\n2. BPA free\nThe cup body is made of Tritan. Our material supplier has issued a BPA-free declaration, and I can share it with you. However, we do not have a third-party test report on the finished product. If you need one for Amazon, the samples can also be tested by your lab.\n\n3. Price\nFor 2,000 pcs, our price is USD 6.20/pc FOB Ningbo. For 5,000 pcs and above, it is USD 5.70/pc. I understand your target is USD 5.20, but we are not able to reach that level, even at higher volumes.\n\n4. Lead time\nOur lead time is 35 days after deposit and artwork confirmation, so we cannot ship within 25 days. If your launch date is fixed, we suggest placing the order as early as possible.\n\n5. Logo and packaging\nWe can print your logo on the color box free of charge, since the order is over 1,000 pcs. Please send your logo as a vector file (AI/PDF/EPS). Packing is 40 pcs per carton.\n\nOther details:\n- Capacity: 350 ml\n- Battery: 2,000 mAh, USB-C charging\n- Blades: 6 stainless steel blades\n- Operation: one button, with auto power-off when the cup is detached\n- Battery life: about 12 blends per charge (our factory test)\n- Payment: 30% T/T deposit and 70% against B/L copy, or L/C at sight\n- MOQ: 1,000 pcs\n\nNext steps:\n- Samples: charged at the unit price. International freight is paid by the buyer, and the sample cost can be deducted from your bulk order.\n- Video factory audit: we can arrange one through an Alibaba video call if you'd like to see our production line.\n\nCould you let me know whether you would like to arrange FCC testing and whether the 35-day lead time works for your schedule? I'm happy to prepare a formal PI once these points are clear.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_material",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "BPA-free",
+      "context": "Our material supplier has issued a BPA-free declaration, and I can share it with you.",
+      "problem_zh": "引用了供应商的 BPA-free 声明，但没有成品第三方报告，能否对外宣称需人工确认",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：材料与检测",
+       "path": "products[BL-35P].material_tests",
+       "value": "杯体 Tritan 材料，有材料供应商的 BPA-free 声明，无成品第三方报告"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "our price is USD 6.20/pc FOB Ningbo",
+      "problem_zh": "2000 个约 50 箱，通常以拼柜（LCL）集装箱方式海运。集装箱货物一般在堆场或货站交给承运人，并非装上船时才交货，此时 FOB 下的风险划分可能与实际操作不符。回复未提示 FCA 可作为备选。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-US-05"
+   },
+   {
+    "reply": "Estimado Sr. Treviño:\n\nBuen día y muchas gracias por su interés en nuestra freidora de aire digital de 4.5 L (modelo AF-45D). Con gusto le apoyamos para la temporada de diciembre.\n\nSobre la NOM, le comento con total transparencia: actualmente el AF-45D no cuenta con certificado NOM. Sí contamos con reporte CB (IEC 60335-2-9) y CE (LVD/EMC). Estamos dispuestos a colaborar en el trámite de la NOM: podemos entregar el reporte CB, la documentación técnica y las muestras que requiera el laboratorio. Para definir la ruta, quién figura como titular del certificado y el tiempo estimado, le propongo revisarlo juntos lo antes posible, ya que de ello depende cumplir con la fecha de diciembre. No embarcaremos producto declarado como NOM sin tener el certificado.\n\nEl manual en español sí lo podemos elaborar. En cuanto confirmemos internamente el tiempo de preparación, se lo informo. También podemos imprimir en la caja la información de etiquetado en español: nombre del producto, datos del importador, \"Hecho en China\" y especificaciones eléctricas. Para ello, le pediría los datos de su empresa como importador.\n\nCotización:\n- Modelo: AF-45D, 4.5 L, 1400 W, 120 V 60 Hz, 8 programas, panel táctil digital, temporizador de 60 min, canasta apta para lavavajillas.\n- Precio FOB Ningbo: USD 24.50 por unidad (1,000 a 2,999 unidades); USD 22.80 por unidad a partir de 3,000 unidades.\n- Para 1,500 unidades: USD 36,750.00 FOB Ningbo.\n- MOQ: 1,000 unidades.\n- Empaque: caja a color, 2 unidades por caja master.\n- Tiempo de producción: aprox. 35 días a partir del anticipo y de la aprobación de los artes finales.\n- Pago: aceptamos sus condiciones, 30% de anticipo por T/T y 70% contra copia del B/L.\n\nCIF Veracruz: estamos confirmando el flete marítimo y el seguro con nuestro agente. Le enviaré el precio CIF en cuanto tengamos la tarifa vigente. Como referencia, bajo CIF nosotros cubrimos el flete y el seguro hasta Veracruz, pero el riesgo se transfiere al momento de cargar la mercancía a bordo en el puerto de origen.\n\nPróximos pasos que le podemos ofrecer:\n1. Muestra: se cobra al precio unitario de fábrica y el flete internacional corre por su cuenta. El costo de la muestra se descuenta del pedido de producción.\n2. Visita virtual a la fábrica por videollamada en Alibaba, cuando usted guste.\n3. Caja a color con su logotipo: sin costo a partir de 1,000 piezas (su pedido califica). Solo necesitamos el archivo en vectores.\n\n¿Le parece si coordinamos primero el tema de la NOM y el envío de la muestra? Quedo atento a sus comentarios.\n\nSaludos cordiales,\nVentas – Yongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "NOM",
+      "context": "Estamos dispuestos a colaborar en el trámite de la NOM: podemos entregar el reporte CB, la documentación técnica y las muestras que requiera el laboratorio.",
+      "problem_zh": "承诺办理 NOM，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[AF-45D].certifications_not_held",
+       "value": "UL, ETL, FCC SDoC test report, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Precio FOB Ningbo: USD 24.50 por unidad (1,000 a 2,999 unidades)",
+      "problem_zh": "1,500 台约 750 箱，大概率走集装箱海运（整柜或拼柜）。回复只报了 FOB，没有提示集装箱货物用 FCA 可能更合适。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-03"
+   }
+  ],
+  "tradedesk_fixed": [
+   {
+    "reply": "Hi Mark,\n\nThank you for your inquiry about our 1.7L stainless steel kettle (model KET-17S). Before quoting, I need to be upfront about a few points so you can decide whether we are a good fit.\n\n1. UL listing\nThis model is not UL listed, and it does not have ETL either. Our current certifications are a CB report (IEC 60335-2-15) and CE (LVD/EMC). If UL or ETL is mandatory for your Amazon listing, please let me know. I will check with our team whether getting this model listed is feasible, and what the cost and timeline would be. I can't commit to it yet.\n\n2. BPA free\nThe inner body is 304 stainless steel. The lid and handle are PP plastic. We have not done a BPA test on this model, so we can't claim it is BPA free. We can check with our PP supplier for material documents. You are also welcome to have samples tested by a third-party lab of your choice.\n\n3. Price\n1,200 pcs: USD 9.80/pc, FOB Ningbo (sea freight, Ningbo-Zhoushan port).\nIf the goods are shipped in a container (FCL/LCL), FCA Ningbo may be a more suitable term. We can quote FCA as an alternative if you prefer.\nFOB is a sea-freight term, so this price is for shipment by sea. If you need air freight, we can discuss a different term, such as FCA, with your forwarder.\nYour logo on the color box is free of charge for this quantity. We just need your logo in vector format.\nMOQ is 500 pcs. Packing is a color box, 6 units per carton.\n\n4. Lead time\nOur production lead time is 35 days, so we are not able to deliver within 20 days. Shipping time is additional.\n\n5. Payment\nWe work with 30% T/T deposit and 70% against B/L copy, or L/C at sight. We are not able to accept 100% payment 60 days after delivery.\n\nProduct highlights: 120V 60Hz, 1500W, 304 stainless steel inner body, auto shut-off, boil-dry protection, 360° swivel base, and a concealed heating element that is easy to clean.\n\nNext steps:\n- Samples are available. They are charged at the unit price, and international freight is paid by you. The sample cost can be deducted from your bulk order.\n- We can also arrange a video factory tour through an Alibaba video call.\n\nPlease let me know whether the certification, lead time and payment terms above work for you. I'll be happy to move forward from there.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "green",
+    "dropped": [],
+    "findings": [],
+    "inquiry_id": "INQ-US-01"
+   },
+   {
+    "reply": "Estimada Señora Ramírez:\n\nBuenas tardes y muchas gracias por su interés en nuestro hervidor eléctrico de acero inoxidable de 1.7 L (modelo KET-17S).\n\nSobre la certificación NOM, le informo con transparencia que este modelo todavía no cuenta con certificado NOM. Actualmente tenemos reporte CB (IEC 60335-2-15) y CE (LVD/EMC). Estamos evaluando la posibilidad de tramitar la certificación conforme a la NOM-003-SCFI-2014. En cuanto confirmemos internamente los tiempos y costos, se los comunicaremos para revisar con ustedes la mejor opción.\n\nDatos principales del producto:\n- Versión para México: 127V 60Hz, 1500 W\n- Interior de acero inoxidable 304; tapa y asa de plástico PP\n- Apagado automático y protección contra funcionamiento en seco\n- Base giratoria de 360° y resistencia oculta, fácil de limpiar\n- Empaque: caja de color, 6 piezas por caja master\n\nPrecios FOB Ningbo (USD por pieza):\n- 500 a 1,999 piezas: 9.80\n- 2,000 a 4,999 piezas: 9.20\n- 5,000 piezas o más: 8.70\n\nEl precio se determina según la cantidad de cada pedido. Por ejemplo, un solo pedido de 3,000 piezas aplicaría el precio de USD 9.20. El pedido mínimo es de 500 piezas.\n\nSi el envío es en contenedor, también podemos cotizar bajo FCA Ningbo, que suele ser más adecuado para carga contenerizada.\n\nEn cuanto al precio CIF Manzanillo, estamos confirmando el flete marítimo y el seguro con nuestro agente de carga, y se lo enviaremos en cuanto lo tengamos. Para afinar la cotización, ¿podría indicarnos si prefieren un solo embarque al año o varios pedidos parciales?\n\nCondiciones:\n- Tiempo de entrega: aproximadamente 35 días después de confirmar el pedido\n- Forma de pago: 30% de anticipo por T/T y 70% contra copia del B/L, o carta de crédito a la vista\n\nLe compartimos por este medio la ficha del producto y nuestro catálogo.\n\nComo siguientes pasos, le ofrecemos lo siguiente:\n- Muestras: se cobran al precio unitario de fábrica y el flete internacional corre por cuenta del comprador. El costo de la muestra se descuenta en el pedido de producción.\n- Visita virtual a la fábrica por videollamada en Alibaba.\n- Impresión de su logotipo en la caja de color: sin costo a partir de 1,000 piezas; por debajo de esa cantidad, USD 0.15 adicionales por pieza. Se requiere el archivo en formato vectorial.\n\nTambién podemos revisar con ustedes los requisitos de empaque, etiquetado e instructivo en español para el mercado mexicano. Para ello, nos serían útiles los datos del importador.\n\nQuedo atento a sus comentarios.\n\nSaludos cordiales,\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "NOM",
+      "context": "Estamos evaluando la posibilidad de tramitar la certificación conforme a la NOM-003-SCFI-2014.",
+      "problem_zh": "承诺办理 NOM，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[KET-17S].certifications_not_held",
+       "value": "UL, ETL, NOM, FDA registration"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Estamos evaluando la posibilidad de tramitar la certificación conforme a la NOM-003-SCFI-2014.",
+      "problem_zh": "工厂资料只写明未持有 NOM 认证，没有提到正在评估或计划办理 NOM-003 认证。这句话可能让买家误以为认证已在推进，需业务员确认是否属实。",
+      "source": {
+       "type": "kb",
+       "rule_id": "ALI-03",
+       "title_zh": "发布的信息须真实、准确、合法",
+       "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+       "url": "https://rule.alibaba.com/rule/detail/2063.htm"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-01"
+   },
+   {
+    "reply": "Hi there,\n\nThank you for your inquiry about our 4.5L Digital Air Fryer (model AF-45D). Here are clear answers to each of your questions.\n\n1. Certifications\nWe do not currently hold ETL or an FCC SDoC test report for this model. Its current certifications are:\n- CB report (IEC 60335-2-9)\n- CE (LVD/EMC)\n\nThe CB report is a good basis for ETL testing. If you would like to go ahead, we can check the testing cost and timeline with a lab and come back to you. Please note that testing would add time and cost before shipment.\n\n2. Basket coating\nThe standard basket uses a PTFE non-stick coating, so it is not PTFE-free. For PFOA, we only have a declaration from our coating supplier, not a third-party test report. We are checking with our suppliers whether a PTFE-free basket option is possible, and we will share the details and price impact once confirmed.\n\n3. Quantity and price\nOur MOQ is 1,000 units. Our prices, FOB Ningbo-Zhoushan, are:\n- 1,000–2,999 units: USD 24.5/unit\n- 3,000+ units: USD 22.8/unit\n\nFor containerized shipments, we can also quote FCA Ningbo (delivery to your nominated carrier or CFS) if you prefer.\n\nWe understand your target is USD 20. However, USD 22.8 at 3,000+ units is the best price we can offer for this model.\n\nThe price covers the US version: 120V 60Hz, 1400W, with 8 presets, a digital touch panel, a 60-minute timer and a dishwasher-safe basket. Packing is one color box per unit and 2 units per carton.\n\n4. Lead time\nOur standard lead time is 35 days after deposit, so we cannot promise shipment within 30 days. If ETL/FCC testing is needed, the lead time will be longer. We will confirm the exact schedule together with the testing plan.\n\nPayment terms\n- 30% T/T deposit, 70% against B/L copy, or\n- L/C at sight\n\nNext steps\n- Samples: Samples are charged at the ex-factory unit price, and international freight is paid by the buyer. The sample cost can be deducted from your bulk order.\n- Video factory audit: We can arrange one through an Alibaba video call.\n- Logo printing: We print your logo on the color box free of charge for 1,000 pcs or more. Please provide your artwork in vector format.\n\nCould you let me know two things?\n1. Would you consider 1,000 units?\n2. Should we check the ETL/FCC testing cost and timeline for you?\n\nI will follow up with the details as soon as possible.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "green",
+    "dropped": [],
+    "findings": [],
+    "inquiry_id": "INQ-US-02"
+   },
+   {
+    "reply": "Dear Dana,\n\nThank you for your inquiry and for sharing the details of your project. Placing one steamer in each of 3,200 guest rooms is a clear plan, and we would be glad to support it.\n\nCertification (ETL/UL)\nOur GS-12H handheld steamer does not currently have ETL or UL certification. The unit holds a CB report (IEC 60335-2-3) and CE (LVD/EMC).\n\nWe understand that ETL or UL listing is usually required for hotel use in the US. We can look into ETL or UL certification for the GS-12H. Our team will check the cost and timeline with a testing lab, and I will get back to you with the details. Please also let me know if your group prefers one mark over the other.\n\nQuotation\n- Model: GS-12H Handheld Garment Steamer, 120V 60Hz, 1200W, 260 ml detachable water tank\n- Features: vertical and horizontal steaming, auto shut-off, fabric brush included\n- Price: USD 10.90 per unit, FOB Ningbo, by sea (3,000+ units tier)\n- Packaging: color box, 12 units per carton\n- Standard lead time: about 35 days per production run\n\nAs the goods will likely ship in containers, we can also quote FCA Ningbo if you prefer.\n\nYou mentioned delivery in two lots in Q1. Could you share the planned quantity for each lot? I will then confirm how the 3,000+ pricing applies to your split and suggest a production schedule.\n\nPayment\nL/C at sight is acceptable to us.\n\nSamples\nWe can send 2 samples to your Orlando office. Samples are charged at our factory unit price, and international freight is paid by the buyer. The sample cost can be deducted from your bulk order. If you have a courier account, please share it. Otherwise, I can arrange a freight quote to Orlando.\n\nOther options\n- We can arrange a video factory audit through an Alibaba video call if your team would like to see our production line.\n- We can print your group's logo on the color box free of charge for orders over 1,000 units. A vector file of the logo is required.\n\nPlease confirm the lot quantities, your preferred certification mark, and the sample delivery details, and I will follow up promptly.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "UL certification",
+      "context": "We can look into ETL or UL certification for the GS-12H.",
+      "problem_zh": "承诺办理 UL，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[GS-12H].certifications_not_held",
+       "value": "UL, ETL, NOM"
+      },
+      "by": "rule"
+     },
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "ETL",
+      "context": "We can look into ETL or UL certification for the GS-12H.",
+      "problem_zh": "承诺办理 ETL，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[GS-12H].certifications_not_held",
+       "value": "UL, ETL, NOM"
+      },
+      "by": "rule"
+     }
+    ],
+    "inquiry_id": "INQ-US-03"
+   },
+   {
+    "reply": "Estimado(a) cliente:\n\nMuchas gracias por su interés en nuestro vaso licuadora portátil (modelo BL-35P).\n\nHemos recibido su solicitud de 100 piezas. Por transparencia, debemos informarle que nuestro pedido mínimo es de 1,000 piezas, por lo que no podemos atender un pedido de 100 piezas.\n\nNuestros precios FOB Ningbo son:\n- 1,000 a 4,999 piezas: USD 6.20 por pieza\n- 5,000 piezas o más: USD 5.70 por pieza\n\nCaracterísticas principales:\n- Capacidad de 350 ml\n- Batería de 2,000 mAh con carga USB-C\n- 6 cuchillas de acero inoxidable\n- Operación con un solo botón\n- Bloqueo de seguridad: no funciona si el vaso está separado de la base\n- Aproximadamente 12 licuados por carga (según prueba interna de fábrica)\n\nEmpaque: caja de color, 40 piezas por caja master.\n\nCertificaciones: contamos con CE (EMC) y con el reporte de prueba de batería UN38.3. Actualmente no contamos con certificación NOM, UL, ETL ni con reporte FCC SDoC. Si su mercado es México, con gusto revisamos con usted los requisitos aplicables antes de cualquier pedido.\n\nPara México, el empaque debe incluir en español el nombre del producto, el nombre y domicilio del importador, el país de origen (\"Hecho en China\") y los datos eléctricos del producto (tensión, potencia o corriente y, en su caso, frecuencia). Con gusto revisamos con usted cómo incluir esta información en la caja de color, con los datos que usted nos proporcione.\n\nEn cuanto al instructivo y las advertencias, para México deben estar en español. Estamos confirmando internamente si podemos proporcionarlos en español; se lo informaremos a la brevedad. En caso de que no fuera posible, tendrían que ser preparados por el importador.\n\nCondiciones del pedido:\n- Tiempo de producción: aproximadamente 35 días.\n- Formas de pago: 30% de anticipo por T/T y 70% contra copia del B/L, o carta de crédito a la vista (L/C at sight).\n\nMuestras: no ofrecemos muestras gratuitas. La muestra se cobra al precio unitario de fábrica y el envío internacional corre por cuenta del comprador. El costo de la muestra se descuenta de su primer pedido de producción.\n\nTambién podemos organizar una videollamada por Alibaba para que conozca nuestra fábrica. Para pedidos de 1,000 piezas o más, imprimimos su logo en la caja de color sin costo adicional. Para ello necesitaríamos su archivo en formato vectorial.\n\nPara preparar una propuesta adecuada, le agradeceríamos que nos indicara:\n1. El nombre de su empresa y su canal de venta (tienda física, tienda en línea, marketplace, distribución, etc.).\n2. El país de destino.\n3. Si le interesa recibir una muestra con las condiciones mencionadas.\n\nQuedamos atentos a sus comentarios.\n\nSaludos cordiales,\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Estimado(a) cliente:",
+      "problem_zh": "称呼使用了泛称“Estimado(a) cliente”，没有按规则使用 Señor/Señora 加姓，或买家签名中的头衔。如果 RFQ 中能看到买家姓名，这样写显得不够正式、不够个性化。",
+      "source": {
+       "type": "kb",
+       "rule_id": "CUL-03",
+       "title_zh": "称呼用 Señor/Señora 加姓",
+       "excerpt": "addressing them using appropriate titles like 'Señor' (Mr.) or 'Señora' (Mrs.), followed by their last name",
+       "url": "https://cibtvisas.com/blog/business-etiquette-mexico"
+      },
+      "by": "model"
+     },
+     {
+      "check": "model_review",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "Nuestros precios FOB Ningbo son:",
+      "problem_zh": "起订量 1000 件、40 件/箱，约 25 箱，通常走拼柜或整柜集装箱运输。回复只报了 FOB，没有提示集装箱货物使用 FCA 可能更合适。",
+      "source": {
+       "type": "kb",
+       "rule_id": "INC-02",
+       "title_zh": "集装箱货物更适合用 FCA",
+       "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+       "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/"
+      },
+      "by": "model"
+     }
+    ],
+    "inquiry_id": "INQ-MX-02"
+   },
+   {
+    "reply": "Dear Sir or Madam,\n\nThank you for your interest in Yongjiang Small Appliances. We are a small home appliance factory in Ningbo, China, with a capacity of about 20,000 units per month.\n\nOur main item is the 1.7L Stainless Steel Electric Kettle (model KET-17S):\n- 304 stainless steel inner body; lid and handle in PP plastic\n- 1500W, available in 120V 60Hz or 127V 60Hz\n- Auto shut-off and boil-dry protection\n- 360° swivel base and concealed heating element for easy cleaning\n- Packed in a color box, 6 units per carton\n- MOQ: 500 units\n\nOur pricing depends on order quantity and the requirements of your market. So that we can send you an accurate price list rather than a general one, could you please tell us:\n1. Your company name and business type (importer, wholesaler, retailer, etc.)\n2. Your target market or country\n3. Your estimated order quantity\n4. Any certification or voltage requirements\n\nOn certifications: the KET-17S currently has a CB report (IEC 60335-2-15) and CE (LVD/EMC). We do not hold UL, ETL or NOM. If your market requires one of these, please let us know early so we can discuss whether it is feasible.\n\nOnce we have these details, we will send you our catalog and a quotation (FOB Ningbo) through Alibaba. Our standard lead time is 35 days. We accept 30% T/T deposit with 70% against B/L copy, or L/C at sight.\n\nIf you would like to see our production line, we can arrange a video factory tour through an Alibaba video call. Samples are also available. They are charged at the factory unit price, and you would cover the international freight. The sample cost can be deducted from your bulk order.\n\nLooking forward to your reply.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "green",
+    "dropped": [],
+    "findings": [],
+    "inquiry_id": "INQ-US-04"
+   },
+   {
+    "reply": "Hi Kevin,\n\nThank you for your inquiry about our Portable Blender Cup (model BL-35P). An Amazon US launch needs the right compliance documents, so I'll start with certification and material status.\n\n1. FCC\nThis model does not have an FCC SDoC test report at the moment. Our current documents are CE (EMC) and the UN38.3 battery test report. If FCC is required for your listing, one option is to order samples and have them tested at a lab you nominate. If you would like us to look into testing on our side, please let me know and I will come back to you with the details. Testing time and cost would need to be agreed before the order is confirmed.\n\n2. BPA free\nThe cup body is made of Tritan. Our material supplier has issued a BPA-free declaration for the raw material. Please note this is a supplier declaration only. The finished product has not been tested by a third-party lab, so we cannot provide a BPA-free test report for the finished cup. If you need one for Amazon, the samples can also be tested by your lab.\n\n3. Price\nFor 2,000 pcs, our price is USD 6.20/pc FOB Ningbo. For 5,000 pcs and above, it is USD 5.70/pc. I understand your target is USD 5.20, but we are not able to reach that level, even at higher volumes.\n\nIf the goods are shipped by container (LCL/FCL), we can also quote FCA Ningbo, which may better reflect the actual handover point. Please let me know how you plan to ship.\n\n4. Lead time\nOur lead time is 35 days after deposit and artwork confirmation, so we cannot ship within 25 days. If your launch date is fixed, we suggest placing the order as early as possible.\n\n5. Logo and packaging\nWe can print your logo on the color box free of charge, since the order is over 1,000 pcs. Please send your logo as a vector file (AI/PDF/EPS). Packing is 40 pcs per carton.\n\nOther details:\n- Capacity: 350 ml\n- Battery: 2,000 mAh, USB-C charging\n- Blades: 6 stainless steel blades\n- Operation: one button, with auto power-off when the cup is detached\n- Battery life: about 12 blends per charge (our factory test)\n- Payment: 30% T/T deposit and 70% against B/L copy, or L/C at sight\n- MOQ: 1,000 pcs\n\nNext steps:\n- Samples: charged at the unit price. International freight is paid by the buyer, and the sample cost can be deducted from your bulk order.\n- Video factory audit: we can arrange one through an Alibaba video call if you'd like to see our production line.\n\nCould you let me know whether you would like to arrange FCC testing, how you plan to ship the goods, and whether the 35-day lead time works for your schedule? I'm happy to prepare a formal PI once these points are clear.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_material",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "BPA-free",
+      "context": "Our material supplier has issued a BPA-free declaration for the raw material.",
+      "problem_zh": "引用了供应商的 BPA-free 声明，但没有成品第三方报告，能否对外宣称需人工确认",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：材料与检测",
+       "path": "products[BL-35P].material_tests",
+       "value": "杯体 Tritan 材料，有材料供应商的 BPA-free 声明，无成品第三方报告"
+      },
+      "by": "rule"
+     }
+    ],
+    "inquiry_id": "INQ-US-05"
+   },
+   {
+    "reply": "Estimado Sr. Treviño:\n\nBuen día y muchas gracias por su interés en nuestra freidora de aire digital de 4.5 L (modelo AF-45D). Con gusto le apoyamos para la temporada de diciembre.\n\nSobre la NOM, le comento con total transparencia: actualmente el AF-45D no cuenta con certificado NOM. Sí contamos con reporte CB (IEC 60335-2-9) y CE (LVD/EMC). Estamos evaluando la posibilidad de tramitar la NOM para este modelo. En cuanto confirmemos internamente el tiempo y el costo, se lo comunico para que lo revisemos juntos, ya que de ello depende cumplir con la fecha de diciembre. No embarcaremos producto declarado como NOM sin tener el certificado.\n\nEl manual en español sí lo podemos elaborar. En cuanto confirmemos internamente el tiempo de preparación, se lo informo. También podemos imprimir en la caja la información de etiquetado en español: nombre del producto, datos del importador, \"Hecho en China\" y especificaciones eléctricas. Para ello, le pediría los datos de su empresa como importador.\n\nCotización:\n- Modelo: AF-45D, 4.5 L, 1400 W, 120 V 60 Hz, 8 programas, panel táctil digital, temporizador de 60 min, canasta apta para lavavajillas.\n- Precio FOB Ningbo: USD 24.50 por unidad (1,000 a 2,999 unidades); USD 22.80 por unidad a partir de 3,000 unidades.\n- Para 1,500 unidades: USD 36,750.00 FOB Ningbo.\n- MOQ: 1,000 unidades.\n- Empaque: caja a color, 2 unidades por caja master.\n- Tiempo de producción: aprox. 35 días a partir del anticipo y de la aprobación de los artes finales.\n- Pago: aceptamos sus condiciones, 30% de anticipo por T/T y 70% contra copia del B/L.\n\nSi la mercancía se embarca en contenedor, también podemos cotizar bajo FCA Ningbo, que suele ser el Incoterm más adecuado para carga contenerizada.\n\nCIF Veracruz: estamos confirmando el flete marítimo y el seguro con nuestro agente. Le enviaré el precio CIF en cuanto tengamos la tarifa vigente. Como referencia, bajo CIF nosotros cubrimos el flete y el seguro hasta Veracruz, pero el riesgo se transfiere al momento de cargar la mercancía a bordo en el puerto de origen.\n\nPróximos pasos que le podemos ofrecer:\n1. Muestra: se cobra al precio unitario de fábrica y el flete internacional corre por su cuenta. El costo de la muestra se descuenta del pedido de producción.\n2. Visita virtual a la fábrica por videollamada en Alibaba, cuando usted guste.\n3. Caja a color con su logotipo: sin costo a partir de 1,000 piezas (su pedido califica). Solo necesitamos el archivo en vectores.\n\nMientras confirmamos el tema de la NOM y la tarifa CIF, ¿le parece si avanzamos con el envío de la muestra? Quedo atento a sus comentarios.\n\nSaludos cordiales,\nVentas – Yongjiang Small Appliances",
+    "risk": "amber",
+    "dropped": [],
+    "findings": [
+     {
+      "check": "fact_cert",
+      "severity": "amber",
+      "field": "reply",
+      "quote": "NOM",
+      "context": "Estamos evaluando la posibilidad de tramitar la NOM para este modelo.",
+      "problem_zh": "承诺办理 NOM，工厂目前没有，需要内部确认周期和费用后再承诺",
+      "source": {
+       "type": "product_card",
+       "label_zh": "产品资料：工厂未持有的认证",
+       "path": "products[AF-45D].certifications_not_held",
+       "value": "UL, ETL, FCC SDoC test report, NOM"
+      },
+      "by": "rule"
+     }
+    ],
+    "inquiry_id": "INQ-MX-03"
+   }
+  ]
+ },
+ "inquiries": {
+  "INQ-US-01": {
+   "label_zh": "美国买家 · 英文 · 要空运 FOB",
+   "language": "en"
+  },
+  "INQ-MX-01": {
+   "label_zh": "墨西哥买家 · 西语 · 分销商",
+   "language": "es"
+  },
+  "INQ-US-02": {
+   "label_zh": "美国买家 · 英文 · 空气炸锅",
+   "language": "en"
+  },
+  "INQ-US-03": {
+   "label_zh": "美国酒店采购 · 英文 · 挂烫机",
+   "language": "en"
+  },
+  "INQ-MX-02": {
+   "label_zh": "墨西哥小卖家 · 西语 · 只问价格",
+   "language": "es"
+  },
+  "INQ-US-04": {
+   "label_zh": "来源不明 · 英文 · 只要目录",
+   "language": "en"
+  },
+  "INQ-US-05": {
+   "label_zh": "美国亚马逊卖家 · 英文 · 榨汁杯",
+   "language": "en"
+  },
+  "INQ-MX-03": {
+   "label_zh": "墨西哥分销商 · 西语 · 空气炸锅",
+   "language": "es"
+  }
+ }
+}

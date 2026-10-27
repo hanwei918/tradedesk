@@ -1,0 +1,19 @@
+{
+ "request": {
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "system": "你是一个乐于助人的 AI 助手。\n\n只输出一个 JSON 对象：{\"reply\": \"给买家的回复全文\"}\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "我是做小家电的外贸业务员，帮我回复这条阿里巴巴国际站的询盘，用买家的语言，尽量拿下订单：\n\nDear Sir, we are interested in your products. Please send your catalog and best price list. Thanks.\n\n我们工厂和产品的资料如下，请按资料回复：\n{\n \"factory\": {\n  \"name_zh\": \"甬江小家电（示例工厂）\",\n  \"name_en\": \"Yongjiang Small Appliances (demo factory)\",\n  \"city\": \"Ningbo\",\n  \"port\": \"Ningbo-Zhoushan\",\n  \"capacity_units_per_month\": 20000,\n  \"standard_lead_time_days\": 35,\n  \"payment_terms_accepted\": [\n   \"30% T/T deposit, 70% against B/L copy\",\n   \"L/C at sight\"\n  ],\n  \"sales_contact_role\": \"业务员\",\n  \"services\": [\n   \"可寄样：样品按出厂单价收费，国际运费由买家承担；量产订单可抵扣样品费\",\n   \"可安排视频验厂（阿里国际站视频通话）\",\n   \"彩盒可印买家 logo：1000 个以上免费，以下每个加收 USD 0.15，需买家提供矢量稿\"\n  ]\n },\n \"product\": {\n  \"id\": \"KET-17S\",\n  \"name_zh\": \"1.7L 不锈钢电热水壶\",\n  \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n  \"specs\": {\n   \"capacity_l\": 1.7,\n   \"power_w_us\": 1500,\n   \"voltage_us\": \"120V 60Hz\",\n   \"power_w_mx\": 1500,\n   \"voltage_mx\": \"127V 60Hz\",\n   \"inner_material\": \"304 stainless steel\",\n   \"lid_handle_material\": \"PP plastic\",\n   \"features\": [\n    \"auto shut-off\",\n    \"boil-dry protection\",\n    \"360° swivel base\",\n    \"concealed heating element\"\n   ]\n  },\n  \"certifications_held\": [\n   \"CB report (IEC 60335-2-15)\",\n   \"CE (LVD/EMC)\"\n  ],\n  \"certifications_not_held\": [\n   \"UL\",\n   \"ETL\",\n   \"NOM\",\n   \"FDA registration\"\n  ],\n  \"material_tests\": {\n   \"BPA\": \"未做 BPA 检测报告\",\n   \"LFGB\": \"未做\"\n  },\n  \"moq_units\": 500,\n  \"fob_ningbo_usd\": {\n   \"500-1999\": 9.8,\n   \"2000-4999\": 9.2,\n   \"5000+\": 8.7\n  },\n  \"packaging\": \"color box, 6 units per carton\",\n  \"selling_points_zh\": [\n   \"304 不锈钢内胆\",\n   \"干烧自动断电\",\n   \"360° 旋转底座\",\n   \"隐藏式发热盘，好清洁\",\n   \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n  ]\n }\n}\n\n我的意图：礼貌回复，请对方说明公司、目标市场、数量，再报价；不留站外联系方式。"
+   }
+  ]
+ },
+ "content": "{\"reply\": \"Dear Sir/Madam,\\n\\nThank you for your inquiry and your interest in Yongjiang Small Appliances, a small kitchen appliance manufacturer based in Ningbo, China.\\n\\nOur featured model is the KET-17S 1.7L Stainless Steel Electric Kettle:\\n- 304 stainless steel inner body\\n- Auto shut-off and boil-dry protection\\n- 360° swivel base\\n- Concealed heating element for easy cleaning\\n- 1500W, available in 120V 60Hz and 127V 60Hz versions\\n- Holds a CB report (IEC 60335-2-15) and CE (LVD/EMC)\\n- Packed in a color box, 6 units per carton\\n\\nOur pricing depends on your quantity, market and packaging needs. To send you an accurate catalog and our best price list, could you please tell us:\\n1. Your company name and business type (importer, wholesaler, retailer, brand owner, etc.)\\n2. Your target market or country, so we can confirm the right voltage and plug and check the certification requirements\\n3. Your estimated order quantity per model\\n4. Whether you need your own logo on the color box\\n\\nFor your reference:\\n- MOQ: 500 units\\n- Monthly capacity: 20,000 units\\n- Standard lead time: about 35 days\\n- Shipping: FOB Ningbo\\n- Payment: 30% T/T deposit with 70% against B/L copy, or L/C at sight\\n- Samples: charged at the factory unit price. The sample cost is deductible from your bulk order, and international freight is paid by the buyer.\\n- Factory audit: we can arrange a video factory tour through an Alibaba video call.\\n\\nOnce we receive these details, we will send you the catalog and a quotation here on Alibaba right away.\\n\\nWe look forward to working with you.\\n\\nBest regards,\\nSales Team\\nYongjiang Small Appliances\"}",
+ "usage": {
+  "input_tokens": 1131,
+  "output_tokens": 992
+ }
+}

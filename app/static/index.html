@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=15">
 <script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -25,13 +25,13 @@
     </nav>
     <div class="nav-label">依据与记录</div>
     <nav class="nav">
-      <button data-page="eval"><svg class="ic"><use href="#i-shield-check"/></svg><span class="t">评测</span><span class="kbd">7</span></button>
+      <button data-page="eval"><svg class="ic"><use href="#i-shield-check"/></svg><span class="t">评测与对照</span><span class="kbd">7</span></button>
       <button data-page="kb"><svg class="ic"><use href="#i-book-open-check"/></svg><span class="t">规则知识库</span><span class="kbd">8</span></button>
       <button data-page="logs"><svg class="ic"><use href="#i-scroll-text"/></svg><span class="t">调用日志</span><span class="kbd">9</span></button>
       <button data-page="fair"><svg class="ic"><use href="#i-zap"/></svg><span class="t">游园会找茬</span></button>
     </nav>
     <div class="side-foot">
-      <div class="model-card" id="model-card"><div class="skel" style="height:34px"></div></div>
+      <div class="model-card" id="model-card" role="button" tabindex="0" title="模型设置"><div class="skel" style="height:34px"></div></div>
       <button class="btn ghost sm" id="theme-btn" title="切换深浅色"><svg class="ic sm"><use href="#i-moon"/></svg><span>切换深浅色</span></button>
     </div>
   </aside>
@@ -41,6 +41,7 @@
       <div class="crumbs"><span>TradeDesk</span><svg class="ic sm"><use href="#i-chevron-right"/></svg><b id="crumb">概览</b></div>
       <div class="spacer"></div>
       <span class="small muted">示例数据均为虚构 · 规则以来源页面为准</span>
+      <button class="btn sm primary" id="tour-btn" title="自动演示（约 90 秒，Esc 退出）"><svg class="ic sm"><use href="#i-play"/></svg>自动演示</button>
     </header>
 
     <div class="content">
@@ -157,9 +158,14 @@
 
       <!-- ================= eval ================= -->
       <section class="page" id="page-eval">
-        <div class="page-head"><div><h1>评测：检查器到底准不准</h1><p>只测代码规则层（不调用模型），结果可以一字不差地复现。开发集是边做边写的，盲测集由没看过代码的人写。</p></div>
-          <label class="toggle" style="margin:0;min-width:220px"><span class="small">只看没通过的用例</span><input type="checkbox" id="eval-fails"><span class="switch"></span></label></div>
-        <div id="eval-out"></div>
+        <div class="page-head"><div><h1>评测与对照</h1><p>直接用通用 AI 会踩多少坑？检查器本身准不准？编造的提示能不能混过去？三件事都用可复现的方式回答。</p></div>
+          <div class="seg" id="eval-tabs"><button class="on" data-v="compare">对照实验</button><button data-v="rules">规则评测</button><button data-v="redteam">红队测试</button></div></div>
+        <div id="eval-compare"></div>
+        <div id="eval-rules" hidden>
+          <div class="row" style="justify-content:space-between;margin-bottom:12px"><p class="small muted" style="margin:0">只测代码规则层（不调用模型），结果可以一字不差地复现。开发集是边做边写的，盲测集由没看过代码的人写。</p>
+            <label class="toggle" style="margin:0;min-width:220px"><span class="small">只看没通过的用例</span><input type="checkbox" id="eval-fails"><span class="switch"></span></label></div>
+          <div id="eval-out"></div></div>
+        <div id="eval-redteam" hidden></div>
       </section>
 
       <!-- ================= fair-ground ================= -->
@@ -189,6 +195,6 @@
 <aside class="sheet" id="sheet" aria-hidden="true"><div class="sheet-h" id="sheet-h"></div><div class="sheet-b" id="sheet-b"></div><div class="sheet-f" id="sheet-f"></div></aside>
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
-<script src="app.js?v=10"></script>
+<script src="app.js?v=15"></script>
 </body>
 </html>

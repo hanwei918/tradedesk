@@ -1,0 +1,59 @@
+{
+ "note_zh": "红队测试：靶子是真实录制的一段回复（美国热水壶询盘第 1 轮）。注入的“模型提示”里 5 条是编造的，1 条是真实有效的，逐条交给和真实审核同一个出处守卫函数判定。不调用模型。",
+ "product_id": "KET-17S",
+ "platform": "alibaba_rfq",
+ "market": "US",
+ "reply": "Hi Mark,\n\nThank you for your inquiry about our 1.7L stainless steel kettle (model KET-17S). Before quoting, I need to be upfront about a few points so you can decide whether we are a good fit.\n\n1. UL listing\nThis model is not UL listed, and it does not have ETL either. Our current certifications are a CB report (IEC 60335-2-15) and CE (LVD/EMC). If UL or ETL is mandatory for your Amazon listing, please let me know. I will check with our team whether getting this model listed is feasible, and what the cost and timeline would be. I can't commit to it yet.\n\n2. BPA free\nThe inner body is 304 stainless steel. The lid and handle are PP plastic. We have not done a BPA test on this model, so we can't claim it is BPA free. We can check with our PP supplier for material documents. You are also welcome to have samples tested by a third-party lab of your choice.\n\n3. Price\n1,200 pcs: USD 9.80/pc, FOB Ningbo (sea freight, Ningbo-Zhoushan port).\nFOB is a sea-freight term, so this price is for shipment by sea. If you need air freight, we can discuss a different term, such as FCA, with your forwarder.\nYour logo on the color box is free of charge for this quantity. We just need your logo in vector format.\nMOQ is 500 pcs. Packing is a color box, 6 units per carton.\n\n4. Lead time\nOur production lead time is 35 days, so we are not able to deliver within 20 days. Shipping time is additional.\n\n5. Payment\nWe work with 30% T/T deposit and 70% against B/L copy, or L/C at sight. We are not able to accept 100% payment 60 days after delivery.\n\nProduct highlights: 120V 60Hz, 1500W, 304 stainless steel inner body, auto shut-off, boil-dry protection, 360° swivel base, and a concealed heating element that is easy to clean.\n\nNext steps:\n- Samples are available. They are charged at the unit price, and international freight is paid by you. The sample cost can be deducted from your bulk order.\n- We can also arrange a video factory tour through an Alibaba video call.\n\nPlease let me know whether the certification, lead time and payment terms above work for you. I'll be happy to move forward from there.\n\nBest regards,\nSales Team\nYongjiang Small Appliances",
+ "injections": [
+  {
+   "label_zh": "编造规则编号",
+   "finding": {
+    "rule_id": "AMZ-99",
+    "quote": "This model is not UL listed, and it does not have ETL either",
+    "severity": "red",
+    "problem_zh": "违反 Amazon 第 99 条规定"
+   }
+  },
+  {
+   "label_zh": "引用回复里没有的话",
+   "finding": {
+    "rule_id": "INC-02",
+    "quote": "We guarantee FDA approval for this kettle",
+    "severity": "red",
+    "problem_zh": "承诺了 FDA 认证"
+   }
+  },
+  {
+   "label_zh": "借用其他平台的规则",
+   "finding": {
+    "rule_id": "TT-03",
+    "quote": "This model is not UL listed, and it does not have ETL either",
+    "severity": "red",
+    "problem_zh": "留了站外联系方式"
+   }
+  },
+  {
+   "label_zh": "只给结论、不给原文",
+   "finding": {
+    "rule_id": "ALI-01",
+    "quote": "",
+    "severity": "red",
+    "problem_zh": "产品描述和实物不符"
+   }
+  },
+  {
+   "label_zh": "一句话随口评价",
+   "finding": "这条回复整体不太合规，建议重写"
+  },
+  {
+   "label_zh": "真实有效的提示（对照）",
+   "finding": {
+    "rule_id": "INC-02",
+    "quote": "1,200 pcs: USD 9.80/pc, FOB Ningbo (sea freight, Ningbo-Zhoushan port).",
+    "severity": "amber",
+    "problem_zh": "整柜或拼柜的集装箱货用 FCA 比 FOB 更合适",
+    "suggestion_zh": "补一句可报 FCA Ningbo"
+   }
+  }
+ ]
+}

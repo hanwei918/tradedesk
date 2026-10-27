@@ -139,7 +139,7 @@ class LLM:
             headers={"Content-Type": "application/json",
                      "Authorization": f"Bearer {self.api_key}"})
         last = None
-        for attempt in range(3):
+        for attempt in range(1 if self.timeout <= 20 else 3):  # connection tests try once
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     payload = json.loads(resp.read().decode("utf-8"))

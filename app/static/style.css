@@ -406,4 +406,28 @@ input[type=checkbox].ck{width:16px;height:16px;accent-color:hsl(var(--foreground
 .evset .v{font-size:26px}
 .chipset{display:flex;gap:4px;flex-wrap:wrap}
 .mono-chip{font:600 11px ui-monospace,Menlo,monospace;padding:2px 6px;border-radius:6px;border:1px solid hsl(var(--border))}
+.cmp-why{list-style:none;margin:10px 0 0;padding:0;font-size:12px}
+.cmp-why li{display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px dashed hsl(var(--border))}
+.cmp-why .by{font:600 10px ui-monospace,Menlo,monospace;padding:1px 5px;border-radius:4px;background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+.cmp-why .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmp-why b{color:hsl(var(--red));font-variant-numeric:tabular-nums}
 .mono-chip.miss{border-color:hsl(var(--red) / .5);color:hsl(var(--red))}.mono-chip.extra{border-color:hsl(var(--amber) / .6);color:hsl(var(--amber))}
+.model-card{cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.model-card:hover{border-color:hsl(var(--ring) / .4);box-shadow:var(--shadow)}
+
+/* ---------- auto tour */
+.tour{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:60;width:min(880px,calc(100vw - 32px));
+  background:hsl(240 10% 6% / .94);color:#fff;border-radius:18px;padding:16px 20px 14px;box-shadow:0 20px 60px -10px rgb(0 0 0 / .5);
+  backdrop-filter:blur(8px);animation:fade .25s ease}
+.tour .cap{font-size:20px;line-height:1.5;font-weight:600;letter-spacing:.01em}
+.tour .sub{font-size:13.5px;color:#c7cbd6;margin-top:4px}
+.tour .bar{display:flex;align-items:center;gap:10px;margin-top:12px}
+.tour .dots{display:flex;gap:5px;flex:1}
+.tour .dots i{height:4px;flex:1;border-radius:4px;background:rgb(255 255 255 / .18);overflow:hidden;position:relative}
+.tour .dots i.done{background:#fff}
+.tour .dots i.now::after{content:"";position:absolute;inset:0;background:#fff;transform-origin:left;animation:tourfill var(--d,6s) linear forwards}
+@keyframes tourfill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.tour button{all:unset;cursor:pointer;font-size:12.5px;padding:5px 10px;border-radius:8px;background:rgb(255 255 255 / .12)}
+.tour button:hover{background:rgb(255 255 255 / .22)}
+.tour-spot{outline:3px solid hsl(var(--brand));outline-offset:4px;border-radius:12px;transition:outline-color .3s}
+body.touring .composer{display:none}

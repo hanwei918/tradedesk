@@ -8,7 +8,7 @@ const RISK = { red: "不能发", amber: "需人工确认", green: "可以发" };
 const RISK_ICON = { red: "shield-alert", amber: "triangle-alert", green: "shield-check" };
 const SEV = { red: "红", amber: "黄" };
 const FLAG = { en: "🇺🇸", es: "🇲🇽" };
-const PAGES = { overview: "概览", board: "商品看板", inbox: "询盘收件箱", inquiry: "询盘回复", listing: "多平台上架", check: "文案体检", eval: "评测", kb: "规则知识库", logs: "调用日志", fair: "游园会找茬" };
+const PAGES = { overview: "概览", board: "商品看板", inbox: "询盘收件箱", inquiry: "询盘回复", listing: "多平台上架", check: "文案体检", eval: "评测与对照", kb: "规则知识库", logs: "调用日志", fair: "游园会找茬" };
 const PLAT = { amazon_us: { name: "Amazon 美国站", lang: "英语", cls: "amz", mark: "a" }, tiktok_mx: { name: "TikTok Shop 墨西哥", lang: "西班牙语", cls: "tt", mark: "♪" } };
 let META = null, KB = null, page = "overview";
 const state = { inq: { history: [], view: -1, busy: false }, lst: { history: [], view: -1, busy: false }, chkPlatform: "amazon_us" };
@@ -16,8 +16,9 @@ const state = { inq: { history: [], view: -1, busy: false }, lst: { history: [],
 // ------------------------------------------------------------------ utils
 async function api(path, body) {
   const res = await fetch(path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {});
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || res.statusText);
+  let data;
+  try { data = await res.json(); } catch (e) { throw new Error(`HTTP ${res.status} ${res.statusText}`); }
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
   return data;
 }
 function toast(msg, kind = "err") {
@@ -179,7 +180,7 @@ function go(p) {
   if (p === "overview") renderOverview();
   if (p === "board") renderBoard();
   if (p === "inbox") renderInbox();
-  if (p === "eval") renderEval();
+  if (p === "eval") showEvalTab(evalTab);
   if (p === "fair") renderFair();
   if (p === "kb") renderKB();
   if (p === "logs") renderLogs();
@@ -729,6 +730,88 @@ async function renderEval() {
     <p class="small muted" style="margin-top:8px">标签：${Object.entries(data.labels_zh).map(([k, v]) => `${k} = ${v}`).join("；")}；其余是知识库规则编号。模型审核层（语义判断、看图）不在这里评测，它的结果都要过出处守卫。</p>`;
 }
 
+
+// ------------------------------------------------------------------ eval tabs: comparison & red team
+let evalTab = "compare";
+function showEvalTab(v) {
+  evalTab = v;
+  $$("#eval-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
+  ["compare", "rules", "redteam"].forEach((k) => ($(`#eval-${k}`).hidden = k !== v));
+  return ({ compare: renderCompare, rules: renderEval, redteam: renderRedteam })[v]();
+}
+
+let BASE = null;
+async function renderCompare() {
+  try { BASE = await api("/api/baseline"); }
+  catch (e) { $("#eval-compare").innerHTML = emptyCard("git-compare-arrows", "还没有运行对照实验", ["在 app 目录运行：python3 tools/run_baseline.py"]); return; }
+  const arms = Object.keys(BASE.arms), S = BASE.summary;
+  const max = Math.max(...arms.map((a) => S[a].replies), 1);
+  const cards = arms.map((a) => {
+    const s = S[a], bad = s.replies_with_red;
+    const cls = bad ? "red" : s.amber ? "amber" : "green";
+    return `<div class="card stat"><div class="k">${esc(BASE.arms[a].name_zh)}${ic(a.startsWith("tradedesk") ? "shield-check" : "sparkles")}</div>
+      <div class="v ${cls}">${bad}<small> / ${s.replies} 条回复不能发</small></div>
+      <div class="bar" style="grid-template-columns:1fr;margin:8px 0 4px"><span class="t"><i style="width:${(bad / max) * 100}%;background:hsl(var(--red))"></i></span></div>
+      <div class="d">红色问题 <b>${s.red}</b>（代码规则 ${s.red_by_rules} · 模型审核 ${s.red_by_model}）· 黄色 ${s.amber} · 全绿 ${s.replies_green}</div>
+      <div class="d" style="margin-top:6px">${esc(BASE.arms[a].desc_zh)}</div>
+      ${Object.keys(s.red_by_label).length ? `<ul class="cmp-why">${Object.entries(s.red_by_label).map(([k, n]) => `<li title="${esc(k)}"><span class="by">${k.startsWith("模型:") ? "模型" : "代码"}</span><span class="nm">${esc((BASE.label_names_zh || {})[k] || k)}</span><b>${n}</b></li>`).join("")}</ul>` : ""}</div>`;
+  }).join("");
+  const rows = Object.entries(BASE.inquiries).map(([qid, q]) => `<tr><td><b>${FLAG[q.language] || ""} ${esc(q.label_zh)}</b><div class="small muted mono">${esc(qid)}</div></td>${arms.map((a) => {
+    const it = BASE.rows[a].find((x) => x.inquiry_id === qid);
+    if (!it) return "<td></td>";
+    const reds = it.findings.filter((f) => f.severity === "red").length, ambers = it.findings.length - reds;
+    return `<td><button class="cell ${it.risk}" data-cmp="${a}:${qid}" style="min-width:130px"><span class="st"><i></i>${RISK[it.risk]}</span><span class="meta">${reds ? `<span class="badge red">红 ${reds}</span>` : ""}${ambers ? `<span class="badge amber">黄 ${ambers}</span>` : ""}${!reds && !ambers ? '<span class="badge green">0</span>' : ""}</span></button></td>`;
+  }).join("")}</tr>`).join("");
+  $("#eval-compare").innerHTML = `
+    <div class="callout" style="margin:0 0 16px">${ic("info")}<div><b>同一把尺子：</b>${esc(BASE.note_zh)} 模型：${esc(BASE.model)} · 运行于 ${esc(BASE.recorded)}。“直接用通用 AI”组的提问原文：<span class="mono small">“${esc(BASE.baseline_ask_zh)}”</span> + 询盘原文。点任意格子看回复全文和每条问题的依据。</div></div>
+    <div class="grid g4">${cards}</div>${compareTakeaway(S)}
+    <div class="card" style="margin-top:16px"><div class="board-wrap"><table class="board"><thead><tr><th>询盘</th>${arms.map((a) => `<th>${esc(BASE.arms[a].name_zh)}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  $$("#eval-compare [data-cmp]").forEach((b) => b.addEventListener("click", () => {
+    const [a, qid] = b.dataset.cmp.split(":");
+    const it = BASE.rows[a].find((x) => x.inquiry_id === qid);
+    openSheet(`<div class="thumb" style="width:40px;height:40px">${ic("git-compare-arrows")}</div><div><h3>${esc(BASE.arms[a].name_zh)} · ${esc(BASE.inquiries[qid].label_zh)}</h3><p>${esc(BASE.arms[a].desc_zh)}</p></div><span class="badge ${it.risk}" style="margin-left:8px">${RISK[it.risk]}</span>`,
+      `<div class="result" data-scope style="grid-template-columns:1fr"><div class="card"><div class="card-h"><h3>${ic("send")}回复全文</h3></div><div class="doc">${highlight(it.reply, it.findings, "reply")}</div></div>
+       <div class="card">${riskPanel(Object.assign({ rules_checked: [] }, it))}</div></div>`);
+    wireLinks($("#sheet-b"));
+  }));
+}
+
+// Read the result off the numbers, including the part that is not TradeDesk's doing.
+function compareTakeaway(S) {
+  const p = S.plain, f = S.with_facts, t = S.tradedesk, x = S.tradedesk_fixed;
+  if (!p || !f || !t || !x) return "";
+  const facts = f.replies_with_red === 0 && p.replies_with_red > 0
+    ? `不给工厂资料，通用 AI ${p.replies_with_red}/${p.replies} 条回复带红色问题（编造认证、免费样品、低于起订量报价）；附上资料后红色清零。<b>差距主要来自工厂资料本身。</b>`
+    : `不给工厂资料，通用 AI ${p.replies_with_red}/${p.replies} 条回复带红色问题；附上资料后还有 ${f.replies_with_red} 条。`;
+  return `<div class="callout" style="margin:16px 0 0">${ic("scan-search")}<div><b>怎么读这个结果：</b>${facts}
+    TradeDesk 做的是把资料自动带进每一次回复，不靠业务员记得粘贴；需人工确认的黄色从 ${f.amber} 条降到 ${t.amber} 条，改一轮后 ${x.amber} 条，可直接发的回复从 ${f.replies_green} 条到 ${x.replies_green} 条，每条提示都挂出处。</div></div>`;
+}
+
+let RT = null;
+async function renderRedteam() {
+  RT = RT || (await api("/api/redteam"));
+  const preset = RT.injections.map((i) => i.finding);
+  $("#eval-redteam").innerHTML = `
+    <div class="callout" style="margin:0 0 16px">${ic("shield-check")}<div><b>出处守卫是代码，不是模型。</b>${esc(RT.note_zh)} 你可以直接改右边的 JSON，自己编一条提示试试能不能混过去。</div></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="card"><div class="card-h"><div><h3>${ic("file-text")}靶子：真实录制的回复</h3><p>审核员只拿到这些规则：${RT.rules_offered.map((r) => `<span class="mono-chip">${esc(r.id)}</span>`).join(" ")}</p></div></div><div class="doc compact" style="max-height:460px;overflow:auto">${esc(RT.reply)}</div></div>
+      <div class="card"><div class="card-h"><div><h3>${ic("ban")}注入的“模型提示”</h3><p>${RT.injections.map((i, k) => `${k + 1}. ${esc(i.label_zh)}`).join("　")}</p></div><button class="btn sm ghost" id="rt-reset">恢复预设</button></div>
+        <div class="card-b"><textarea id="rt-json" rows="14" class="mono" spellcheck="false">${esc(JSON.stringify(preset, null, 1))}</textarea>
+        <button class="btn primary" id="rt-run" style="width:100%;margin-top:10px">${ic("shield-check", "sm")}注入并检查</button></div></div>
+    </div><div id="rt-out" style="margin-top:16px"></div>`;
+  $("#rt-reset").addEventListener("click", () => { $("#rt-json").value = JSON.stringify(preset, null, 1); });
+  $("#rt-run").addEventListener("click", runRedteam);
+}
+async function runRedteam() {
+  let items;
+  try { items = JSON.parse($("#rt-json").value); } catch (e) { return toast("JSON 格式不对：" + e.message); }
+  const r = await api("/api/redteam", { findings: items });
+  $("#rt-out").innerHTML = `<div class="card"><div class="card-h"><h3>${ic("shield-check")}守卫判定：保留 ${r.kept} 条 · 拦下 ${r.dropped} 条</h3></div>
+    <table class="tbl"><tbody>${r.results.map((x, k) => `<tr><td style="width:40px"><b>${k + 1}</b></td>
+      <td>${x.kept ? `<span class="badge green">${ic("circle-check-big", "sm")}保留</span>` : `<span class="badge red">${ic("ban", "sm")}拦下</span>`}</td>
+      <td class="small"><b>${esc(x.reason_zh)}</b><div class="mono muted" style="margin-top:4px;word-break:break-all">${esc(typeof x.item === "string" ? x.item : JSON.stringify(x.item))}</div></td></tr>`).join("")}</tbody></table></div>`;
+}
+
 // ------------------------------------------------------------------ fair-ground
 async function renderFair() {
   const lb = await api("/api/play/leaderboard");
@@ -790,12 +873,133 @@ async function renderLogs() {
   }).join("");
 }
 
+
+// ------------------------------------------------------------------ model settings
+const MODE_ZH = { live: "实时调用", record: "实时 + 录制缓存", replay: "回放（不联网）" };
+const PROVIDER_ZH = { openai: "OpenAI 兼容（如赛事 Tokenhub）", anthropic: "Claude（Anthropic）" };
+const DEFAULTS = { openai: { endpoint: "", model: "" }, anthropic: { endpoint: "https://api.anthropic.com", model: "claude-opus-5-5" } };
+
+async function openSettings() {
+  const cfg = await api("/api/settings");
+  let provider = cfg.provider;
+  const body = () => `
+    <div class="callout" style="margin:0">${ic("shield-check")}<div>key 只保存在这台电脑的 <code>app/.env</code>（不会提交），保存后页面不会再显示完整 key。<b>不要在微信或群里发 key。</b></div></div>
+    ${cfg.env_overrides.length ? `<div class="callout warn" style="margin:0">${ic("triangle-alert")}<div>启动命令里设置了 ${esc(cfg.env_overrides.join("、"))}；保存后以这里的设置为准，重启服务时又会回到启动命令的设置。</div></div>` : ""}
+    <div class="card"><div class="card-b">
+      <label class="field">接口类型<div class="seg" id="set-prov">${Object.entries(PROVIDER_ZH).map(([k, v]) => `<button data-p="${k}" class="${k === provider ? "on" : ""}">${esc(v)}</button>`).join("")}</div></label>
+      <label class="field">接口地址 <span class="muted" style="font-weight:400">${provider === "openai" ? "以 /chat/completions 结尾，从 Tokenhub 使用指南复制" : "一般不用改"}</span><input type="text" id="set-endpoint" value="${esc(cfg.provider === provider ? cfg.endpoint : DEFAULTS[provider].endpoint)}" placeholder="https://…/v1/chat/completions"></label>
+      <label class="field">模型名<input type="text" id="set-model" value="${esc(cfg.provider === provider ? cfg.model : DEFAULTS[provider].model)}" placeholder="例如 deepseek-v3"></label>
+      <label class="field">API key <span class="muted" style="font-weight:400">${cfg.key_set && cfg.provider === provider ? `已保存 ${esc(cfg.key_hint)}，留空表示不修改` : "还没有保存 key"}</span>
+        <input type="password" id="set-key" autocomplete="off" spellcheck="false" placeholder="${cfg.key_set && cfg.provider === provider ? "留空 = 不修改" : "粘贴 key"}"></label>
+      <label class="field">模式<select id="set-mode">${Object.entries(MODE_ZH).map(([k, v]) => `<option value="${k}" ${k === cfg.mode ? "selected" : ""}>${esc(v)}</option>`).join("")}</select></label>
+      <p class="small muted" style="margin:0">实时：每次点击都调用模型。录制：实时调用并存下结果，供断网时回放。回放：只用存下的结果，不联网、不需要 key。换了接口或模型后，回放缓存要重新录制（运行 <code>python3 tools/record_demo.py</code>）。</p>
+    </div></div>
+    <div id="set-result"></div>`;
+  const render = () => {
+    openSheet(`<div class="thumb" style="width:40px;height:40px">${ic("cpu")}</div><div><h3>模型设置</h3><p>当前：${esc(cfg.active.model)} · ${esc(MODE_ZH[cfg.active.mode] || cfg.active.mode)}</p></div>`, body(),
+      `<button class="btn" id="set-test">${ic("zap", "sm")}测试连接</button><button class="btn primary" id="set-save">${ic("circle-check-big", "sm")}保存</button>`);
+    $$("#set-prov button").forEach((b) => b.addEventListener("click", (e) => { e.preventDefault(); provider = b.dataset.p; render(); }));
+    $("#set-save").addEventListener("click", async () => {
+      busy($("#set-save"), true, "保存中…");
+      try {
+        const r = await api("/api/settings", { provider, endpoint: $("#set-endpoint").value, model: $("#set-model").value, api_key: $("#set-key").value, mode: $("#set-mode").value });
+        Object.assign(cfg, r); META.llm = r.active; renderModelCard(); toast("已保存，立即生效", "ok"); render();
+      } catch (e) { $("#set-result").innerHTML = `<div class="callout warn" style="margin:0">${ic("circle-x")}<div>${esc(e.message)}</div></div>`; busy($("#set-save"), false); }
+    });
+    $("#set-test").addEventListener("click", async () => {
+      busy($("#set-test"), true, "测试中…");
+      try {
+        const r = await api("/api/settings/test", {});
+        $("#set-result").innerHTML = r.ok ? `<div class="callout" style="margin:0">${ic("circle-check-big")}<div>连接正常：${esc(r.model)} · ${r.seconds}s${r.usage ? ` · ${r.usage.input_tokens}/${r.usage.output_tokens} tokens` : ""}（测试的是已保存的设置）</div></div>`
+          : `<div class="callout warn" style="margin:0">${ic("circle-x")}<div>连接失败：${esc(r.error || "返回内容不对")}</div></div>`;
+      } catch (e) { $("#set-result").innerHTML = `<div class="callout warn" style="margin:0">${ic("circle-x")}<div>${esc(e.message)}</div></div>`; }
+      busy($("#set-test"), false);
+    });
+  };
+  render();
+}
+
+
+// ------------------------------------------------------------------ auto tour (captions, replay data, optional loop)
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const tourState = { on: false, paused: false, loop: false };
+function spot(sel) {
+  $$(".tour-spot").forEach((e) => e.classList.remove("tour-spot"));
+  const el = typeof sel === "string" ? $(sel) : sel;
+  if (el) { el.classList.add("tour-spot"); el.scrollIntoView({ behavior: "smooth", block: "center" }); }
+}
+async function tourSteps() {
+  const base = await api("/api/baseline").catch(() => null);
+  const ev = await api("/api/eval").catch(() => null);
+  const fr = (ev && ev.first_runs) || {};
+  const pct = (v) => `${Math.round(v * 1000) / 10}%`;
+  const blind = fr.heldout && fr.heldout2 ? `两份盲测集（没看过代码的人出题）首次运行，精确率 ${pct(fr.heldout.summary.precision)} / ${pct(fr.heldout2.summary.precision)}，召回率 ${pct(fr.heldout.summary.recall)} / ${pct(fr.heldout2.summary.recall)}。` : "检查器用两份盲测集评测过。";
+  const S = base && base.summary;
+  const cmp = S ? `直接把询盘丢给通用 AI：${S.plain.replies} 条回复 ${S.plain.replies_with_red} 条带红色问题，编造认证、承诺免费样品。附上工厂资料后 ${S.with_facts.replies_with_red} 条：差距来自资料。` : "对照实验：同一把尺子测通用 AI 和 TradeDesk。";
+  const cmpSub = S ? `TradeDesk 把资料自动带进每次回复，需人工确认的黄色从 ${S.with_facts.amber} 条降到 ${S.tradedesk_fixed.amber} 条，每条提示都挂出处` : "";
+  return [
+    { d: 6000, cap: "TradeDesk 出海工作台：询盘 → 回复 → 上架，每一条风险提示都有出处。", sub: "给宁波中小外贸工厂的 AI 助手（演示数据为虚构）",
+      run: async () => { go("overview"); await sleep(400); spot("#ov-stats"); } },
+    { d: 7000, cap: "业务员每天先看收件箱：8 条询盘按优先级排好，每一分都能看到依据。", sub: "分数由代码按公开公式计算，依据是询盘原文",
+      run: async () => { go("inbox"); await renderInbox(); showInboxTab("list"); const d = $("#inbox-list details"); if (d) d.open = true; spot($("#inbox-list .mail")); } },
+    { d: 8000, cap: "这条美国询盘里埋了五个坑：要 UL、要 BPA free、FOB 空运、20 天交货、货到 60 天付款。", sub: "询盘分析员逐条找出和工厂资料对不上的地方，每条都标了询盘原文",
+      run: async () => { go("inquiry"); pickSample(0); state.inqId = null; await runInquiry(); await sleep(300); spot($("#inq-out .analysis-grid")); } },
+    { d: 8000, cap: "回复如实说明了没有 UL、FOB 只走海运。校验又抓到一处更细的问题：集装箱货用 FCA 更合适。", sub: "依据是 ICC 的原文和链接，不是模型自己说的",
+      run: async () => { window.scrollTo({ top: 0, behavior: "smooth" }); await sleep(300); spot($("#inq-out .finding")); } },
+    { d: 7500, cap: "业务员只说一句“按风险提示全部修改”，第 2 轮就变绿；需要采购、生产、美工跟进的事自动派成任务。", sub: "右上角是轮次，“与上一轮对比”里能看到新增的那句话",
+      run: async () => { $("#inq-ins").value = "按风险提示全部修改"; await reviseInquiry(); $('#inq-tabs [data-t="diff"]')?.click(); await sleep(200); spot($("#inq-out .result .card")); } },
+    { d: 6500, cap: "商品看板：4 个产品 × 主图 / Amazon / TikTok，运营一眼看到哪里卡住了。", sub: "一键批量生成上品，导出 CSV",
+      run: async () => { go("board"); await renderBoard(); spot($(".board")); } },
+    { d: 8500, cap: "主图检查：白底、占比、尺寸由代码测像素；徽章、促销字、道具由模型看图，必须写出看到了什么。", sub: "这张图被标了 5 条红；红色时“标记已上架”按钮是灰的",
+      run: async () => { await openCell("KET-17S", "image"); } },
+    { d: 6500, cap: "同一份中文资料，同时生成 Amazon 美国站英文 Listing 和 TikTok 墨西哥西语脚本，各按平台规则检查。", sub: "Amazon 标题现在最多 75 个字符，这里实时计数",
+      run: async () => { closeSheet(); go("listing"); await runListing(); await sleep(200); spot($("#lst-out .grid")); } },
+    { d: 9500, cap: cmp, sub: cmpSub || "同样 8 条询盘，同一套代码规则 + 同一个合规审核员来测",
+      run: async () => { go("eval"); await showEvalTab("compare"); spot($("#eval-compare .grid")); } },
+    { d: 8000, cap: "出处守卫是代码，不是模型：编造的规则编号、回复里没有的原文，当场被拦下。", sub: "6 条注入：5 条编造的全部拦下，1 条真实的保留",
+      run: async () => { await showEvalTab("redteam"); await runRedteam(); spot($("#rt-out")); } },
+    { d: 7000, cap: blind, sub: "首次成绩在修复前冻结保存；修复后的满分不算盲测成绩",
+      run: async () => { await showEvalTab("rules"); spot($("#eval-out .grid")); } },
+    { d: 6000, cap: "让宁波工厂的每一句对外承诺，都有依据。", sub: "TradeDesk · INTERCITY HACK 宁波站 · 赛道二",
+      run: async () => { go("overview"); spot(null); } },
+  ];
+}
+
+async function startTour(loop = false) {
+  if (tourState.on) return;
+  Object.assign(tourState, { on: true, paused: false, loop });
+  document.body.classList.add("touring");
+  const box = document.createElement("div");
+  box.className = "tour"; box.id = "tour";
+  document.body.appendChild(box);
+  if (META.llm.mode !== "replay") toast("当前是实时模式：自动演示会真实调用模型，每一步会慢一些", "ok");
+  do {
+    const steps = await tourSteps();
+    for (let i = 0; i < steps.length && tourState.on; i++) {
+      const st = steps[i];
+      box.innerHTML = `<div class="cap">${esc(st.cap)}</div><div class="sub">${esc(st.sub || "")}</div>
+        <div class="bar"><div class="dots">${steps.map((_, k) => `<i class="${k < i ? "done" : k === i ? "now" : ""}" style="--d:${st.d}ms"></i>`).join("")}</div>
+        <button id="tour-pause">${tourState.paused ? "继续" : "暂停"}</button><button id="tour-next">下一步</button><button id="tour-stop">退出</button></div>`;
+      let skip = false;
+      $("#tour-stop").onclick = () => { tourState.on = false; skip = true; };
+      $("#tour-next").onclick = () => { skip = true; };
+      $("#tour-pause").onclick = () => { tourState.paused = !tourState.paused; $("#tour-pause").textContent = tourState.paused ? "继续" : "暂停"; box.querySelectorAll(".dots i.now").forEach((e) => (e.style.animationPlayState = tourState.paused ? "paused" : "running")); };
+      try { await st.run(); } catch (e) { console.warn("tour step failed", e); }
+      let left = st.d;
+      while (left > 0 && !skip && tourState.on) { await sleep(100); if (!tourState.paused) left -= 100; }
+    }
+  } while (tourState.on && tourState.loop);
+  tourState.on = false;
+  closeSheet(); spot(null); box.remove(); document.body.classList.remove("touring");
+}
+
 // ------------------------------------------------------------------ boot
 function renderModelCard() {
   const m = META.llm;
   const live = m.mode !== "replay";
   $("#model-card").innerHTML = `<div class="row" style="justify-content:space-between"><b>${esc(m.model)}</b><span class="dot ${live ? "live" : "replay"}"></span></div>
-    <div class="muted" style="margin-top:2px">${live ? (m.mode === "record" ? "实时 · 录制缓存" : "实时调用") : "回放模式 · 不联网"} · ${esc(m.provider === "anthropic" ? "Claude API" : "OpenAI 兼容")}</div>`;
+    <div class="muted" style="margin-top:2px">${live ? (m.mode === "record" ? "实时 · 录制缓存" : "实时调用") : "回放模式 · 不联网"} · ${esc(m.provider === "anthropic" ? "Claude API" : "OpenAI 兼容")}</div>
+    <div class="small" style="margin-top:6px;color:hsl(var(--brand))">${ic("cpu", "sm")} 点击设置模型和 key</div>`;
 }
 function setTheme(t) { document.documentElement.dataset.theme = t; store.set("td-theme", t); $("#theme-btn use").setAttribute("href", t === "dark" ? "#i-sun" : "#i-moon"); }
 
@@ -817,9 +1021,15 @@ async function boot() {
   $("#chk-run").addEventListener("click", runCheck);
   $("#log-refresh").addEventListener("click", renderLogs);
   $("#board-batch").addEventListener("click", runBatch);
+  $("#tour-btn").addEventListener("click", () => startTour(false));
+  addEventListener("keydown", (e) => { if (e.key === "Escape" && tourState.on) tourState.on = false; });
+  $("#model-card").addEventListener("click", () => openSettings().catch((e) =>
+    toast(/not found|404/i.test(e.message) ? "服务端还是旧版本：在终端按 Ctrl+C 停掉服务，再重新启动" : `打不开模型设置：${e.message}`)));
+  $("#model-card").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#model-card").click(); } });
   $("#inbox-triage").addEventListener("click", runTriage);
   $$("#inbox-tabs button").forEach((b) => b.addEventListener("click", () => showInboxTab(b.dataset.v)));
   $("#eval-fails").addEventListener("change", renderEval);
+  $$("#eval-tabs button").forEach((b) => b.addEventListener("click", () => showEvalTab(b.dataset.v)));
   $("#board-all").addEventListener("change", (e) => { boardState.selected = new Set(e.target.checked ? META.products.map((p) => p.id) : []); renderBoard(); });
   $("#scrim").addEventListener("click", closeSheet);
   addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
@@ -835,6 +1045,7 @@ async function boot() {
     } else if (!typing && !e.metaKey && !e.ctrlKey && /^[1-9]$/.test(e.key) && !$("#sheet").classList.contains("on")) go(Object.keys(PAGES)[+e.key - 1]);
   });
   renderOverview();
+  if (/^#tour/.test(location.hash)) return startTour(location.hash === "#tour=loop");
   await runDemoFromHash();
 }
 
@@ -857,6 +1068,10 @@ async function runDemoFromHash() {
     for (let i = 1; i < n; i++) { $("#lst-ins").value = "按风险提示全部修改"; await reviseListing(); }
   } else if (p === "check") {
     await runCheck();
+  } else if (p === "eval") {
+    const tab = ({ "1": "rules", "2": "redteam" })[idx] || "compare";
+    await showEvalTab(tab);
+    if (tab === "redteam") await runRedteam();
   } else if (p === "inbox") {
     await renderInbox();
     if (idx === "1") showInboxTab("tasks");

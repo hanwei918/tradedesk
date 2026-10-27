@@ -34,6 +34,7 @@ class KnowledgeBase:
         self.version = kb.get("version")
         self.all_rules = kb.get("rules", [])
         self.rules = {r["id"]: r for r in self.all_rules if r.get("verified") is True}
+        self.all_rules_by_id = {r["id"]: r for r in self.all_rules}
         self.catalog = _load(products_path, {"factory": {}, "products": []})
         self.factory = self.catalog.get("factory", {})
         self.products = {p["id"]: p for p in self.catalog.get("products", [])}

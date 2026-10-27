@@ -1,0 +1,19 @@
+{
+ "request": {
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "system": "你是一个乐于助人的 AI 助手。\n\n只输出一个 JSON 对象：{\"reply\": \"给买家的回复全文\"}\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "我是做小家电的外贸业务员，帮我回复这条阿里巴巴国际站的询盘，用买家的语言，尽量拿下订单：\n\nHello, do you have FCC and ETL for the 4.5L air fryer? We want 800 units, PTFE-free basket preferred. Target price USD 20 FOB. Can you ship within 30 days?"
+   }
+  ]
+ },
+ "content": "{\"reply\": \"Hi [Buyer Name],\\n\\nThank you for your inquiry about our 4.5L air fryer. Here are answers to each of your questions.\\n\\n1. Certifications (FCC & ETL)\\nOur 4.5L model holds [FCC certificate/report No. ___] and [ETL listing No. ___], issued by [testing lab]. I can send you copies of both today so your team can verify them before you order. Since these certifications are for the North American market, the unit runs on 120V/60Hz with a US plug.\\n\\n2. PTFE-free basket\\nWe offer two PTFE-free options for this model:\\n- Ceramic-coated basket: non-stick, easy to clean, and the most popular choice with US retailers\\n- Stainless steel basket: very durable and fully coating-free\\nBoth are food-contact safe, and we can provide [FDA / LFGB] test reports.\\n\\n3. Price for 800 units, FOB [Port]\\n- Standard version: USD [__]/unit\\n- Ceramic-coated PTFE-free basket: USD [__]/unit\\n- Stainless steel basket: USD [__]/unit\\nI understand your target is USD 20. If we [adjust the color box packaging / simplify the accessories / use our standard housing color], we can bring the PTFE-free version to USD [__], close to your target. I'm happy to work through these options with you.\\n\\n4. Delivery\\nWe can ship within [__] days after we receive your deposit and you confirm the artwork. Keeping a standard color and simple logo printing makes a 30-day schedule easier to meet. If your timeline is tight, I can reserve production capacity for your order now.\\n\\nTo send you an exact quotation, could you please confirm:\\n- Which basket type you prefer (ceramic or stainless steel)\\n- Housing color, and whether you need your logo on the unit or packaging\\n- Packaging requirements (color box, retail-ready, Amazon FBA labeling, etc.)\\n- Your preferred payment terms\\n\\nWe can also send a pre-production sample so you can check quality before placing the order. If it helps, I'm available for a quick video call to show you the product and our factory.\\n\\nI look forward to working with you on this order.\\n\\nBest regards,\\n[Your Name]\\n[Company Name]\\nWhatsApp/WeChat: [__]\\nEmail: [__]\"}",
+ "usage": {
+  "input_tokens": 208,
+  "output_tokens": 1117
+ }
+}

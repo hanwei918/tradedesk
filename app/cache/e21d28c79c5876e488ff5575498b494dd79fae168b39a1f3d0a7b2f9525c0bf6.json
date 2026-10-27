@@ -1,0 +1,19 @@
+{
+ "request": {
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "system": "你是一个乐于助人的 AI 助手。\n\n只输出一个 JSON 对象：{\"reply\": \"给买家的回复全文\"}\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "我是做小家电的外贸业务员，帮我回复这条阿里巴巴国际站的询盘，用买家的语言，尽量拿下订单：\n\nHola, precio? quiero 100 piezas y muestra gratis. gracias"
+   }
+  ]
+ },
+ "content": "{\"reply\": \"¡Hola! Muchas gracias por su interés en nuestros productos. 😊\\n\\nCon gusto le preparamos la mejor cotización para 100 piezas. Para darle un precio exacto, ¿podría confirmarnos estos datos?\\n\\n1. ¿Qué producto o modelo le interesa? (puede enviarnos el enlace, el número de modelo o una foto)\\n2. ¿A qué país se enviará la mercancía?\\n3. ¿Qué voltaje y tipo de enchufe necesita? (por ejemplo, 110V o 220V)\\n4. ¿Desea su propio logotipo o empaque personalizado (OEM)?\\n\\nSobre la muestra: queremos que compruebe la calidad antes de hacer su pedido. Según el modelo, podemos ofrecerle la muestra gratis y usted solo cubre el costo del envío. En otros casos, el valor de la muestra se le reembolsa completamente al confirmar el pedido de 100 piezas. Le confirmaremos la opción exacta en cuanto sepamos qué modelo le interesa.\\n\\nEn cuanto recibamos su respuesta, le enviaremos en menos de 24 horas:\\n✅ Precio para 100 piezas\\n✅ Costo de envío hasta su país\\n✅ Tiempo de entrega\\n✅ Fotos y detalles del producto\\n\\nSi lo prefiere, también podemos atenderle por WhatsApp: [su número de WhatsApp].\\n\\n¡Quedamos atentos a su respuesta!\\n\\nSaludos cordiales,\\n[Su nombre]\\n[Nombre de la empresa]\"}",
+ "usage": {
+  "input_tokens": 167,
+  "output_tokens": 995
+ }
+}

@@ -7,6 +7,9 @@
 - **工作流 A · 询盘回复**：读买家询盘（英语、西语等），找出买家要求和工厂资料对不上的地方。用买家的语言写阿里国际站 RFQ 回复，同时给采购和生产写一份中文内部备忘。
 - **询盘收件箱 + 跨岗位任务**：理解每条询盘，按公开公式打优先级（每一分挂询盘原文）；回复时把需要采购、生产、美工跟进的事派成任务，任务同样必须挂询盘原文。
 - **评测**：两份由没看过检查代码的人写的盲测集，首次运行精确率 97.1% / 92.3%、召回率 94.4% / 82.8%（修复前冻结在 `app/eval/*_first_run.json`）；评测页逐条展示。
+- **对照实验**：同样 8 条询盘、同一个模型、同一套检查，比较四组回复。直接用通用 AI：8 条回复 8 条带红色问题（声称有 UL/ETL/NOM 认证、承诺免费样品、按低于起订量报价）；附上工厂资料：0 条红、20 条需确认；TradeDesk 第 1 轮：0 条红、13 条需确认；改一轮后：0 条红、8 条需确认、3 条可直接发。**差距主要来自工厂资料**，TradeDesk 的作用是每次自动带上资料、减少需人工确认的地方。结果在 `app/eval/baseline_run.json`，评测页可逐条查看回复全文。
+- **红队测试**：往审核结果里注入编造的模型提示（不存在的规则编号、原文里没有的话、不适用的规则、空引用），出处守卫逐条拦下并说明原因；评测页上可以自己改 JSON 再试。
+- **自动演示**：右上角一键播放 12 步带字幕的走查，`#tour=loop` 可在摊位循环播放。
 - **游园会找茬**：`python3 server.py --lan` 后手机扫码答题，答案由代码规则计算；局域网访问只开放找茬页面，其余接口一律 403。
 - **工作流 C · 商品看板**：所有产品 × 主图 / Amazon / TikTok 的最新状态一屏看清；一键批量生成上品，导出 CSV。主图按 Amazon 美国站的 10 条要求检查：尺寸、白底、产品占比、是否贴边由代码测量，文字、徽章、道具、是否实拍由模型看图判断。
 - **工作流 B · 多平台上架**：一份中文产品资料，同时生成 Amazon 美国站英文 Listing 和 TikTok Shop 墨西哥站西语种草脚本。
@@ -22,7 +25,7 @@ cd app
 python3 server.py                          # 打开 http://127.0.0.1:8765
 ```
 
-模型配置写在 `app/.env`，这个文件不会提交。参考 `app/.env.example`：
+模型配置可以在网页左下角的"模型设置"里填写（key 只存在本机的 `app/.env`，页面只显示末 4 位），也可以直接编辑 `app/.env`（不会提交，参考 `app/.env.example`）：
 
 ```
 LLM_API_KEY=...
@@ -52,7 +55,8 @@ LLM_MODEL=claude-opus-5-5
 cd app
 TRADEDESK_MODE=record python3 tools/record_demo.py   # 把固定演示输入跑一遍并缓存
 TRADEDESK_MODE=replay python3 server.py              # 断网也能演示
-python3 -m unittest discover -s tests -v             # 测试（35 项）
+python3 -m unittest discover -s tests -v             # 测试（46 项）
+TRADEDESK_MODE=replay python3 tools/run_baseline.py  # 对照实验（缓存齐全时不联网）
 TRADEDESK_MODE=replay python3 server.py --lan        # 游园会：手机扫码访问 /play，大屏打开 /play#screen
 python3 tools/export_config.py                       # 导出平台配置 → app/config/agents.json
 ```
@@ -70,7 +74,9 @@ app/
   tradedesk/board.py     商品看板状态（state/，不提交）
   tradedesk/inbox.py     收件箱优先级打分 + 跨岗位任务
   tradedesk/evaluate.py  评测：开发集 + 两份盲测集（eval/）
-  prompts/*.md           6 个角色的提示词（含主图审核员）
+  tradedesk/compare.py   对照实验汇总：通用 AI vs TradeDesk
+  data/redteam.json      红队测试的注入样例
+  prompts/*.md           各角色提示词（含主图审核员、对照组的通用助手）
   kb/rules.json          规则知识库（38 条，每条带原文摘录与来源 URL）
   config/check_map.json  内置检查 → 依据的知识库规则
   config/agents.json     平台配置导出

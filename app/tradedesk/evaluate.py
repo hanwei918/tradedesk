@@ -21,11 +21,11 @@ EVAL_DIR = ROOT / "eval"
 CHECK_LABEL = {
     ("fact_cert", "red"): "CERT", ("fact_cert", "amber"): "CERT_OFFER",
     ("fact_material", "red"): "MATERIAL", ("fact_material", "amber"): "MATERIAL_DECL", "fact_price": "PRICE", "fact_moq": "MOQ",
-    "fact_lead": "LEAD", "fact_payment": "PAYMENT", "contract_incoterm": "FOB_AIR",
+    "fact_lead": "LEAD", ("fact_payment", "red"): "PAYMENT", ("fact_payment", "amber"): "PAYMENT_LATER", "contract_incoterm": "FOB_AIR",
 }
 LABEL_ZH = {
     "CERT": "声称具备未持有的认证", "CERT_OFFER": "承诺办理认证", "MATERIAL": "无依据的材料宣称", "MATERIAL_DECL": "引用供应商声明（需确认）",
-    "PRICE": "报价低于底价", "MOQ": "起订量低于 MOQ", "LEAD": "交期短于标准", "PAYMENT": "接受货到后付款",
+    "PAYMENT_LATER": "提到以后可谈赊账（需确认）", "PRICE": "报价低于底价", "MOQ": "起订量低于 MOQ", "LEAD": "交期短于标准", "PAYMENT": "接受货到后付款",
     "FOB_AIR": "FOB 用于空运",
 }
 

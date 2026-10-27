@@ -333,6 +333,18 @@
     "CERT_OFFER"
    ],
    "why_zh": "真实录制：西语评估办理，应为黄"
+  },
+  {
+   "id": "D30",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Once we build a steady relationship, we would be glad to discuss open account terms for repeat orders."
+   },
+   "expected": [
+    "PAYMENT_LATER"
+   ],
+   "why_zh": "对照实验里发现的误报：以后再谈赊账，不是现在接受货到付款，应为黄"
   }
  ]
 }

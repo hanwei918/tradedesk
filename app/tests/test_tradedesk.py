@@ -156,6 +156,13 @@ class CheckTests(unittest.TestCase):
         self.assertIn(("fact_payment", "red"), self.kinds("OK, payment 60 days after delivery is fine."))
         self.assertEqual(self.kinds("Sorry, we cannot accept payment after delivery."), [])
 
+    def test_payment_talk_for_later_is_amber_not_red(self):
+        # Found in the comparison run: offering to discuss open account later is not accepting it now.
+        later = "Once we build a steady relationship, we would be glad to discuss open account terms for repeat orders."
+        self.assertEqual(self.kinds(later), [("fact_payment", "amber")])
+        self.assertIn(("fact_payment", "red"),
+                      self.kinds("We accept payment 60 days after delivery for this long-term partnership."))
+
     def test_fob_by_air_needs_the_mapped_rule(self):
         self.assertIn(("contract_incoterm", "amber"), self.kinds("We quote FOB Ningbo by air."))
         self.assertEqual(self.kinds("FOB Ningbo by sea; by air we suggest FCA Ningbo."), [])
@@ -192,6 +199,16 @@ class CheckTests(unittest.TestCase):
         self.assertEqual([k["quote"] for k in kept], ["Eco-friendly kettle"])
         self.assertEqual(len(dropped), 4)
         self.assertEqual(kept[0]["source"]["url"], "https://example.test/e")
+
+    def test_model_guard_caps_culture_rules_at_amber(self):
+        # Found in the comparison run: the model called an emoji in a Mexican reply red.
+        allowed = [{"id": "CUL-01", "category": "culture", "title_zh": "正式语气"},
+                   {"id": "ALI-03", "category": "platform_alibaba", "title_zh": "信息真实"}]
+        fields = {"reply": "Muchas gracias 😊. Free samples for everyone."}
+        raw = [{"rule_id": "CUL-01", "quote": "Muchas gracias 😊", "severity": "red"},
+               {"rule_id": "ALI-03", "quote": "Free samples", "severity": "red"}]
+        kept, _ = checks.guard_model_findings(raw, allowed, fields)
+        self.assertEqual([k["severity"] for k in kept], ["amber", "red"])
 
     def test_risk_level(self):
         self.assertEqual(checks.risk_level([]), "green")
@@ -461,6 +478,102 @@ class FairGroundTests(unittest.TestCase):
         self.assertGreaterEqual(r["total"], 5)
         self.assertEqual(r["found"], 1)
         self.assertEqual(app.play_check({"id": "P2", "taps": []})["found"], 0)
+
+
+class SettingsTests(unittest.TestCase):
+    def setUp(self):
+        from tradedesk import settings
+        self.s = settings
+        self.tmp = tempfile.TemporaryDirectory()
+        self.env = Path(self.tmp.name) / ".env"
+        self.env.write_text("# my note\nOTHER=1\n", encoding="utf-8")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_key_is_stored_but_never_returned(self):
+        self.s.save({"provider": "openai", "endpoint": "https://hub.example/v1/chat/completions",
+                     "model": "m1", "api_key": "sk-test-1234567890abcd", "mode": "live"}, self.env)
+        text = self.env.read_text(encoding="utf-8")
+        self.assertIn("LLM_API_KEY=sk-test-1234567890abcd", text)
+        self.assertIn("OTHER=1", text)                      # unrelated lines kept
+        self.assertEqual(oct(self.env.stat().st_mode & 0o777), "0o600")
+        view = self.s.public_view(self.env)
+        self.assertNotIn("sk-test-1234567890abcd", json.dumps(view))
+        self.assertEqual((view["key_set"], view["key_hint"]), (True, "…abcd"))
+
+    def test_saved_key_never_follows_a_new_endpoint(self):
+        self.s.save({"provider": "openai", "endpoint": "https://hub.example/v1/chat/completions",
+                     "model": "m1", "api_key": "sk-test-1234567890abcd", "mode": "live"}, self.env)
+        with self.assertRaises(ValueError):          # live needs a key, the old one is not carried over
+            self.s.save({"endpoint": "https://evil.example/v1/chat/completions"}, self.env)
+        v = self.s.save({"endpoint": "https://evil.example/v1/chat/completions", "mode": "replay"}, self.env)
+        self.assertEqual(v["api_key"], "")
+        self.assertNotIn("sk-test", self.env.read_text(encoding="utf-8"))
+        # same endpoint, empty key field = keep the saved key
+        self.s.save({"api_key": "sk-new-key-0000000001", "mode": "live"}, self.env)
+        self.assertEqual(self.s.save({"model": "m2"}, self.env)["api_key"], "sk-new-key-0000000001")
+
+    def test_rejects_bad_input(self):
+        for bad in [{"endpoint": "http://evil.example/x"}, {"provider": "other"}, {"mode": "turbo"},
+                    {"api_key": "two words"}, {"model": "a b"}]:
+            with self.assertRaises(ValueError, msg=bad):
+                self.s.save(dict({"mode": "replay"}, **bad), self.env)
+
+
+class CrossSiteTests(unittest.TestCase):
+    def gate(self, path, method="POST", host="127.0.0.1:8765", origin=None, ctype="application/json"):
+        import server
+        h = server.Handler.__new__(server.Handler)
+        h.client_address, h.path, h.command = ("127.0.0.1", 5555), path, method
+        h.headers = {k: v for k, v in {"Host": host, "Origin": origin, "Content-Type": ctype}.items() if v is not None}
+        sent = []
+        h._json = lambda code, obj: sent.append(code)
+        return h._cross_site(), sent
+
+    def test_local_page_passes(self):
+        self.assertEqual(self.gate("/api/settings", origin="http://127.0.0.1:8765"), (False, []))
+        self.assertEqual(self.gate("/api/settings", method="GET", ctype=None)[0], False)
+
+    def test_forged_requests_are_refused(self):
+        self.assertEqual(self.gate("/api/settings", origin="https://evil.example"), (True, [403]))
+        self.assertEqual(self.gate("/api/settings", host="evil.example:8765")[0], True)   # DNS rebinding
+        self.assertEqual(self.gate("/api/settings", ctype="text/plain")[0], True)         # form post without preflight
+        self.assertEqual(self.gate("/api/inquiry", origin="http://evil.example")[0], True)
+
+    def test_game_is_exempt(self):
+        self.assertEqual(self.gate("/api/play/score", host="192.168.0.3:8765")[0], False)
+
+
+class CompareAndRedTeamTests(unittest.TestCase):
+    def test_summary_counts_replies_and_sources(self):
+        from tradedesk.compare import summarize
+        red_rule = {"check": "fact_cert", "severity": "red", "source": {"type": "product_card"}, "by": "rule"}
+        red_model = {"check": "model_review", "severity": "red", "source": {"rule_id": "ALI-02"}, "by": "model"}
+        amber = {"check": "fact_lead", "severity": "amber", "source": {}, "by": "rule"}
+        s = summarize({"plain": [{"findings": [red_rule, red_model], "risk": "red"},
+                                 {"findings": [amber], "risk": "amber"},
+                                 {"findings": [], "risk": "green"}]})["plain"]
+        self.assertEqual((s["replies"], s["replies_with_red"], s["replies_green"], s["red"], s["amber"]), (3, 1, 1, 2, 1))
+        self.assertEqual((s["red_by_rules"], s["red_by_model"]), (1, 1))
+        self.assertEqual(s["red_by_label"], {"CERT": 1, "模型:ALI-02": 1})
+
+    def test_baseline_rejects_unknown_variant(self):
+        with tempfile.TemporaryDirectory() as t:
+            kb = make_kb(t)
+            runner = Runner(LLM(api_key="", mode="replay", cache_dir=t, provider="openai"), kb,
+                            log_path=Path(t) / "c.jsonl", board=Board(Path(t) / "state"))
+            with self.assertRaises(ValueError):
+                runner.baseline({"inquiry_id": kb.inquiries[0]["id"], "variant": "cheat"})
+
+    def test_red_team_preset_drops_every_fabrication(self):
+        import server
+        r = server.App().redteam_run({})
+        self.assertEqual([x["kept"] for x in r["results"]], [False, False, False, False, False, True])
+        custom = server.App().redteam_run({"findings": [{"rule_id": "INC-01", "quote": "totally invented sentence", "severity": "red"}]})
+        self.assertEqual(custom["kept"], 0)
+        with self.assertRaises(ValueError):
+            server.App().redteam_run({"findings": "not a list"})
 
 
 class DiffTests(unittest.TestCase):

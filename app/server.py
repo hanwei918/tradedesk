@@ -20,9 +20,9 @@ from pathlib import Path
 
 from tradedesk.kb import KnowledgeBase, PLATFORM_NAMES
 from tradedesk.llm import LLM, LLMError
-from tradedesk import checks
+from tradedesk import checks, settings
 from tradedesk.board import Board, CHANNELS
-from tradedesk.evaluate import evaluate
+from tradedesk.evaluate import evaluate, LABEL_ZH
 from tradedesk.inbox import TASK_STATUS
 from tradedesk.workflows import Runner, LOG_PATH, ROLES
 
@@ -77,8 +77,76 @@ class App:
     def task_status(self, payload):
         return self.runner.inbox.set_task_status(payload["id"], payload["status"])
 
+    # ---------------------------------------------------------- model settings
+    def settings_view(self):
+        return dict(settings.public_view(), active=self.llm.describe())
+
+    def settings_save(self, payload):
+        v = settings.save(payload)
+        self.llm = LLM(provider=v["provider"], endpoint=v["endpoint"], model=v["model"],
+                       api_key=v["api_key"], mode=v["mode"])
+        self.runner.llm = self.llm
+        return self.settings_view()
+
+    def settings_test(self, payload):
+        """One tiny real call through the saved settings, bypassing the cache."""
+        if not self.llm.api_key:
+            raise ValueError("还没有填写 key")
+        started = time.time()
+        probe = LLM(provider=self.llm.provider, endpoint=self.llm.endpoint, model=self.llm.model,
+                    api_key=self.llm.api_key, mode="live", timeout=20)
+        try:
+            content = probe.transport(probe.body("你是连接测试。只输出 JSON。", '返回 {"ok": true}'))
+            ok = json.loads(content).get("ok") is True
+            self.llm.last_usage = probe.last_usage if hasattr(probe, "last_usage") else None
+        except (LLMError, ValueError) as exc:
+            return {"ok": False, "error": friendly_error(str(exc))}
+        return {"ok": ok, "seconds": round(time.time() - started, 2), "model": self.llm.model,
+                "usage": getattr(self.llm, "last_usage", None)}
+
     def eval_view(self):
         return evaluate(self.kb)
+
+    def baseline_view(self):
+        p = ROOT / "eval" / "baseline_run.json"
+        if not p.exists():
+            raise KeyError("还没有运行对照实验：python3 tools/run_baseline.py")
+        data = json.loads(p.read_text(encoding="utf-8"))
+        names = {}
+        for s in data["summary"].values():
+            for label in s["red_by_label"]:
+                rule = self.kb.all_rules_by_id.get(label.split(":", 1)[1]) if label.startswith("模型:") else None
+                names[label] = rule["title_zh"] if rule else LABEL_ZH.get(label, label)
+        return dict(data, label_names_zh=names)
+
+    # ---------------------------------------------------------- red team (citation guard, no model call)
+    def redteam_preset(self):
+        data = json.loads((ROOT / "data" / "redteam.json").read_text(encoding="utf-8"))
+        offered = self.kb.rules_for(data["platform"], kinds=["llm"], market=data["market"])
+        return dict(data, rules_offered=[{"id": r["id"], "title_zh": r.get("title_zh")} for r in offered])
+
+    def redteam_run(self, payload):
+        """Run each injected 'model finding' through the same guard the real review uses."""
+        preset = self.redteam_preset()
+        items = payload.get("findings")
+        if items is None:
+            items = [i["finding"] for i in preset["injections"]]
+        if not isinstance(items, list) or len(items) > 50:
+            raise ValueError("请提交一个列表（最多 50 条）")
+        allowed = self.kb.rules_for(preset["platform"], kinds=["llm"], market=preset["market"])
+        fields = {"reply": preset["reply"]}
+        results = []
+        for item in items:
+            kept, dropped = checks.guard_model_findings([item], allowed, fields)
+            reason = dropped[0]["reason_zh"] if dropped else "规则编号在白名单里，原文也在回复里找到了"
+            rid = item.get("rule_id") if isinstance(item, dict) else None
+            if dropped and rid in self.kb.rules and rid not in {r["id"] for r in allowed}:
+                reason = f"{rid} 是真实规则，但不适用于这个平台/市场，审核员根本没拿到它"
+            elif dropped and rid and rid not in self.kb.all_rules_by_id:
+                reason = f"知识库里没有 {rid} 这条规则（编造的编号）"
+            results.append({"item": item, "kept": bool(kept), "reason_zh": reason,
+                            "finding": kept[0] if kept else None})
+        return {"results": results, "kept": sum(r["kept"] for r in results), "dropped": sum(not r["kept"] for r in results)}
 
     # ---------------------------------------------------------- fair-ground game
     def play_challenges(self):
@@ -192,6 +260,27 @@ class Handler(SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(raw)
 
+    def _cross_site(self):
+        """Reject requests a web page on another site could forge (CSRF, DNS rebinding).
+
+        Applies to everything except the fair-ground game: the Host must be this machine,
+        an Origin (sent by browsers on cross-site requests) must be this machine too, and
+        POST bodies must be JSON, which a cross-site page cannot send without a preflight
+        that this server never answers."""
+        if self.path.startswith("/api/play/") or not self.path.startswith("/api/"):
+            return False
+        local = re.compile(r"^(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$")
+        host = self.headers.get("Host", "")
+        origin = self.headers.get("Origin")
+        bad = not local.match(host)
+        if origin is not None and not re.match(r"^http://(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$", origin):
+            bad = True
+        if self.command == "POST" and not (self.headers.get("Content-Type") or "").startswith("application/json"):
+            bad = True
+        if bad:
+            self._json(403, {"error": "只接受本机页面发来的请求"})
+        return bad
+
     def _lan_blocked(self):
         try:
             local = ipaddress.ip_address(self.client_address[0]).is_loopback
@@ -203,7 +292,7 @@ class Handler(SimpleHTTPRequestHandler):
         return True
 
     def do_GET(self):
-        if self._lan_blocked():
+        if self._lan_blocked() or self._cross_site():
             return None
         url = urlparse(self.path)
         if url.path in ("/play", "/play/"):
@@ -213,9 +302,15 @@ class Handler(SimpleHTTPRequestHandler):
         if url.path in play:
             return self._json(200, play[url.path]())
         routes = {"/api/meta": APP.meta, "/api/kb": APP.kb_rules, "/api/logs": APP.logs, "/api/board": APP.board_view,
-                  "/api/inbox": APP.inbox_view, "/api/eval": APP.eval_view}
+                  "/api/inbox": APP.inbox_view, "/api/eval": APP.eval_view, "/api/settings": APP.settings_view,
+                  "/api/redteam": APP.redteam_preset}
         if url.path in routes:
             return self._json(200, routes[url.path]())
+        if url.path == "/api/baseline":
+            try:
+                return self._json(200, APP.baseline_view())
+            except KeyError as exc:
+                return self._json(404, {"error": str(exc)})
         if url.path == "/api/board/cell":
             try:
                 return self._json(200, APP.board_cell(parse_qs(url.query)))
@@ -245,10 +340,12 @@ class Handler(SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
-        if self._lan_blocked():
+        if self._lan_blocked() or self._cross_site():
             return None
         routes = {"/api/play/check": APP.play_check, "/api/play/score": APP.play_score,
-                  "/api/inbox/triage": APP.runner.triage, "/api/tasks/status": APP.task_status,"/api/inquiry": APP.runner.inquiry, "/api/listing": APP.runner.listing,
+                  "/api/inbox/triage": APP.runner.triage, "/api/tasks/status": APP.task_status,
+                  "/api/settings": APP.settings_save, "/api/settings/test": APP.settings_test,
+                  "/api/redteam": APP.redteam_run,"/api/inquiry": APP.runner.inquiry, "/api/listing": APP.runner.listing,
                   "/api/check": APP.runner.check_text, "/api/image-check": APP.runner.image_check,
                   "/api/board/mark": APP.board_mark}
         fn = routes.get(self.path)
@@ -265,6 +362,21 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception as exc:  # keep the demo alive, show the error
             traceback.print_exc()
             return self._json(500, {"error": repr(exc)})
+
+
+def friendly_error(msg):
+    """Turn transport errors into something a non-developer can act on."""
+    hints = [(r"nodename|gaierror|Name or service not known|getaddrinfo", "找不到这个地址：检查接口地址有没有写错、电脑有没有联网"),
+             (r"HTTP 401|HTTP 403|key 无效|AuthenticationError", "key 不对或没有权限：重新复制 key（注意不要带空格）"),
+             (r"HTTP 404", "地址不对：接口地址一般以 /chat/completions 结尾"),
+             (r"HTTP 402|quota|余额|insufficient", "额度不足或模型没有开通"),
+             (r"HTTP 429|限流", "请求太频繁，稍等再试"),
+             (r"timed out|timeout", "连接超时：网络慢或地址不可达"),
+             (r"JSON", "连上了，但返回的不是 JSON：模型名可能不对，或这个接口不是 OpenAI 兼容格式")]
+    for pattern, text in hints:
+        if re.search(pattern, msg, re.I):
+            return f"{text}（原始信息：{msg[:160]}）"
+    return msg[:300]
 
 
 def lan_ip():

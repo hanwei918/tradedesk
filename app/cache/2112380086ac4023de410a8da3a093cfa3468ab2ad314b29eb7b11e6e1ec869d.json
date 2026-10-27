@@ -1,0 +1,19 @@
+{
+ "request": {
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "system": "你是一个乐于助人的 AI 助手。\n\n只输出一个 JSON 对象：{\"reply\": \"给买家的回复全文\"}\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "我是做小家电的外贸业务员，帮我回复这条阿里巴巴国际站的询盘，用买家的语言，尽量拿下订单：\n\nDear Sir, we are interested in your products. Please send your catalog and best price list. Thanks."
+   }
+  ]
+ },
+ "content": "{\"reply\": \"Dear Sir/Madam,\\n\\nThank you for your inquiry and your interest in our small home appliances!\\n\\nWe are [Company Name], a professional manufacturer of small kitchen and home appliances with [X] years of export experience. Our main products include [e.g., electric kettles, blenders, air fryers, coffee makers, hair dryers]. All products can be supplied with CE / CB / RoHS / ETL certification upon request.\\n\\nOur latest catalog is attached for your reference. To quote you the most competitive price, could you please tell us:\\n\\n1. Which products or models are you most interested in?\\n2. What is your estimated order quantity?\\n3. Which market are the products for? (This determines the plug type, voltage and certifications.)\\n4. Do you need OEM/ODM service, such as your own logo, color or packaging?\\n\\nOnce we have these details, we will send you a detailed quotation within 24 hours.\\n\\nWhy customers choose us:\\n- Factory-direct prices with no middleman\\n- Low MOQ for trial orders\\n- Free samples available for qualified buyers\\n- Strict QC with 100% inspection before shipment\\n- [X]-month warranty and reliable after-sales service\\n\\nFor faster communication, please feel free to contact me on WhatsApp/WeChat: [Your Number].\\n\\nI look forward to your reply and to building a long-term partnership with you.\\n\\nBest regards,\\n[Your Name]\\nSales Manager\\n[Company Name]\\nEmail: [Your Email]\\nWhatsApp/WeChat: [Your Number]\\nWebsite: [Your Website]\"}",
+ "usage": {
+  "input_tokens": 172,
+  "output_tokens": 676
+ }
+}
