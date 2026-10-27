@@ -1,0 +1,372 @@
+{
+ "note": "Second independent held-out set (30 cases, written blind to the checker code and the first held-out set). Labels follow the eval spec: section A product facts from data/products.json, section B regex/length rules from kb/rules.json. Expected label lists are sorted; an empty list means clean.",
+ "cases": [
+  {
+   "id": "K01",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Hi Jason,\nYes sir, this kettle is UL listed, so no problem for US retail.\nMOQ 500 pcs, USD 9.80/pc FOB Ningbo, 35 days after deposit."
+   },
+   "expected": [
+    "CERT"
+   ],
+   "why_zh": "断言持有 UL，而 KET-17S 没有 UL；起订量、价格、交期都合规。"
+  },
+  {
+   "id": "K02",
+   "platform": "alibaba_rfq",
+   "product_id": "AF-45D",
+   "fields": {
+    "reply": "About ETL: we don't have it yet, but we will apply for ETL and cover the testing cost.\nEverything else as quoted."
+   },
+   "expected": [
+    "CERT_OFFER"
+   ],
+   "why_zh": "先说没有 ETL，同一句又无条件承诺去申请，属于认证承诺（黄）而不是断言持有。"
+  },
+  {
+   "id": "K03",
+   "platform": "alibaba_rfq",
+   "product_id": "GS-12H",
+   "fields": {
+    "reply": "Hello Priya,\nok we checked with boss. For 3000 pcs best I can do is USD 10.20/pc FOB Ningbo.\nPacking 12 pcs per carton."
+   },
+   "expected": [
+    "PRICE"
+   ],
+   "why_zh": "10.20 低于 GS-12H 最低档 10.90。"
+  },
+  {
+   "id": "K04",
+   "platform": "alibaba_rfq",
+   "product_id": "BL-35P",
+   "fields": {
+    "reply": "Dear buyer,\n- MOQ for you is 300 pcs, mixed colors ok\n- Price USD 6.20/pc\n- Payment 30% T/T deposit, 70% against B/L copy"
+   },
+   "expected": [
+    "MOQ"
+   ],
+   "why_zh": "写的起订量 300 低于 BL-35P 的 1000。"
+  },
+  {
+   "id": "K05",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Hi Tom, good news:\n1) We can finish production in 20 days after your deposit.\n2) For the balance, you can pay 60 days after the goods arrive in LA.\nLet me know!"
+   },
+   "expected": [
+    "LEAD",
+    "PAYMENT"
+   ],
+   "why_zh": "交期 20 天短于 35 天；尾款到货后 60 天付属于货到后付款。"
+  },
+  {
+   "id": "K06",
+   "platform": "alibaba_rfq",
+   "product_id": "AF-45D",
+   "fields": {
+    "reply": "Estimado Sr. López:\nLe cotizamos FOB Ningbo con envío por avión, USD 24.50 por pieza.\nSaludos."
+   },
+   "expected": [
+    "FOB_AIR"
+   ],
+   "why_zh": "西语里把 FOB 用于空运，同句没有改报 FCA；价格 24.50 合规。"
+  },
+  {
+   "id": "K07",
+   "platform": "alibaba_rfq",
+   "product_id": "GS-12H",
+   "fields": {
+    "reply": "Since you need them fast, we'll send by air on FOB Ningbo terms. Lead time stays 35 days, MOQ 800 pcs."
+   },
+   "expected": [
+    "FOB_AIR"
+   ],
+   "why_zh": "空运用 FOB 条款且同句没提 FCA；交期 35 天、起订量 800 都合规。"
+  },
+  {
+   "id": "K08",
+   "platform": "amazon_us",
+   "product_id": "KET-17S",
+   "fields": {
+    "title": "Hot Item 1.7L Stainless Steel Electric Kettle with Auto Shut-Off and Boil-Dry Protection for Home Office",
+    "bullets[0]": "BPA-free lid and handle, safe for the whole family",
+    "bullets[1]": "304 stainless steel interior, concealed heating element"
+   },
+   "expected": [
+    "AMZ-01",
+    "AMZ-04",
+    "MATERIAL"
+   ],
+   "why_zh": "标题超 75 字符且含 Hot Item；KET-17S 没做 BPA 检测却写 BPA-free。"
+  },
+  {
+   "id": "K09",
+   "platform": "amazon_us",
+   "product_id": "AF-45D",
+   "fields": {
+    "title": "4.5L Digital Air Fryer with 8 Presets and 60-Min Timer",
+    "bullets[0]": "8 one-touch presets for fries, wings and veggies",
+    "bullets[1]": "Antibacterial nonstick basket, dishwasher safe",
+    "description": "PTFE-free nonstick surface for healthier cooking."
+   },
+   "expected": [
+    "AMZ-05",
+    "MATERIAL"
+   ],
+   "why_zh": "五点里写抗菌（Antibacterial）；炸篮涂层就是 PTFE 却写 PTFE-free。"
+  },
+  {
+   "id": "K10",
+   "platform": "amazon_us",
+   "product_id": "GS-12H",
+   "fields": {
+    "title": "Handheld Garment Steamer 1200W, Free Shipping",
+    "bullets[0]": "Vertical and horizontal steaming with fabric brush",
+    "description": "More ironing tips at www.yongjiang-demo.com"
+   },
+   "expected": [
+    "AMZ-03",
+    "AMZ-06"
+   ],
+   "why_zh": "标题含 Free Shipping；描述里有网址。"
+  },
+  {
+   "id": "K11",
+   "platform": "amazon_us",
+   "product_id": "BL-35P",
+   "fields": {
+    "title": "Portable Blender Cup 350ml USB-C Rechargeable!",
+    "bullets[0]": "Eco-friendly Tritan cup, rinses clean in seconds",
+    "bullets[1]": "Safety lock: motor stops when the cup is detached"
+   },
+   "expected": [
+    "AMZ-02",
+    "AMZ-05",
+    "US-01"
+   ],
+   "why_zh": "标题有感叹号；五点里的 Eco-friendly 同时触发五点禁用词和 FTC 笼统环保宣称。"
+  },
+  {
+   "id": "K12",
+   "platform": "amazon_us",
+   "product_id": "KET-17S",
+   "fields": {
+    "title": "Electric Kettle 1.7L, 304 Stainless Steel, Auto Shut-Off",
+    "description": "Proudly crafted in America by our design team. Now only $29.99 while in stock."
+   },
+   "expected": [
+    "AMZ-07",
+    "US-02"
+   ],
+   "why_zh": "描述写 crafted in America（美国原产宣称），还写了价格和库存；29.99 远高于出厂价，不算低价。"
+  },
+  {
+   "id": "K13",
+   "platform": "tiktok_mx",
+   "product_id": "KET-17S",
+   "fields": {
+    "title": "Hervidor eléctrico 1.7 L de acero inoxidable",
+    "text": "El hervidor número 1 en las cocinas mexicanas.\nCuenta con certificación NOM, listo para venta en México."
+   },
+   "expected": [
+    "CERT",
+    "TT-01"
+   ],
+   "why_zh": "“número 1”是绝对化用语；断言有 NOM，而 KET-17S 没有。"
+  },
+  {
+   "id": "K14",
+   "platform": "tiktok_mx",
+   "product_id": "AF-45D",
+   "fields": {
+    "title": "Freidora de aire digital 4.5 L",
+    "text": "Cocina sin aceite con el mejor precio de la tienda 🔥\n¿Dudas? Escríbenos por WhatsApp."
+   },
+   "expected": [
+    "TT-02",
+    "TT-03"
+   ],
+   "why_zh": "“mejor precio”是价格承诺；WhatsApp 是站外引流。"
+  },
+  {
+   "id": "K15",
+   "platform": "alibaba_rfq",
+   "product_id": "GS-12H",
+   "fields": {
+    "reply": "Hi Ana,\nNOM is not something we hold today. That said, we can help you get NOM certification before your shipment leaves.\nCB report and CE are available now."
+   },
+   "expected": [
+    "CERT_OFFER"
+   ],
+   "why_zh": "先否认持有 NOM，后一句无条件提出帮忙办 NOM，属于认证承诺。"
+  },
+  {
+   "id": "K16",
+   "platform": "alibaba_rfq",
+   "product_id": "BL-35P",
+   "fields": {
+    "reply": "Hola Carlos!\nGood news: the blender cup is ETL certified, so your Liverpool listing won't be a problem.\nAnd since it's your first order we can start at 500 pcs."
+   },
+   "expected": [
+    "CERT",
+    "MOQ"
+   ],
+   "why_zh": "断言有 ETL（实际没有）；起订量 500 低于 1000。"
+  },
+  {
+   "id": "K17",
+   "platform": "alibaba_rfq",
+   "product_id": "AF-45D",
+   "fields": {
+    "reply": "Hi Dana,\nfor a repeat customer like you we're happy to ship on open account, payment 90 days after arrival.\nPrice for 3000 pcs: USD 21.90/pc."
+   },
+   "expected": [
+    "PAYMENT",
+    "PRICE"
+   ],
+   "why_zh": "接受赊账（open account 90 天）；21.90 低于最低档 22.80。"
+  },
+  {
+   "id": "K18",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Is UL a must for your channel? Just so you know, this model is not UL or ETL listed; we hold CB + CE only.\nMOQ 500 pcs, USD 9.20/pc at 2000 pcs."
+   },
+   "expected": [],
+   "why_zh": "UL 出现在问句和否定句里，不是断言；价格 9.20 是正常档位。"
+  },
+  {
+   "id": "K19",
+   "platform": "alibaba_rfq",
+   "product_id": "AF-45D",
+   "fields": {
+    "reply": "Hi Mike,\nThanks for the target. USD 19.50 is noted, but we can't go that low.\n- 1000-2999 pcs: USD 24.50\n- 3000+ pcs: USD 22.80\nMOQ 1000 pcs, lead time 35-40 days."
+   },
+   "expected": [],
+   "why_zh": "19.50 是复述买家目标价且明确拒绝；报价最低 22.80 等于最低档，不算低价。"
+  },
+  {
+   "id": "K20",
+   "platform": "alibaba_rfq",
+   "product_id": "GS-12H",
+   "fields": {
+    "reply": "Dear Ms. Wong,\nUSD 11.60/pc for 800-2999 pcs, USD 10.90/pc for 3000+.\nDropping to USD 10.50 isn't possible, sorry.\nMOQ 800 pcs. Lead time 35 days after deposit."
+   },
+   "expected": [],
+   "why_zh": "报价都不低于 10.90；10.50 出现在否定句；交期正好 35 天；起订量 800。"
+  },
+  {
+   "id": "K21",
+   "platform": "alibaba_rfq",
+   "product_id": "BL-35P",
+   "fields": {
+    "reply": "Sorry, net 60 or open account is not possible for a first order.\nOur terms: 30% T/T deposit, 70% against B/L copy, or L/C at sight."
+   },
+   "expected": [],
+   "why_zh": "net 60 / open account 出现在否定句里，实际条款合规。"
+  },
+  {
+   "id": "K22",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "For the air shipment we'd suggest FCA Ningbo instead of FOB, since FOB is meant for sea freight.\nSea freight stays FOB Ningbo at USD 9.80/pc."
+   },
+   "expected": [],
+   "why_zh": "同一句提到 FOB 和空运但改报 FCA；第二句 FOB 是海运。"
+  },
+  {
+   "id": "K23",
+   "platform": "alibaba_rfq",
+   "product_id": "AF-45D",
+   "fields": {
+    "reply": "Hola Sr. Pérez,\nEl precio FOB Ningbo aplica solo para envío marítimo.\nSi lo necesita por avión, le cotizamos FCA aeropuerto de Ningbo.\nMOQ 1000 piezas."
+   },
+   "expected": [],
+   "why_zh": "FOB 那句是海运；说空运的那句报的是 FCA，没有 FOB。"
+  },
+  {
+   "id": "K24",
+   "platform": "alibaba_rfq",
+   "product_id": "GS-12H",
+   "fields": {
+    "reply": "Understood that your importer says the steamer must be UL certified for Walmart.\nWe only have CB and CE today, so please confirm with them whether a CB-based route works."
+   },
+   "expected": [],
+   "why_zh": "“must be UL certified”是买家的要求，不是断言；随后明确只有 CB 和 CE，也没有主动提出去办认证。"
+  },
+  {
+   "id": "K25",
+   "platform": "tiktok_mx",
+   "product_id": "KET-17S",
+   "fields": {
+    "title": "Hervidor eléctrico 1.7 L",
+    "text": "Certificaciones:\n- CE (LVD/EMC)\n- Reporte CB\n¿Tiene NOM? Este modelo no tiene NOM por ahora."
+   },
+   "expected": [],
+   "why_zh": "“Certificaciones:”是标题行；NOM 出现在问句和否定句；没写 IEC 编号以免触发电话号码规则。"
+  },
+  {
+   "id": "K26",
+   "platform": "amazon_us",
+   "product_id": "AF-45D",
+   "fields": {
+    "title": "4.5L Digital Air Fryer, 8 Presets, Touch Panel, 60-Min Timer",
+    "bullets[0]": "What can it cook? Fries, wings and veggies with one touch",
+    "bullets[1]": "Basket goes straight into the dishwasher",
+    "description": "1400W, 120V 60Hz. Restock-friendly basket liners sold separately."
+   },
+   "expected": [],
+   "why_zh": "问号在五点里不在标题里，不受 AMZ-02 约束；Restock 不是 in stock；没有价格。"
+  },
+  {
+   "id": "K27",
+   "platform": "amazon_us",
+   "product_id": "KET-17S",
+   "fields": {
+    "title": "Electric Kettle 1.7L, 304 Stainless Steel, Auto Shut-Off, 360° Base",
+    "bullets[0]": "Built for American kitchens: 120V, 1500W",
+    "bullets[1]": "Boil-dry protection and concealed heating element",
+    "description": "Stock up for the holidays. Lid and handle are PP plastic."
+   },
+   "expected": [],
+   "why_zh": "Built for American 不是 built in America；Stock up 不是 in stock；没写 BPA-free。"
+  },
+  {
+   "id": "K28",
+   "platform": "tiktok_mx",
+   "product_id": "GS-12H",
+   "fields": {
+    "title": "Vaporizador de mano para ropa",
+    "text": "Quita arrugas en unos 25 segundos (prueba interna de fábrica).\nIdeal para cualquier número de prendas.\nPrecio especial de lanzamiento, pregúntanos por el chat de la tienda."
+   },
+   "expected": [],
+   "why_zh": "“número de prendas”不是“número 1”；“precio especial”不是“mejor precio”；站内聊天不算站外引流。"
+  },
+  {
+   "id": "K29",
+   "platform": "tiktok_mx",
+   "product_id": "BL-35P",
+   "fields": {
+    "title": "Vaso licuadora portátil 350 ml",
+    "text": "Carga USB-C, 6 cuchillas de acero inoxidable.\nMás barato que comprar jugos todos los días 😉"
+   },
+   "expected": [],
+   "why_zh": "“Más barato que…”不符合“el más barato / precio más barato”的规则写法；不涉及认证和材料。"
+  },
+  {
+   "id": "K30",
+   "platform": "alibaba_rfq",
+   "product_id": "BL-35P",
+   "fields": {
+    "reply": "Hi Rosa,\nMinimum is 1000 pcs per color, so 2 colors means 2000 pcs total.\nUSD 6.20/pc, or USD 5.70/pc from 5000 pcs.\nLead time 35-40 days; free logo printing on the color box above 1000 pcs."
+   },
+   "expected": [],
+   "why_zh": "按颜色算起订量仍是 1000；5.70 正好是最低档；交期 35-40 天；“above 1000 pcs”是印 logo 门槛不是起订量。"
+  }
+ ]
+}

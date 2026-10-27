@@ -1,0 +1,77 @@
+{
+  "note": "示例询盘：全部为虚构文本，买家公司、人名、邮箱均不存在。用于固定演示输入，保证现场可重复。",
+  "inquiries": [
+    {
+      "id": "INQ-US-01",
+      "label_zh": "美国买家 · 英文 · 要空运 FOB",
+      "platform": "alibaba_rfq",
+      "language": "en",
+      "product_id": "KET-17S",
+      "text": "Hi, we are a kitchenware importer in Texas selling on Amazon. Interested in your 1.7L stainless kettle, 1,200 pcs for first order. Need it UL listed and BPA free, with our logo on the box. Please quote FOB Ningbo by air, we need goods in 20 days. Payment: we usually pay 100% 60 days after delivery. Best, Mark (purchasing@example-kitchen.com)",
+      "intent_zh": "报 FOB 宁波海运价，MOQ 500 没问题，付款要 30% 定金，交期 35 天。UL 我们没有。"
+    },
+    {
+      "id": "INQ-MX-01",
+      "label_zh": "墨西哥买家 · 西语 · 分销商",
+      "platform": "alibaba_rfq",
+      "language": "es",
+      "product_id": "KET-17S",
+      "text": "Buenas tardes, somos distribuidores de electrodomésticos en Guadalajara. Nos interesa el hervidor eléctrico de acero inoxidable de 1.7 L, unas 3,000 piezas al año. ¿Cuentan con certificación NOM? ¿Pueden enviar precio CIF Manzanillo y catálogo? Saludos, Lucía Ramírez",
+      "intent_zh": "先报 FOB 宁波阶梯价，CIF 曼萨尼约需要确认运费后再报；NOM 目前没有，可以配合买家做；可以寄样。"
+    },
+    {
+      "id": "INQ-US-02",
+      "label_zh": "美国买家 · 英文 · 空气炸锅",
+      "platform": "alibaba_rfq",
+      "language": "en",
+      "product_id": "AF-45D",
+      "text": "Hello, do you have FCC and ETL for the 4.5L air fryer? We want 800 units, PTFE-free basket preferred. Target price USD 20 FOB. Can you ship within 30 days?",
+      "intent_zh": "MOQ 是 1000，价格最低 22.8（3000 台以上），篮子是 PTFE 涂层，不能说无 PTFE。"
+    },
+    {
+      "id": "INQ-US-03",
+      "label_zh": "美国酒店采购 · 英文 · 挂烫机",
+      "platform": "alibaba_rfq",
+      "language": "en",
+      "product_id": "GS-12H",
+      "text": "Hello, I manage procurement for a 40-property hotel group in Florida. We plan to place one garment steamer in each guest room, about 3,200 units in total, delivered in two lots in Q1. Please quote FOB Ningbo by sea for 3,000+ units, and confirm whether the unit has ETL or UL. We normally pay by L/C at sight. Could you also send 2 samples to our Orlando office? Regards, Dana Whitfield, Procurement Manager",
+      "intent_zh": "报 3000 台以上阶梯价 10.90，L/C 即期可以；没有 ETL/UL，如实说明，可以评估办理；样品按资料里的样品政策。"
+    },
+    {
+      "id": "INQ-MX-02",
+      "label_zh": "墨西哥小卖家 · 西语 · 只问价格",
+      "platform": "alibaba_rfq",
+      "language": "es",
+      "product_id": "BL-35P",
+      "text": "Hola, precio? quiero 100 piezas y muestra gratis. gracias",
+      "intent_zh": "MOQ 1000，100 个做不了；样品按资料政策收费；礼貌回复，问清楚销售渠道。"
+    },
+    {
+      "id": "INQ-US-04",
+      "label_zh": "来源不明 · 英文 · 只要目录",
+      "platform": "alibaba_rfq",
+      "language": "en",
+      "product_id": "KET-17S",
+      "text": "Dear Sir, we are interested in your products. Please send your catalog and best price list. Thanks.",
+      "intent_zh": "礼貌回复，请对方说明公司、目标市场、数量，再报价；不留站外联系方式。"
+    },
+    {
+      "id": "INQ-US-05",
+      "label_zh": "美国亚马逊卖家 · 英文 · 榨汁杯",
+      "platform": "alibaba_rfq",
+      "language": "en",
+      "product_id": "BL-35P",
+      "text": "Hi, we sell kitchen gadgets on Amazon US. Looking for your portable blender cup, 2,000 units, with our logo. We need it FCC certified and BPA free, and we need shipment within 25 days. Can you do USD 5.20 FOB? Best, Kevin, Brightline Home LLC",
+      "intent_zh": "报 FOB 宁波 6.20（5000 以上 5.70）；没有 FCC 报告，杯体只有材料商的 BPA-free 声明、没有成品第三方报告，如实说明；交期 35 天。"
+    },
+    {
+      "id": "INQ-MX-03",
+      "label_zh": "墨西哥分销商 · 西语 · 空气炸锅",
+      "platform": "alibaba_rfq",
+      "language": "es",
+      "product_id": "AF-45D",
+      "text": "Buen día, somos un distribuidor de línea blanca en Monterrey con 12 sucursales. Nos interesa la freidora de aire digital de 4.5 L, 1,500 unidades para la temporada de diciembre. Necesitamos que cumpla con la NOM y el manual en español. ¿Pueden cotizar CIF Veracruz? Pago 30% anticipo y 70% contra copia de B/L. Saludos, Jorge Treviño, Compras",
+      "intent_zh": "先报 FOB 宁波 24.50（3000 以上 22.80），CIF 维拉克鲁斯确认运费后再报；没有 NOM，可以配合办理；说明书可以做西语版（需确认周期）。付款方式可以接受。"
+    }
+  ]
+}

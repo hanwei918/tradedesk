@@ -1,0 +1,19 @@
+{
+ "request": {
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "system": "你是外贸工厂的\"询盘分析员\"。读一条买家询盘，把买家要什么、和工厂能给什么之间的差距找出来，给业务员看。\n\n规则：\n- 只根据询盘原文和给你的工厂/产品资料判断，不猜测、不补充外部信息。\n- 每一条 requests、signals、conflicts 都必须带 `quote`：从询盘原文里逐字复制的一小段（不超过 20 个词），证明这条判断有出处。找不到原文依据的条目不要写。\n- conflicts 只写买家要求和工厂资料确实对不上的地方（认证、付款、交期、运输方式、价格、数量、材料宣称等）。\n- 所有说明用简体中文。\n\n只输出 JSON，结构如下：\n{\n  \"buyer\": {\"country_guess\": \"...\", \"language\": \"en|es|...\", \"business_type_zh\": \"...\", \"sales_channel_zh\": \"...\"},\n  \"requests\": [{\"topic_zh\": \"数量|价格条款|认证|付款|交期|包装|样品|其他\", \"value\": \"...\", \"quote\": \"...\"}],\n  \"signals\": [{\"signal_zh\": \"询盘质量信号，例如：给出具体数量、说明销售渠道、使用公司邮箱\", \"positive\": true, \"quote\": \"...\"}],\n  \"conflicts\": [{\"topic_zh\": \"...\", \"buyer_wants\": \"...\", \"factory_can\": \"...\", \"severity\": \"red|amber\", \"quote\": \"...\"}],\n  \"summary_zh\": \"一句话：这个买家是谁、值不值得优先跟进、最大的风险是什么\"\n}\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": "## 询盘原文\nDear Sir, we are interested in your products. Please send your catalog and best price list. Thanks.\n\n## 工厂与产品资料\n{\n \"factory\": {\n  \"name_zh\": \"甬江小家电（示例工厂）\",\n  \"name_en\": \"Yongjiang Small Appliances (demo factory)\",\n  \"city\": \"Ningbo\",\n  \"port\": \"Ningbo-Zhoushan\",\n  \"capacity_units_per_month\": 20000,\n  \"standard_lead_time_days\": 35,\n  \"payment_terms_accepted\": [\n   \"30% T/T deposit, 70% against B/L copy\",\n   \"L/C at sight\"\n  ],\n  \"sales_contact_role\": \"业务员\",\n  \"services\": [\n   \"可寄样：样品按出厂单价收费，国际运费由买家承担；量产订单可抵扣样品费\",\n   \"可安排视频验厂（阿里国际站视频通话）\",\n   \"彩盒可印买家 logo：1000 个以上免费，以下每个加收 USD 0.15，需买家提供矢量稿\"\n  ]\n },\n \"product\": {\n  \"id\": \"KET-17S\",\n  \"name_zh\": \"1.7L 不锈钢电热水壶\",\n  \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n  \"specs\": {\n   \"capacity_l\": 1.7,\n   \"power_w_us\": 1500,\n   \"voltage_us\": \"120V 60Hz\",\n   \"power_w_mx\": 1500,\n   \"voltage_mx\": \"127V 60Hz\",\n   \"inner_material\": \"304 stainless steel\",\n   \"lid_handle_material\": \"PP plastic\",\n   \"features\": [\n    \"auto shut-off\",\n    \"boil-dry protection\",\n    \"360° swivel base\",\n    \"concealed heating element\"\n   ]\n  },\n  \"certifications_held\": [\n   \"CB report (IEC 60335-2-15)\",\n   \"CE (LVD/EMC)\"\n  ],\n  \"certifications_not_held\": [\n   \"UL\",\n   \"ETL\",\n   \"NOM\",\n   \"FDA registration\"\n  ],\n  \"material_tests\": {\n   \"BPA\": \"未做 BPA 检测报告\",\n   \"LFGB\": \"未做\"\n  },\n  \"moq_units\": 500,\n  \"fob_ningbo_usd\": {\n   \"500-1999\": 9.8,\n   \"2000-4999\": 9.2,\n   \"5000+\": 8.7\n  },\n  \"packaging\": \"color box, 6 units per carton\",\n  \"selling_points_zh\": [\n   \"304 不锈钢内胆\",\n   \"干烧自动断电\",\n   \"360° 旋转底座\",\n   \"隐藏式发热盘，好清洁\",\n   \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n  ]\n }\n}"
+   }
+  ]
+ },
+ "content": "{\"buyer\":{\"country_guess\":\"无法判断（询盘未提及国家或地区）\",\"language\":\"en\",\"business_type_zh\":\"无法判断（未说明是进口商、批发商、零售商还是终端用户）\",\"sales_channel_zh\":\"未说明\"},\"requests\":[{\"topic_zh\":\"其他\",\"value\":\"索要产品目录\",\"quote\":\"Please send your catalog\"},{\"topic_zh\":\"价格条款\",\"value\":\"索要最优价格表，未指定产品、数量或贸易条款\",\"quote\":\"best price list\"}],\"signals\":[{\"signal_zh\":\"通用模板式开头，未称呼具体联系人，可能为群发询盘\",\"positive\":false,\"quote\":\"Dear Sir, we are interested in your products.\"},{\"signal_zh\":\"未指明具体产品型号，只泛指“your products”\",\"positive\":false,\"quote\":\"interested in your products\"},{\"signal_zh\":\"只要目录和价格表，未给出数量、目标市场、认证或交期等任何采购细节\",\"positive\":false,\"quote\":\"Please send your catalog and best price list. Thanks.\"}],\"conflicts\":[],\"summary_zh\":\"这是一封无国家、无产品、无数量的通用群发式询盘，买家身份不明，暂无与工厂条件的明确冲突，不建议优先投入；可回复 KET-17S 简要资料和阶梯价（FOB 宁波 USD 9.8/8.7，MOQ 500），同时追问目标市场、电压/认证需求和采购数量来筛选。最大风险是这是比价或收集资料的无效询盘，以及买家所在市场可能需要工厂没有的认证（如 UL/ETL/NOM）。\"}",
+ "usage": {
+  "input_tokens": 1526,
+  "output_tokens": 705
+ }
+}

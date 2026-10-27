@@ -1,0 +1,32 @@
+{
+ "request": {
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "system": "你是 Amazon 美国站的主图审核员。下面给你一张产品主图、产品资料，以及一组只能靠看图判断的规则（每条有编号、原文摘录和要判断的问题）。\n\n逐条看图判断。对每一个问题：\n- 必须写 `rule_id`：只能是下面列出的规则编号之一。\n- 必须写 `evidence_zh`：你在图里具体看到了什么（例如\"左上角有红色圆形徽章，文字 BEST SELLER\"）。说不出看到了什么，就不要报。\n- severity：red = 明确违反规则；amber = 有风险、需要人确认。\n- problem_zh / suggestion_zh 用简体中文，建议要具体可执行。\n- 尺寸、白底、产品占比这些像素指标已经由代码测量，不需要你判断。\n\n只输出 JSON：\n{\"findings\": [{\"rule_id\": \"...\", \"evidence_zh\": \"...\", \"severity\": \"red|amber\", \"problem_zh\": \"...\", \"suggestion_zh\": \"...\"}], \"description_zh\": \"一句话描述这张图\"}\n如果没有问题：{\"findings\": [], \"description_zh\": \"...\"}\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "image",
+      "source": {
+       "type": "base64",
+       "media_type": "image/png",
+       "data": "<image sha256 7e067cbafd4e5092, 942792 b64 chars>"
+      }
+     },
+     {
+      "type": "text",
+      "text": "## 规则\n[\n {\n  \"rule_id\": \"IMG-06\",\n  \"title_zh\": \"主图须是真实、专业的产品照片\",\n  \"excerpt\": \"Accurately represent the product as a realistic, professional-quality image.\",\n  \"question_zh\": \"这张图是不是真实拍摄的专业产品照片？如果是插画、示意图、渲染草图或占位图，请指出。\"\n },\n {\n  \"rule_id\": \"IMG-07\",\n  \"title_zh\": \"产品在图中只出现一次\",\n  \"excerpt\": \"Only show the product once in the image.\",\n  \"question_zh\": \"图中同一产品是否出现了不止一次（多个视图或多个产品）？\"\n },\n {\n  \"rule_id\": \"IMG-08\",\n  \"title_zh\": \"不能出现非随附的道具\",\n  \"excerpt\": \"Don't show accessories or any props that aren't included with the product and could confuse the customer.\",\n  \"question_zh\": \"图中是否有产品本身不附带的道具或配件（杯子、食物、植物等）？\"\n },\n {\n  \"rule_id\": \"IMG-09\",\n  \"title_zh\": \"图片中不能有促销宣称和评价\",\n  \"excerpt\": \"No images of customer reviews, five-star imagery, claims (for example, free shipping), or selling partner-specific information.\",\n  \"question_zh\": \"图中是否有文字宣称、促销语、五星或评价图案、卖家信息？请写出看到的文字。\"\n },\n {\n  \"rule_id\": \"IMG-10\",\n  \"title_zh\": \"不能使用类似 Amazon 的徽章\",\n  \"excerpt\": \"No badges used on Amazon, or variations, modifications, or anything confusingly similar to such badges.\",\n  \"question_zh\": \"图中是否有类似 Best seller、Top seller、Amazon's Choice 的徽章或标签？\"\n }\n]\n\n## 产品资料\n{\n \"id\": \"KET-17S\",\n \"name_zh\": \"1.7L 不锈钢电热水壶\",\n \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n \"specs\": {\n  \"capacity_l\": 1.7,\n  \"power_w_us\": 1500,\n  \"voltage_us\": \"120V 60Hz\",\n  \"power_w_mx\": 1500,\n  \"voltage_mx\": \"127V 60Hz\",\n  \"inner_material\": \"304 stainless steel\",\n  \"lid_handle_material\": \"PP plastic\",\n  \"features\": [\n   \"auto shut-off\",\n   \"boil-dry protection\",\n   \"360° swivel base\",\n   \"concealed heating element\"\n  ]\n },\n \"certifications_held\": [\n  \"CB report (IEC 60335-2-15)\",\n  \"CE (LVD/EMC)\"\n ],\n \"certifications_not_held\": [\n  \"UL\",\n  \"ETL\",\n  \"NOM\",\n  \"FDA registration\"\n ],\n \"material_tests\": {\n  \"BPA\": \"未做 BPA 检测报告\",\n  \"LFGB\": \"未做\"\n },\n \"moq_units\": 500,\n \"fob_ningbo_usd\": {\n  \"500-1999\": 9.8,\n  \"2000-4999\": 9.2,\n  \"5000+\": 8.7\n },\n \"packaging\": \"color box, 6 units per carton\",\n \"selling_points_zh\": [\n  \"304 不锈钢内胆\",\n  \"干烧自动断电\",\n  \"360° 旋转底座\",\n  \"隐藏式发热盘，好清洁\",\n  \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n ]\n}\n\n## 代码已测量的像素指标（仅供参考）\n{\n \"width\": 1500,\n \"height\": 1500,\n \"longest_side\": 1500,\n \"white_border\": 0.0,\n \"exact_white_border\": 0.0,\n \"fill\": 1.0,\n \"bbox\": [\n  0.0,\n  0.0,\n  1.0,\n  1.0\n ],\n \"touches_edge\": true\n}"
+     }
+    ]
+   }
+  ]
+ },
+ "content": "{\"findings\": [{\"rule_id\": \"IMG-06\", \"evidence_zh\": \"整张图是矢量插画风格：水壶由纯色块和线性渐变构成，没有真实材质纹理、反光和阴影细节，水位窗只是一个浅灰圆角矩形，指示灯是一个蓝色圆点。\", \"severity\": \"red\", \"problem_zh\": \"主图是插画或示意图，不是真实拍摄的专业产品照片，不能准确呈现产品外观。\", \"suggestion_zh\": \"换成实物水壶（含底座）的专业棚拍照片，要求光线均匀、对焦清晰，能看清 304 不锈钢壶身和 PP 壶盖、把手的真实质感。\"}, {\"rule_id\": \"IMG-08\", \"evidence_zh\": \"水壶右下角有一只红色马克杯，杯中盛有深棕色液体（类似咖啡）。\", \"severity\": \"red\", \"problem_zh\": \"产品资料显示包装只有彩盒装水壶，不含杯子。马克杯属于非随附道具，可能让买家误以为杯子包含在内。\", \"suggestion_zh\": \"从主图中删除马克杯及杯中液体，只保留水壶和底座。场景搭配可以放到副图中展示。\"}, {\"rule_id\": \"IMG-09\", \"evidence_zh\": \"图片底部有黑色横幅，黄色大字写着 \\\"FREE SHIPPING · 5★\\\"，其中包含五角星图案。\", \"severity\": \"red\", \"problem_zh\": \"主图出现了\\\"免运费\\\"促销宣称和五星评价图案，规则明确禁止。\", \"suggestion_zh\": \"删除底部整条黑色横幅及其中的 \\\"FREE SHIPPING\\\" 文字和五星图案，主图上不要添加任何促销文字或评分元素。\"}, {\"rule_id\": \"IMG-10\", \"evidence_zh\": \"左上角有一个红色圆形徽章，边缘为白色虚线，内有白色文字 \\\"BEST SELLER\\\"，并压在水壶壶嘴上方。\", \"severity\": \"red\", \"problem_zh\": \"该徽章与 Amazon 的 Best Seller 徽章易混淆，属于禁止使用的仿冒徽章，还遮挡了壶嘴。\", \"suggestion_zh\": \"删除左上角的 \\\"BEST SELLER\\\" 徽章，让壶嘴完整露出。\"}], \"description_zh\": \"一张插画风格的不锈钢电热水壶图：渐变色背景，右下角配有一杯咖啡，左上角有红色 BEST SELLER 徽章，底部有 \\\"FREE SHIPPING · 5★\\\" 黑色横幅。\"}",
+ "usage": {
+  "input_tokens": 4699,
+  "output_tokens": 923
+ }
+}

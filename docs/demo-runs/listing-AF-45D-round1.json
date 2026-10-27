@@ -1,0 +1,185 @@
+{
+ "run_id": "a50a1b50",
+ "round": 1,
+ "platforms": {
+  "amazon_us": {
+   "content": {
+    "title": "[Brand] 4.5L Air Fryer, 1400W Digital, 8 Presets, PTFE Nonstick Basket",
+    "bullets": [
+     "4.5L CAPACITY FOR EVERYDAY MEALS – The 4.5-liter (about 4.8-quart) basket holds fries, wings, veggies, or reheated leftovers, and the compact body fits on most countertops.",
+     "8 ONE-TOUCH PRESETS – Eight built-in cooking programs mean no guessing on time and temperature for everyday favorites. Pick a preset, press start, and get on with your day.",
+     "EASY DIGITAL TOUCH CONTROLS – The digital touch panel lets you set and adjust cooking with a tap. The 60-minute timer handles everything from quick snacks to longer roasts.",
+     "CRISPY RESULTS WITH LESS OIL – Hot circulating air gives food a golden, crispy finish while using less oil than traditional deep frying. You get the crunch you want without a pot of hot oil on the stove.",
+     "DISHWASHER-SAFE NONSTICK BASKET – The PTFE nonstick-coated basket releases food easily and goes straight into the dishwasher, so cleanup takes less time. Built for standard US outlets (120V, 60Hz, 1400W)."
+    ],
+    "description": "Get crispy, golden results without deep frying. The [Brand] 4.5L Digital Air Fryer circulates hot air around your food, so you can make fries, chicken wings, roasted vegetables, and more with less oil than a traditional fryer. The 1400-watt heating system runs on a standard 120V US outlet.\n\nCooking is simple. Choose one of 8 presets on the digital touch panel, or set your own time with the 60-minute timer. The 4.5-liter (about 4.8-quart) basket gives you room for snacks, sides, and weeknight dinners.\n\nCleanup is just as easy. The basket has a PTFE nonstick coating, so food releases without much scrubbing, and it is dishwasher safe.",
+    "search_terms": "airfryer quart small countertop cooker less oil fry crisp roast reheat touchscreen timer dishwasher safe 120V kitchen appliance dorm apartment fries wings",
+    "notes_zh": "标题按AMZ-01控制在75字符内（实测70），未写UL/ETL等资料中没有的认证，也未写PFOA-free（仅有供应商声明、无第三方报告）；少油只做定性表述，不给百分比；未写环保和产地宣称，也不含价格、MOQ等信息；是否需要Prop 65警示须由供应商检测资料确认，上架前请核实。"
+   },
+   "fields": {
+    "title": "[Brand] 4.5L Air Fryer, 1400W Digital, 8 Presets, PTFE Nonstick Basket",
+    "bullets[1]": "4.5L CAPACITY FOR EVERYDAY MEALS – The 4.5-liter (about 4.8-quart) basket holds fries, wings, veggies, or reheated leftovers, and the compact body fits on most countertops.",
+    "bullets[2]": "8 ONE-TOUCH PRESETS – Eight built-in cooking programs mean no guessing on time and temperature for everyday favorites. Pick a preset, press start, and get on with your day.",
+    "bullets[3]": "EASY DIGITAL TOUCH CONTROLS – The digital touch panel lets you set and adjust cooking with a tap. The 60-minute timer handles everything from quick snacks to longer roasts.",
+    "bullets[4]": "CRISPY RESULTS WITH LESS OIL – Hot circulating air gives food a golden, crispy finish while using less oil than traditional deep frying. You get the crunch you want without a pot of hot oil on the stove.",
+    "bullets[5]": "DISHWASHER-SAFE NONSTICK BASKET – The PTFE nonstick-coated basket releases food easily and goes straight into the dishwasher, so cleanup takes less time. Built for standard US outlets (120V, 60Hz, 1400W).",
+    "description": "Get crispy, golden results without deep frying. The [Brand] 4.5L Digital Air Fryer circulates hot air around your food, so you can make fries, chicken wings, roasted vegetables, and more with less oil than a traditional fryer. The 1400-watt heating system runs on a standard 120V US outlet.\n\nCooking is simple. Choose one of 8 presets on the digital touch panel, or set your own time with the 60-minute timer. The 4.5-liter (about 4.8-quart) basket gives you room for snacks, sides, and weeknight dinners.\n\nCleanup is just as easy. The basket has a PTFE nonstick coating, so food releases without much scrubbing, and it is dishwasher safe.",
+    "search_terms": "airfryer quart small countertop cooker less oil fry crisp roast reheat touchscreen timer dishwasher safe 120V kitchen appliance dorm apartment fries wings"
+   },
+   "diff": null,
+   "findings": [
+    {
+     "check": "model_review",
+     "severity": "amber",
+     "field": "bullets[5]",
+     "quote": "The PTFE nonstick-coated basket releases food easily and goes straight into the dishwasher",
+     "problem_zh": "供应商资料没有说明本产品是否需要加州 65 号提案警示。产品含 PTFE 不粘涂层，PFOA 只有供应商声明，没有第三方报告。目前商品页文案里没有任何 65 号提案警示，也没有标明 WARNING 的链接，是否合规无法确认，需要人工核实。",
+     "suggestion_zh": "请向工厂索取涂层及其他接触材料（含电源线、塑料件）的第三方检测报告，确认是否含有加州 65 号提案清单中的物质。如需警示，应在商品页加入完整警示文字，或加入标明 \"WARNING\" 的超链接，写明具体化学物质名称、危害类型和 www.P65Warnings.ca.gov。不要在资料未确认的情况下自行写入化学物质名称。",
+     "source": {
+      "type": "kb",
+      "rule_id": "US-03",
+      "title_zh": "加州 65 号提案：网购须在商品页展示警示",
+      "excerpt": "a warning on the product display page, or (B) a clearly marked hyperlink using the word",
+      "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25602"
+     },
+     "by": "model"
+    }
+   ],
+   "dropped": [],
+   "risk": "amber",
+   "review_skipped": null,
+   "rules_checked": [
+    "AMZ-01",
+    "AMZ-02",
+    "AMZ-03",
+    "AMZ-04",
+    "AMZ-05",
+    "AMZ-06",
+    "AMZ-07",
+    "US-01",
+    "US-02",
+    "US-03",
+    "US-04"
+   ]
+  },
+  "tiktok_mx": {
+   "content": {
+    "hook": "¿Sigues friendo con un montón de aceite? Mira esto 👀",
+    "script": [
+     {
+      "shot_zh": "厨房台面特写，手从包装盒里拿出空气炸锅放到台面上",
+      "line": "Les presento mi nueva freidora de aire de 4.5 litros, ¡y está bien bonita!"
+     },
+     {
+      "shot_zh": "手指点触数显面板，屏幕亮起，依次切换预设菜单",
+      "line": "Tiene panel touch digital y 8 programas ya listos: nomás le picas y ya."
+     },
+     {
+      "shot_zh": "往篮子里放薯条，用刷子刷一点点油，推入锅中，设定时间",
+      "line": "Le pongo poquito aceite a las papas, le programo el tiempo, hasta 60 minutos, y me voy a hacer otra cosa."
+     },
+     {
+      "shot_zh": "拉出篮子，金黄薯条倒进盘子，咬一口发出脆响",
+      "line": "¡Miren nomás qué doraditas quedaron! Y con mucho menos aceite que en el sartén."
+     },
+     {
+      "shot_zh": "把篮子放进洗碗机，关门，对镜头比赞",
+      "line": "Y lo mejor para mí: la canasta va directo al lavavajillas. Cero batallar lavando."
+     }
+    ],
+    "caption": "Mi nueva compañera de cocina 🍟 Freidora de aire digital de 4.5 L con 8 programas, panel touch, timer de hasta 60 minutos y canasta que puedes meter al lavavajillas. Cocina con poquito aceite y sin tanto rollo. ¿Qué le meterían primero? 👇",
+    "hashtags": [
+     "#freidoradeaire",
+     "#airfryer",
+     "#cocinafacil",
+     "#recetasfaciles",
+     "#cocinamexicana",
+     "#tiktokshopmexico",
+     "#hogar"
+    ],
+    "notes_zh": "用墨西哥口语（nomás、le picas、cero batallar）展示开箱→触控预设→少油烹饪→洗碗机清洗，只写资料内事实（4.5L、8预设、触控数显、60分钟定时、篮子可进洗碗机、少油）；未提NOM/UL、PFOA无添加及健康功效；注意：资料标注额定电压为120V 60Hz，与要求写的127V不一致，为避免误标电气参数文案中暂未写电压，请确认产品实际额定电压后再补充。"
+   },
+   "fields": {
+    "hook": "¿Sigues friendo con un montón de aceite? Mira esto 👀",
+    "script[1]": "Les presento mi nueva freidora de aire de 4.5 litros, ¡y está bien bonita!",
+    "script[2]": "Tiene panel touch digital y 8 programas ya listos: nomás le picas y ya.",
+    "script[3]": "Le pongo poquito aceite a las papas, le programo el tiempo, hasta 60 minutos, y me voy a hacer otra cosa.",
+    "script[4]": "¡Miren nomás qué doraditas quedaron! Y con mucho menos aceite que en el sartén.",
+    "script[5]": "Y lo mejor para mí: la canasta va directo al lavavajillas. Cero batallar lavando.",
+    "caption": "Mi nueva compañera de cocina 🍟 Freidora de aire digital de 4.5 L con 8 programas, panel touch, timer de hasta 60 minutos y canasta que puedes meter al lavavajillas. Cocina con poquito aceite y sin tanto rollo. ¿Qué le meterían primero? 👇",
+    "hashtags": "#freidoradeaire #airfryer #cocinafacil #recetasfaciles #cocinamexicana #tiktokshopmexico #hogar"
+   },
+   "diff": null,
+   "findings": [],
+   "dropped": [],
+   "risk": "green",
+   "review_skipped": null,
+   "rules_checked": [
+    "MX-01",
+    "MX-02",
+    "MX-03",
+    "TT-01",
+    "TT-02",
+    "TT-03"
+   ]
+  }
+ },
+ "trace": [
+  {
+   "step": "生成 Amazon 美国站 · Listing · 第 1 轮",
+   "role": "Amazon 运营",
+   "meta": {
+    "source": "replay",
+    "cache_key": "d2d3d442b73c",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2204,
+     "output_tokens": 1809
+    }
+   }
+  },
+  {
+   "step": "合规审核 · amazon_us",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "f043f171c68b",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2422,
+     "output_tokens": 554
+    }
+   }
+  },
+  {
+   "step": "生成 TikTok Shop 墨西哥 · 种草短视频 · 第 1 轮",
+   "role": "TikTok 内容运营",
+   "meta": {
+    "source": "replay",
+    "cache_key": "263ad09a98e4",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 1668,
+     "output_tokens": 1364
+    }
+   }
+  },
+  {
+   "step": "合规审核 · tiktok_mx",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "e0468839e164",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2231,
+     "output_tokens": 113
+    }
+   }
+  }
+ ]
+}

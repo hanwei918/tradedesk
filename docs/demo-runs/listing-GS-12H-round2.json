@@ -1,0 +1,563 @@
+{
+ "run_id": "4d40c262",
+ "round": 2,
+ "platforms": {
+  "amazon_us": {
+   "content": {
+    "title": "[Brand] Handheld Garment Steamer, 260ml Tank, 1200W, Auto Shut-Off",
+    "bullets": [
+     "READY IN ABOUT 25 SECONDS – Our 1200W handheld steamer heats up in about 25 seconds (based on our in-house testing). You can de-wrinkle a shirt or dress before heading out instead of waiting around.",
+     "STEAM HANGING OR FLAT – Use it vertically to refresh clothes right on the hanger, or horizontally on a flat surface for pants, linens, and more. One compact steamer handles both, with no ironing board required.",
+     "EASY-FILL DETACHABLE 260ML TANK – The water tank detaches from the steamer, so refilling at the sink is quick and easy. The 260ml capacity gives you room to steam several garments between fills.",
+     "AUTO SHUT-OFF FOR ADDED CONVENIENCE – The built-in auto shut-off feature helps if you get distracted mid-task. The steamer is designed for standard US outlets (120V, 60Hz).",
+     "FABRIC BRUSH INCLUDED – Attach the included fabric brush to help work steam into thicker fabrics and smooth out garments as you go. It's a practical pick for home, dorm, or travel use."
+    ],
+    "description": "Skip the ironing board. The [Brand] Handheld Garment Steamer puts 1200 watts of steaming power in a compact design that heats up in about 25 seconds (based on our in-house testing). It handles a wrinkled work shirt, a dress straight out of the suitcase, or curtains that need a refresh.\n\nSteam vertically while clothes hang, or switch to horizontal steaming for items laid flat. The 260ml water tank detaches for easy refilling at the sink, and the included fabric brush helps you handle heavier materials. An auto shut-off feature adds convenience during everyday use.\n\nThe steamer is built for US households and runs on 120V, 60Hz power. It is easy to keep in a closet or dorm room or pack in a carry-on, so you always have a quick way to look put-together.",
+    "search_terms": "clothes steamer portable fabric wrinkle remover travel steamer handheld vertical horizontal dorm hanging shirt dress curtain compact 120v",
+    "notes_zh": "Prop 65 方面：资料中 material_tests 为空，无法判断是否需要警示，因此未编造化学物质或 WARNING 文字。上架前需人工向工厂索取材料检测报告或 Prop 65 符合性声明。如确认需要警示，按 27 CCR 25603(a) 在商品页或后台合规字段补充 WARNING:、具体化学物质名称、危害类型及 www.P65Warnings.ca.gov。电压方面：127V 问题属于 TikTok 墨西哥站，本美国站文案已与规格一致（120V 60Hz），仍需向工厂确认是否有墨西哥 127V 版本。其他方面：标题 66 字符，未写 UL/ETL/CE/CB 等认证，25 秒已注明为内部测试，并删去了 search_terms 中可能误导的 steam iron。"
+   },
+   "fields": {
+    "title": "[Brand] Handheld Garment Steamer, 260ml Tank, 1200W, Auto Shut-Off",
+    "bullets[1]": "READY IN ABOUT 25 SECONDS – Our 1200W handheld steamer heats up in about 25 seconds (based on our in-house testing). You can de-wrinkle a shirt or dress before heading out instead of waiting around.",
+    "bullets[2]": "STEAM HANGING OR FLAT – Use it vertically to refresh clothes right on the hanger, or horizontally on a flat surface for pants, linens, and more. One compact steamer handles both, with no ironing board required.",
+    "bullets[3]": "EASY-FILL DETACHABLE 260ML TANK – The water tank detaches from the steamer, so refilling at the sink is quick and easy. The 260ml capacity gives you room to steam several garments between fills.",
+    "bullets[4]": "AUTO SHUT-OFF FOR ADDED CONVENIENCE – The built-in auto shut-off feature helps if you get distracted mid-task. The steamer is designed for standard US outlets (120V, 60Hz).",
+    "bullets[5]": "FABRIC BRUSH INCLUDED – Attach the included fabric brush to help work steam into thicker fabrics and smooth out garments as you go. It's a practical pick for home, dorm, or travel use.",
+    "description": "Skip the ironing board. The [Brand] Handheld Garment Steamer puts 1200 watts of steaming power in a compact design that heats up in about 25 seconds (based on our in-house testing). It handles a wrinkled work shirt, a dress straight out of the suitcase, or curtains that need a refresh.\n\nSteam vertically while clothes hang, or switch to horizontal steaming for items laid flat. The 260ml water tank detaches for easy refilling at the sink, and the included fabric brush helps you handle heavier materials. An auto shut-off feature adds convenience during everyday use.\n\nThe steamer is built for US households and runs on 120V, 60Hz power. It is easy to keep in a closet or dorm room or pack in a carry-on, so you always have a quick way to look put-together.",
+    "search_terms": "clothes steamer portable fabric wrinkle remover travel steamer handheld vertical horizontal dorm hanging shirt dress curtain compact 120v"
+   },
+   "diff": {
+    "title": [
+     {
+      "op": "equal",
+      "text": "[Brand] Handheld Garment Steamer, 260ml Tank, 1200W, Auto Shut-Off"
+     }
+    ],
+    "bullets[1]": [
+     {
+      "op": "equal",
+      "text": "READY IN ABOUT 25 SECONDS – Our 1200W handheld steamer heats up in about 25 seconds (based on our in-house testing)"
+     },
+     {
+      "op": "delete",
+      "text": ","
+     },
+     {
+      "op": "insert",
+      "text": "."
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "so you"
+     },
+     {
+      "op": "insert",
+      "text": "You"
+     },
+     {
+      "op": "equal",
+      "text": " can de-wrinkle a shirt or dress before heading out instead of waiting around."
+     }
+    ],
+    "bullets[2]": [
+     {
+      "op": "equal",
+      "text": "STEAM HANGING OR FLAT – Use it vertically to refresh clothes right on the hanger, or horizontally on a flat surface for pants, linens, and more. One compact steamer handles both, "
+     },
+     {
+      "op": "insert",
+      "text": "with "
+     },
+     {
+      "op": "equal",
+      "text": "no ironing board required."
+     }
+    ],
+    "bullets[3]": [
+     {
+      "op": "equal",
+      "text": "EASY-FILL DETACHABLE 260ML TANK – The water tank "
+     },
+     {
+      "op": "delete",
+      "text": "removes"
+     },
+     {
+      "op": "insert",
+      "text": "detaches"
+     },
+     {
+      "op": "equal",
+      "text": " from the steamer, so refilling at the sink is quick and "
+     },
+     {
+      "op": "delete",
+      "text": "mess-free"
+     },
+     {
+      "op": "insert",
+      "text": "easy"
+     },
+     {
+      "op": "equal",
+      "text": ". The 260ml capacity gives you room to steam several garments between fills."
+     }
+    ],
+    "bullets[4]": [
+     {
+      "op": "equal",
+      "text": "AUTO SHUT-OFF FOR "
+     },
+     {
+      "op": "delete",
+      "text": "PEACE"
+     },
+     {
+      "op": "insert",
+      "text": "ADDED"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "OF MIND"
+     },
+     {
+      "op": "insert",
+      "text": "CONVENIENCE"
+     },
+     {
+      "op": "equal",
+      "text": " – "
+     },
+     {
+      "op": "delete",
+      "text": "Built"
+     },
+     {
+      "op": "insert",
+      "text": "The built"
+     },
+     {
+      "op": "equal",
+      "text": "-in auto shut-off "
+     },
+     {
+      "op": "delete",
+      "text": "adds"
+     },
+     {
+      "op": "insert",
+      "text": "feature"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "an extra layer of convenience"
+     },
+     {
+      "op": "insert",
+      "text": "helps"
+     },
+     {
+      "op": "equal",
+      "text": " if you get distracted mid-task. "
+     },
+     {
+      "op": "delete",
+      "text": "Designed"
+     },
+     {
+      "op": "insert",
+      "text": "The steamer is designed"
+     },
+     {
+      "op": "equal",
+      "text": " for standard US outlets (120V, 60Hz)."
+     }
+    ],
+    "bullets[5]": [
+     {
+      "op": "equal",
+      "text": "FABRIC BRUSH INCLUDED – Attach the included fabric brush to help work steam into thicker fabrics and smooth out garments as you go. "
+     },
+     {
+      "op": "delete",
+      "text": "A"
+     },
+     {
+      "op": "insert",
+      "text": "It's a"
+     },
+     {
+      "op": "equal",
+      "text": " practical pick for home, dorm, or travel use."
+     }
+    ],
+    "description": [
+     {
+      "op": "equal",
+      "text": "Skip the ironing board. The [Brand] Handheld Garment Steamer puts 1200 watts of steaming power in a compact design that heats up in about 25 seconds (based on our in-house testing). "
+     },
+     {
+      "op": "delete",
+      "text": "Whether"
+     },
+     {
+      "op": "insert",
+      "text": "It"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "it's"
+     },
+     {
+      "op": "insert",
+      "text": "handles"
+     },
+     {
+      "op": "equal",
+      "text": " a wrinkled work shirt, a dress straight out of the suitcase, or curtains that need a refresh"
+     },
+     {
+      "op": "delete",
+      "text": ", you can get it done quickly"
+     },
+     {
+      "op": "equal",
+      "text": ".\n\nSteam vertically while clothes hang, or switch to horizontal steaming for items laid flat. The 260ml water tank detaches for easy refilling at the sink, and the included fabric brush helps you handle heavier materials. An auto shut-off feature adds convenience during everyday use.\n\n"
+     },
+     {
+      "op": "delete",
+      "text": "Built"
+     },
+     {
+      "op": "insert",
+      "text": "The steamer is built"
+     },
+     {
+      "op": "equal",
+      "text": " for US households "
+     },
+     {
+      "op": "delete",
+      "text": "with"
+     },
+     {
+      "op": "insert",
+      "text": "and"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "a"
+     },
+     {
+      "op": "insert",
+      "text": "runs on"
+     },
+     {
+      "op": "equal",
+      "text": " 120V, 60Hz "
+     },
+     {
+      "op": "delete",
+      "text": "plug,"
+     },
+     {
+      "op": "insert",
+      "text": "power."
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "this handheld steamer"
+     },
+     {
+      "op": "insert",
+      "text": "It"
+     },
+     {
+      "op": "equal",
+      "text": " is easy to keep in a closet"
+     },
+     {
+      "op": "delete",
+      "text": ","
+     },
+     {
+      "op": "insert",
+      "text": " or"
+     },
+     {
+      "op": "equal",
+      "text": " dorm room"
+     },
+     {
+      "op": "delete",
+      "text": ","
+     },
+     {
+      "op": "equal",
+      "text": " or"
+     },
+     {
+      "op": "insert",
+      "text": " pack in a"
+     },
+     {
+      "op": "equal",
+      "text": " carry-on, so you always have a quick way to look put-together."
+     }
+    ],
+    "search_terms": [
+     {
+      "op": "equal",
+      "text": "clothes steamer portable fabric wrinkle remover travel steamer handheld "
+     },
+     {
+      "op": "delete",
+      "text": "steam iron "
+     },
+     {
+      "op": "equal",
+      "text": "vertical horizontal dorm hanging shirt dress curtain compact 120v"
+     }
+    ]
+   },
+   "findings": [
+    {
+     "check": "model_review",
+     "severity": "amber",
+     "field": "description",
+     "quote": "The steamer is built for US households and runs on 120V, 60Hz power.",
+     "problem_zh": "该商品面向美国（含加州）销售，但供应商资料中 material_tests 为空，没有说明产品是否含有加州 65 号提案清单内的化学物质。商品页目前没有 65 号提案警示，也没有标明 WARNING 的链接。是否需要警示无法从资料判断，需要人工确认。",
+     "suggestion_zh": "先向工厂索取材料检测报告，确认电源线、外壳塑料、刷头等部件是否含 65 号提案清单物质（不得自行猜测化学物质）。如确需警示，按 US-04 要求在商品页加入完整警示：WARNING:、具体化学物质名称、危害类型及 www.P65Warnings.ca.gov，或加入标明 WARNING 的链接。如确认不需要，保留书面依据备查。",
+     "source": {
+      "type": "kb",
+      "rule_id": "US-03",
+      "title_zh": "加州 65 号提案：网购须在商品页展示警示",
+      "excerpt": "a warning on the product display page, or (B) a clearly marked hyperlink using the word",
+      "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25602"
+     },
+     "by": "model"
+    }
+   ],
+   "dropped": [],
+   "risk": "amber",
+   "review_skipped": null,
+   "rules_checked": [
+    "AMZ-01",
+    "AMZ-02",
+    "AMZ-03",
+    "AMZ-04",
+    "AMZ-05",
+    "AMZ-06",
+    "AMZ-07",
+    "US-01",
+    "US-02",
+    "US-03",
+    "US-04"
+   ]
+  },
+  "tiktok_mx": {
+   "content": {
+    "hook": "¿Otra vez tu camisa toda arrugada y sin ganas de sacar la plancha? Mira esto.",
+    "script": [
+     {
+      "shot_zh": "早上赶时间，人物拿起一件皱巴巴的衬衫，一脸无奈",
+      "line": "Neta, ya voy tarde y la camisa parece acordeón… ¿sacar el burro de planchar? Ni de chiste."
+     },
+     {
+      "shot_zh": "特写：取下水箱，在水龙头下加水，再装回去",
+      "line": "Mira, el tanque se quita, le pones agua directo de la llave y lo vuelves a poner. Le caben 260 mililitros."
+     },
+     {
+      "shot_zh": "插电开机，屏幕角落显示计时，蒸汽冒出",
+      "line": "Lo conectas y en unos 25 segunditos ya está echando vapor."
+     },
+     {
+      "shot_zh": "衬衫挂在门上竖着烫，接着把裤子平放在床上平烫，换上刷头刷外套",
+      "line": "Lo usas con la ropa colgada o acostada en la cama, como te acomode. Y trae su cepillo para la tela."
+     },
+     {
+      "shot_zh": "人物穿上平整的衬衫出门，对镜头比赞",
+      "line": "Y listo, camisa lisita y yo saliendo a tiempo. ¿A poco no está chido?"
+     }
+    ],
+    "caption": "Para las mañanas en las que no te da tiempo de planchar 👔💨 Vaporizador de mano de 1200 W / 120V 60Hz: echa vapor en aprox. 25 segundos (según prueba interna del fabricante), lo usas en vertical u horizontal, tanque desmontable de 260 ml para rellenar fácil, apagado automático y cepillo para tela incluido. Encuéntralo aquí en TikTok Shop 🛒",
+    "hashtags": [
+     "#vaporizadorderopa",
+     "#adiosarrugas",
+     "#tipsdecasa",
+     "#hogarpractico",
+     "#ropasinarrugas",
+     "#TikTokShopMexico",
+     "#cosasutiles"
+    ],
+    "notes_zh": "按风险提示修改：文案电压由127V改为资料规格“1200 W / 120V 60Hz”并补写频率。这与任务要求“电压写127V”冲突，但资料中只有120V 60Hz，写127V属于无依据的规格，所以按资料写。上线前请向工厂确认实际额定电压、是否适配墨西哥127V电网，以及有无127V版本；若确认有127V版本，再按确认后的规格改回。同时提醒工厂按MX-01在包装上用西语标注产品名、进口商名称地址、原产国（Hecho en China）及电压/功率/频率。Prop 65提示针对amazon_us商品页，不适用于本条TikTok墨西哥内容；本文案未加任何化学物质或材料安全描述，仍需人工向工厂索取材料测试报告或Prop 65符合性声明，用于美国站。其余内容保持不变：只讲资料卖点，不提NOM/UL/ETL，不用绝对化用语，不放站外信息。"
+   },
+   "fields": {
+    "hook": "¿Otra vez tu camisa toda arrugada y sin ganas de sacar la plancha? Mira esto.",
+    "script[1]": "Neta, ya voy tarde y la camisa parece acordeón… ¿sacar el burro de planchar? Ni de chiste.",
+    "script[2]": "Mira, el tanque se quita, le pones agua directo de la llave y lo vuelves a poner. Le caben 260 mililitros.",
+    "script[3]": "Lo conectas y en unos 25 segunditos ya está echando vapor.",
+    "script[4]": "Lo usas con la ropa colgada o acostada en la cama, como te acomode. Y trae su cepillo para la tela.",
+    "script[5]": "Y listo, camisa lisita y yo saliendo a tiempo. ¿A poco no está chido?",
+    "caption": "Para las mañanas en las que no te da tiempo de planchar 👔💨 Vaporizador de mano de 1200 W / 120V 60Hz: echa vapor en aprox. 25 segundos (según prueba interna del fabricante), lo usas en vertical u horizontal, tanque desmontable de 260 ml para rellenar fácil, apagado automático y cepillo para tela incluido. Encuéntralo aquí en TikTok Shop 🛒",
+    "hashtags": "#vaporizadorderopa #adiosarrugas #tipsdecasa #hogarpractico #ropasinarrugas #TikTokShopMexico #cosasutiles"
+   },
+   "diff": {
+    "hook": [
+     {
+      "op": "equal",
+      "text": "¿Otra vez tu camisa toda arrugada y sin ganas de sacar la plancha? Mira esto."
+     }
+    ],
+    "script[1]": [
+     {
+      "op": "equal",
+      "text": "Neta, ya voy tarde y la camisa parece acordeón… ¿sacar el burro de planchar? Ni de chiste."
+     }
+    ],
+    "script[2]": [
+     {
+      "op": "equal",
+      "text": "Mira, el tanque se quita, le pones agua directo de la llave y lo vuelves a poner. Le caben 260 mililitros."
+     }
+    ],
+    "script[3]": [
+     {
+      "op": "equal",
+      "text": "Lo conectas y en unos 25 segunditos ya está echando vapor."
+     }
+    ],
+    "script[4]": [
+     {
+      "op": "equal",
+      "text": "Lo usas con la ropa colgada o acostada en la cama, como te acomode. Y trae su cepillo para la tela."
+     }
+    ],
+    "script[5]": [
+     {
+      "op": "equal",
+      "text": "Y listo, camisa lisita y yo saliendo a tiempo. ¿A poco no está chido?"
+     }
+    ],
+    "caption": [
+     {
+      "op": "equal",
+      "text": "Para las mañanas en las que no te da tiempo de planchar 👔💨 Vaporizador de mano de 1200 W / "
+     },
+     {
+      "op": "delete",
+      "text": "127V"
+     },
+     {
+      "op": "insert",
+      "text": "120V 60Hz"
+     },
+     {
+      "op": "equal",
+      "text": ": echa vapor en aprox. 25 segundos (según prueba interna del fabricante), lo usas en vertical u horizontal, tanque desmontable de 260 ml para rellenar fácil, apagado automático y cepillo para tela incluido. Encuéntralo aquí en TikTok Shop 🛒"
+     }
+    ],
+    "hashtags": [
+     {
+      "op": "equal",
+      "text": "#vaporizadorderopa #adiosarrugas #tipsdecasa #hogarpractico #ropasinarrugas #TikTokShopMexico #cosasutiles"
+     }
+    ]
+   },
+   "findings": [],
+   "dropped": [],
+   "risk": "green",
+   "review_skipped": null,
+   "rules_checked": [
+    "MX-01",
+    "MX-02",
+    "MX-03",
+    "TT-01",
+    "TT-02",
+    "TT-03"
+   ]
+  }
+ },
+ "trace": [
+  {
+   "step": "生成 Amazon 美国站 · Listing · 第 2 轮",
+   "role": "Amazon 运营",
+   "meta": {
+    "source": "replay",
+    "cache_key": "859d50e79561",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 3713,
+     "output_tokens": 1504
+    }
+   }
+  },
+  {
+   "step": "合规审核 · amazon_us",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "0592dabbae27",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2408,
+     "output_tokens": 595
+    }
+   }
+  },
+  {
+   "step": "生成 TikTok Shop 墨西哥 · 种草短视频 · 第 2 轮",
+   "role": "TikTok 内容运营",
+   "meta": {
+    "source": "replay",
+    "cache_key": "11d7b4a8f4ac",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 3241,
+     "output_tokens": 1508
+    }
+   }
+  },
+  {
+   "step": "合规审核 · tiktok_mx",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "c10a085c0409",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2281,
+     "output_tokens": 196
+    }
+   }
+  }
+ ]
+}

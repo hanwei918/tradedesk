@@ -1,0 +1,103 @@
+{
+ "run_id": "8317cb89",
+ "metrics": {
+  "width": 450,
+  "height": 450,
+  "longest_side": 450,
+  "white_border": 1.0,
+  "exact_white_border": 1.0,
+  "fill": 0.895,
+  "bbox": [
+   0.2875,
+   0.05,
+   0.425,
+   0.895
+  ],
+  "touches_edge": false,
+  "background_ok": true
+ },
+ "findings": [
+  {
+   "check": "image_size",
+   "severity": "red",
+   "field": "image",
+   "quote": "",
+   "problem_zh": "最长边 450 像素，低于 500",
+   "suggestion_zh": "用更高分辨率的原图重新导出",
+   "source": {
+    "type": "kb",
+    "rule_id": "IMG-01",
+    "title_zh": "主图最长边不少于 500 像素",
+    "excerpt": "Images below 500 pixels on the longest side cannot be uploaded.",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881"
+   },
+   "by": "rule"
+  },
+  {
+   "check": "image_size",
+   "severity": "amber",
+   "field": "image",
+   "quote": "",
+   "problem_zh": "最长边 450 像素，低于 1000",
+   "suggestion_zh": "用更高分辨率的原图重新导出",
+   "source": {
+    "type": "kb",
+    "rule_id": "IMG-02",
+    "title_zh": "最长边 1000 像素以上才能放大",
+    "excerpt": "Images with 1,000+ pixels on the longest side enable the zoom function.",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881"
+   },
+   "by": "rule"
+  },
+  {
+   "check": "vision_review",
+   "severity": "red",
+   "field": "image",
+   "quote": "",
+   "problem_zh": "主图是卡通/矢量示意图，不是真实、专业的产品照片，不符合主图必须真实呈现产品的要求，可能被下架或抑制展示。",
+   "suggestion_zh": "用 BL-35P 实物在纯白背景下拍摄专业产品照：杯体与底座组装完整，透过透明 Tritan 杯体能看到 6 片不锈钢刀片，按键清晰可见。用柔光箱打光，保证材质和细节真实。也可以使用基于实物精确建模的高质量写实渲染，但不能使用简笔示意图。",
+   "source": {
+    "type": "kb",
+    "rule_id": "IMG-06",
+    "title_zh": "主图须是真实、专业的产品照片",
+    "excerpt": "Accurately represent the product as a realistic, professional-quality image.",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881"
+   },
+   "by": "model",
+   "evidence_zh": "图中只有平面矢量图形：上方是浅蓝渐变圆角矩形（模拟杯体），下方是深蓝圆角矩形，中间一个白色圆点（模拟按键）。没有真实材质、刀片、USB-C 接口、光影和产品细节，明显是示意图或占位图，不是实拍照片。"
+  }
+ ],
+ "dropped": [],
+ "risk": "red",
+ "review_skipped": null,
+ "description_zh": "白底上的便携榨汁杯简笔矢量示意图：上方浅蓝渐变杯体，下方深蓝底座，底座中间有一个白色圆形按键。",
+ "rules_checked": [
+  "IMG-01",
+  "IMG-02",
+  "IMG-03",
+  "IMG-04",
+  "IMG-05",
+  "IMG-06",
+  "IMG-07",
+  "IMG-08",
+  "IMG-09",
+  "IMG-10"
+ ],
+ "trace": [
+  {
+   "step": "看图审核",
+   "role": "主图审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "b70d0ae1fe45",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 1968,
+     "output_tokens": 430
+    }
+   }
+  }
+ ],
+ "image_name": "BL-35P_main.png"
+}

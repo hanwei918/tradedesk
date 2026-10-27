@@ -1,0 +1,71 @@
+{
+ "run_id": "df9ae008",
+ "metrics": {
+  "width": 1500,
+  "height": 1500,
+  "longest_side": 1500,
+  "white_border": 1.0,
+  "exact_white_border": 1.0,
+  "fill": 0.885,
+  "bbox": [
+   0.035,
+   0.0575,
+   0.8675,
+   0.885
+  ],
+  "touches_edge": false,
+  "background_ok": true
+ },
+ "findings": [
+  {
+   "check": "vision_review",
+   "severity": "red",
+   "field": "image",
+   "quote": "",
+   "problem_zh": "主图是电脑绘制的示意插画，不是真实拍摄的专业产品照片，不符合主图必须真实呈现产品的要求。",
+   "suggestion_zh": "用实物样品在纯白背景下进行专业棚拍，建议 45° 正侧角度，完整展示壶身、壶嘴、把手和底座。也可使用与实物完全一致的高精度写实渲染图。替换掉当前插画。",
+   "source": {
+    "type": "kb",
+    "rule_id": "IMG-06",
+    "title_zh": "主图须是真实、专业的产品照片",
+    "excerpt": "Accurately represent the product as a realistic, professional-quality image.",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881"
+   },
+   "by": "model",
+   "evidence_zh": "整张图是矢量插画风格：壶身为平面渐变色块，壶嘴是一块斜放的扁平梯形色块，盖子与把手为纯色几何形状，没有真实的材质纹理、反光细节和投影，明显不是实拍照片。"
+  }
+ ],
+ "dropped": [],
+ "risk": "red",
+ "review_skipped": null,
+ "description_zh": "一张白底的卡通矢量风格不锈钢电热水壶插画，壶身银灰渐变，配黑色壶盖、把手和底座，壶身上有一个蓝色指示灯。",
+ "rules_checked": [
+  "IMG-01",
+  "IMG-02",
+  "IMG-03",
+  "IMG-04",
+  "IMG-05",
+  "IMG-06",
+  "IMG-07",
+  "IMG-08",
+  "IMG-09",
+  "IMG-10"
+ ],
+ "trace": [
+  {
+   "step": "看图审核",
+   "role": "主图审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "78d94fd0d3a3",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 4711,
+     "output_tokens": 562
+    }
+   }
+  }
+ ],
+ "image_name": "KET-17S_main.png"
+}

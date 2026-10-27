@@ -1,0 +1,152 @@
+{
+ "run_id": "00217748",
+ "fields": {
+  "text": "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping"
+ },
+ "trace": [
+  {
+   "step": "合规审核 · amazon_us",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "580b03e36f51",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 1782,
+     "output_tokens": 530
+    }
+   }
+  }
+ ],
+ "findings": [
+  {
+   "check": "fact_cert",
+   "severity": "red",
+   "field": "text",
+   "quote": "UL Listed",
+   "problem_zh": "文本写成具备 UL，但工厂没有这项认证",
+   "suggestion_zh": "删除 UL 的说法，如实说明现有认证（CB report (IEC 60335-2-15), CE (LVD/EMC)）",
+   "source": {
+    "type": "product_card",
+    "label_zh": "产品资料：工厂未持有的认证",
+    "path": "products[KET-17S].certifications_not_held",
+    "value": "UL, ETL, NOM, FDA registration"
+   },
+   "by": "rule",
+   "context": "[Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping"
+  },
+  {
+   "check": "fact_material",
+   "severity": "red",
+   "field": "text",
+   "quote": "BPA Free",
+   "problem_zh": "文本宣称 BPA Free，但工厂没有对应检测报告，无法证明",
+   "suggestion_zh": "删除该宣称；如买家需要，先送检取得报告再写",
+   "source": {
+    "type": "product_card",
+    "label_zh": "产品资料：材料与检测",
+    "path": "products[KET-17S].material_tests",
+    "value": "未做 BPA 检测报告"
+   },
+   "by": "rule",
+   "context": "[Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping"
+  },
+  {
+   "check": "kb_length",
+   "severity": "red",
+   "field": "text",
+   "quote": "",
+   "problem_zh": "text 长度 78 字符，超过上限 75",
+   "suggestion_zh": "精简到上限以内",
+   "source": {
+    "type": "kb",
+    "rule_id": "AMZ-01",
+    "title_zh": "标题不超过 75 个字符",
+    "excerpt": "Titles must not exceed 75 characters, including spaces.",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC"
+   },
+   "by": "rule"
+  },
+  {
+   "check": "kb_regex",
+   "severity": "red",
+   "field": "text",
+   "quote": "!",
+   "problem_zh": "标题含亚马逊禁用的特殊字符（! $ ? _ { } ^ ¬ ¦），请删除。",
+   "suggestion_zh": "删除或改写这一处",
+   "source": {
+    "type": "kb",
+    "rule_id": "AMZ-02",
+    "title_zh": "标题禁用特殊字符",
+    "excerpt": "Titles must not use the following special characters: !, $, ?, _, {, }, ^, ¬, ¦.",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC"
+   },
+   "by": "rule"
+  },
+  {
+   "check": "kb_regex",
+   "severity": "red",
+   "field": "text",
+   "quote": "Free Shipping",
+   "problem_zh": "标题含促销用语（如 free shipping），请删除。",
+   "suggestion_zh": "删除或改写这一处",
+   "source": {
+    "type": "kb",
+    "rule_id": "AMZ-03",
+    "title_zh": "标题不得含促销用语",
+    "excerpt": "Titles must not contain promotional phrases, such as \"free shipping\" or \"100% quality guaranteed.\"",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC"
+   },
+   "by": "rule"
+  },
+  {
+   "check": "kb_regex",
+   "severity": "red",
+   "field": "text",
+   "quote": "BEST SELLER",
+   "problem_zh": "标题含主观评价词（Hot Item / Best seller），请删除。",
+   "suggestion_zh": "删除或改写这一处",
+   "source": {
+    "type": "kb",
+    "rule_id": "AMZ-04",
+    "title_zh": "标题不得含主观评价（Hot Item / Best seller）",
+    "excerpt": "Subjective commentary examples are \"Hot Item\" or \"Best seller\".",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC"
+   },
+   "by": "rule"
+  },
+  {
+   "check": "model_review",
+   "severity": "amber",
+   "field": "text",
+   "quote": "[Brand] 1.7L Electric Kettle",
+   "problem_zh": "该商品将在 Amazon 美国站销售，可能销往加州。但供应商资料未说明是否需要加州 65 号提案警示，商品页文案中也没有任何警示或标明 WARNING 的链接，无法确认是否合规。",
+   "suggestion_zh": "请人工向工厂确认产品（含 PP 塑料盖/手柄、不锈钢内胆等部件）是否含有 65 号提案清单中的化学物质，并取得书面资料。如需警示，应在商品页加入完整警示（含 WARNING:、具体化学物质名称、危害类型及 www.P65Warnings.ca.gov），或加入标明 WARNING 的清晰链接。在确认前不得自行填写化学物质名称。",
+   "source": {
+    "type": "kb",
+    "rule_id": "US-03",
+    "title_zh": "加州 65 号提案：网购须在商品页展示警示",
+    "excerpt": "a warning on the product display page, or (B) a clearly marked hyperlink using the word",
+    "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25602"
+   },
+   "by": "model"
+  }
+ ],
+ "dropped": [],
+ "risk": "red",
+ "review_skipped": null,
+ "rules_checked": [
+  "AMZ-01",
+  "AMZ-02",
+  "AMZ-03",
+  "AMZ-04",
+  "AMZ-05",
+  "AMZ-06",
+  "AMZ-07",
+  "US-01",
+  "US-02",
+  "US-03",
+  "US-04"
+ ]
+}

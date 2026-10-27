@@ -1,0 +1,14 @@
+{
+  "note": "游园会找茬题目：文本均为虚构示例，故意埋了违规点。答案由代码规则当场计算，不调用模型。",
+  "challenges": [
+    {"id": "P1", "title_zh": "第 1 题 · Amazon 标题", "platform": "amazon_us", "product_id": "KET-17S", "field": "title",
+     "hint_zh": "这是一个电热水壶的 Amazon 美国站标题。工厂没有 UL，也没做过 BPA 检测。",
+     "text": "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping"},
+    {"id": "P2", "title_zh": "第 2 题 · 给买家的回复", "platform": "alibaba_rfq", "product_id": "KET-17S", "field": "reply",
+     "hint_zh": "业务员回复美国买家。工厂底价 USD 8.70，交期 35 天，只接受定金 + 见提单付尾款。",
+     "text": "Dear Mark, yes our kettle is UL listed and BPA free. Price USD 8.20 FOB Ningbo by air, delivery in 20 days, and payment 60 days after delivery is OK."},
+    {"id": "P3", "title_zh": "第 3 题 · TikTok 墨西哥文案", "platform": "tiktok_mx", "product_id": "KET-17S", "field": "caption",
+     "hint_zh": "TikTok Shop 墨西哥站的种草文案（西班牙语）。",
+     "text": "¡El hervidor número 1 de México y el más barato! Pídelo por WhatsApp 55 1234 5678"}
+  ]
+}

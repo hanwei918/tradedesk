@@ -1,0 +1,59 @@
+{
+ "recorded": "2026-10-27",
+ "note": "盲测集第一次运行的结果，在任何针对它的修改之前记录。之后修了这里列出的 3 个缺陷，所以 heldout.json 之后的成绩不再是盲测成绩。",
+ "summary": {
+  "cases": 30,
+  "passed": 27,
+  "tp": 34,
+  "fp": 1,
+  "fn": 2,
+  "precision": 0.971,
+  "recall": 0.944,
+  "clean_cases": 12,
+  "clean_flagged": 1
+ },
+ "failures": [
+  {
+   "id": "H16",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Estimado Sr. García: actualmente no contamos con la NOM, pero podemos colaborar con usted para obtener la certificación NOM. Para 3000 piezas el precio es de USD 21.50 por unidad, FOB Ningbo por barco."
+   },
+   "expected": [
+    "CERT_OFFER",
+    "PRICE"
+   ],
+   "got": [
+    "PRICE"
+   ],
+   "why_zh": "否认持有 NOM 后提出合作取得 NOM，属于 CERT_OFFER；21.50 低于最低档 22.80。"
+  },
+  {
+   "id": "H18",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Estimado Sr. Hernández: podemos entregar el pedido en 25 días y enviarlo FOB Ningbo por avión."
+   },
+   "expected": [
+    "FOB_AIR",
+    "LEAD"
+   ],
+   "got": [
+    "LEAD"
+   ],
+   "why_zh": "25 天短于 35 天；空运用 FOB 且同句没有 FCA。"
+  },
+  {
+   "id": "H21",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Certification (UL / ETL):\nNot available for this model at the moment.\nIf your market requires UL, please tell us which retailer standard applies. Would ETL also be acceptable to your customer?"
+   },
+   "expected": [],
+   "got": [
+    "CERT"
+   ],
+   "why_zh": "刁钻：单独的标题行、否定句、条件句和问句，都不是认证声称，也没有主动提出代办认证。"
+  }
+ ]
+}

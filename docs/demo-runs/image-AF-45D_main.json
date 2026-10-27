@@ -1,0 +1,87 @@
+{
+ "run_id": "c619c637",
+ "metrics": {
+  "width": 1200,
+  "height": 1200,
+  "longest_side": 1200,
+  "white_border": 1.0,
+  "exact_white_border": 1.0,
+  "fill": 0.495,
+  "bbox": [
+   0.3025,
+   0.2525,
+   0.395,
+   0.495
+  ],
+  "touches_edge": false,
+  "background_ok": true
+ },
+ "findings": [
+  {
+   "check": "image_fill",
+   "severity": "amber",
+   "field": "image",
+   "quote": "",
+   "problem_zh": "产品约占画面 50%（按非白色区域外接框估算），低于 85%",
+   "suggestion_zh": "裁剪留白，让产品占满约 85% 的画面",
+   "source": {
+    "type": "kb",
+    "rule_id": "IMG-04",
+    "title_zh": "产品占画面 85%",
+    "excerpt": "Show the product as 85% of the image.",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881"
+   },
+   "by": "rule"
+  },
+  {
+   "check": "vision_review",
+   "severity": "red",
+   "field": "image",
+   "quote": "",
+   "problem_zh": "主图是插画或示意图式的矢量渲染，不是真实拍摄的专业产品照片，不符合“真实、专业品质图像”的要求。",
+   "suggestion_zh": "换成实物 AF-45D 空气炸锅的专业棚拍照片：纯白背景（RGB 255,255,255），采用正面或 3/4 角度，柔光打光，清楚呈现机身材质、触摸数显面板（8 个预设图标）、炸篮和把手的真实细节；产品占画面约 85%，不要额外添加文字或图形。",
+   "source": {
+    "type": "kb",
+    "rule_id": "IMG-06",
+    "title_zh": "主图须是真实、专业的产品照片",
+    "excerpt": "Accurately represent the product as a realistic, professional-quality image.",
+    "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881"
+   },
+   "by": "model",
+   "evidence_zh": "整机是纯色块和线性渐变构成的扁平矢量图形：圆角矩形机身，顶部黑色屏幕显示橙色等宽字体“200°”，下方深灰圆角矩形炸篮，中间一条灰色圆角短横条作把手。没有真实材质纹理、反光、阴影和透视，也看不到触摸按键、出风口等实物细节。"
+  }
+ ],
+ "dropped": [],
+ "risk": "red",
+ "review_skipped": null,
+ "description_zh": "白底上一台黑色空气炸锅的扁平矢量示意图，顶部屏幕显示橙色“200°”，下方为带灰色把手的炸篮。",
+ "rules_checked": [
+  "IMG-01",
+  "IMG-02",
+  "IMG-03",
+  "IMG-04",
+  "IMG-05",
+  "IMG-06",
+  "IMG-07",
+  "IMG-08",
+  "IMG-09",
+  "IMG-10"
+ ],
+ "trace": [
+  {
+   "step": "看图审核",
+   "role": "主图审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "4ee796e7d782",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 3527,
+     "output_tokens": 435
+    }
+   }
+  }
+ ],
+ "image_name": "AF-45D_main.png"
+}

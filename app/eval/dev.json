@@ -1,0 +1,338 @@
+{
+ "note": "开发集：开发检查器时写的，包含真实录制中出现过的误报句子。检查器是照着这些句子修的，成绩会偏乐观；可信度看盲测集。",
+ "cases": [
+  {
+   "id": "D01",
+   "platform": "amazon_us",
+   "product_id": "KET-17S",
+   "fields": {
+    "text": "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping"
+   },
+   "expected": [
+    "AMZ-01",
+    "AMZ-02",
+    "AMZ-03",
+    "AMZ-04",
+    "CERT",
+    "MATERIAL"
+   ],
+   "why_zh": "文案体检示例：6 个问题"
+  },
+  {
+   "id": "D02",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "If UL is a must for your Amazon listing, please let me know."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：条件句"
+  },
+  {
+   "id": "D03",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Please confirm whether UL and BPA free are mandatory for your project."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：询问买家"
+  },
+  {
+   "id": "D04",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "2. BPA free\nThe inner body is 304 stainless steel. We have not done a BPA test on these parts."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：小标题 + 否定"
+  },
+  {
+   "id": "D05",
+   "platform": "alibaba_rfq",
+   "product_id": "AF-45D",
+   "fields": {
+    "reply": "We are not able to reach USD 20 on this model."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：否定句里的买家目标价"
+  },
+  {
+   "id": "D06",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Sabemos que, para su venta en México, los hervidores eléctricos deben certificarse conforme a la NOM-003-SCFI-2014."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：说明要求，不是声称具备"
+  },
+  {
+   "id": "D07",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Estamos en disposición de colaborar con ustedes para obtener la certificación NOM."
+   },
+   "expected": [
+    "CERT_OFFER"
+   ],
+   "why_zh": "真实录制：承诺协助办理，应为黄"
+  },
+  {
+   "id": "D08",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Our kettle is UL listed and ready to ship."
+   },
+   "expected": [
+    "CERT"
+   ],
+   "why_zh": "直接声称具备 UL"
+  },
+  {
+   "id": "D09",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Price: USD 8.20 per unit FOB Ningbo by sea."
+   },
+   "expected": [
+    "PRICE"
+   ],
+   "why_zh": "低于 8.70 底价"
+  },
+  {
+   "id": "D10",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Price: USD 9.20 per unit FOB Ningbo by sea for 2,000 pcs."
+   },
+   "expected": [],
+   "why_zh": "阶梯价内"
+  },
+  {
+   "id": "D11",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "We quote FOB Ningbo by air, delivery within 20 days."
+   },
+   "expected": [
+    "FOB_AIR",
+    "LEAD"
+   ],
+   "why_zh": "FOB 空运 + 交期短于 35 天"
+  },
+  {
+   "id": "D12",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "FOB Ningbo by sea; for air shipment we suggest FCA Ningbo Airport."
+   },
+   "expected": [],
+   "why_zh": "同句给出 FCA"
+  },
+  {
+   "id": "D13",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "OK, payment 60 days after delivery is fine for us."
+   },
+   "expected": [
+    "PAYMENT"
+   ],
+   "why_zh": "接受货到后付款"
+  },
+  {
+   "id": "D14",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Sorry, we cannot accept payment after delivery for a first order."
+   },
+   "expected": [],
+   "why_zh": "否定"
+  },
+  {
+   "id": "D15",
+   "platform": "alibaba_rfq",
+   "product_id": "AF-45D",
+   "fields": {
+    "reply": "Our MOQ is 500 units for this air fryer."
+   },
+   "expected": [
+    "MOQ"
+   ],
+   "why_zh": "空气炸锅 MOQ 是 1000"
+  },
+  {
+   "id": "D16",
+   "platform": "amazon_us",
+   "product_id": "AF-45D",
+   "fields": {
+    "title": "[Brand] 4.5L Digital Air Fryer, 8 Presets, Dishwasher-Safe Basket",
+    "bullets[1]": "PTFE-FREE BASKET: cook without worries."
+   },
+   "expected": [
+    "MATERIAL"
+   ],
+   "why_zh": "篮子是 PTFE 涂层"
+  },
+  {
+   "id": "D17",
+   "platform": "amazon_us",
+   "product_id": "KET-17S",
+   "fields": {
+    "title": "[Brand] 1.7L Electric Kettle, 304 Stainless Steel, Auto Shut-Off",
+    "bullets[1]": "ECO-FRIENDLY DESIGN: less energy every day."
+   },
+   "expected": [
+    "AMZ-05",
+    "US-01"
+   ],
+   "why_zh": "五点描述里的环保宣称（Amazon + FTC 两条）"
+  },
+  {
+   "id": "D18",
+   "platform": "amazon_us",
+   "product_id": "KET-17S",
+   "fields": {
+    "title": "[Brand] 1.7L Electric Kettle, 304 Stainless Steel, Auto Shut-Off",
+    "description": "Proudly made in USA quality."
+   },
+   "expected": [
+    "US-02"
+   ],
+   "why_zh": "Made in USA 宣称"
+  },
+  {
+   "id": "D19",
+   "platform": "tiktok_mx",
+   "product_id": "KET-17S",
+   "fields": {
+    "caption": "¡El hervidor número 1 de México! Escríbenos por WhatsApp."
+   },
+   "expected": [
+    "TT-01",
+    "TT-03"
+   ],
+   "why_zh": "绝对化用语 + 站外引流"
+  },
+  {
+   "id": "D20",
+   "platform": "tiktok_mx",
+   "product_id": "KET-17S",
+   "fields": {
+    "caption": "Hervidor de 1.7 L con apagado automático, ideal para tu cafecito de la mañana."
+   },
+   "expected": [],
+   "why_zh": "干净文案"
+  },
+  {
+   "id": "D21",
+   "platform": "alibaba_rfq",
+   "product_id": "BL-35P",
+   "fields": {
+    "reply": "Actualmente no contamos con certificación NOM, UL, ETL ni con reporte FCC SDoC."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：列举式否认"
+  },
+  {
+   "id": "D22",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "We do not hold UL, ETL or NOM."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：列举式否认"
+  },
+  {
+   "id": "D23",
+   "platform": "alibaba_rfq",
+   "product_id": "GS-12H",
+   "fields": {
+    "reply": "Certification (ETL/UL)\nThe GS-12H does not have ETL or UL at the moment."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：没有冒号的小标题"
+  },
+  {
+   "id": "D24",
+   "platform": "alibaba_rfq",
+   "product_id": "GS-12H",
+   "fields": {
+    "reply": "We are willing to look into getting the GS-12H ETL or UL certified for your order."
+   },
+   "expected": [
+    "CERT_OFFER"
+   ],
+   "why_zh": "真实录制：承诺评估办理，应为黄"
+  },
+  {
+   "id": "D25",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Con gusto colaboramos con ustedes para tramitar la certificación conforme a la NOM-003-SCFI-2014 ante el organismo correspondiente."
+   },
+   "expected": [
+    "CERT_OFFER"
+   ],
+   "why_zh": "真实录制：西语承诺协助办理"
+  },
+  {
+   "id": "D26",
+   "platform": "alibaba_rfq",
+   "product_id": "BL-35P",
+   "fields": {
+    "reply": "Our material supplier has issued a BPA-free declaration, and I can share it with you."
+   },
+   "expected": [
+    "MATERIAL_DECL"
+   ],
+   "why_zh": "真实录制：引用供应商声明，黄色待确认，不判红"
+  },
+  {
+   "id": "D27",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Sobre la certificación NOM, le informo con transparencia que este modelo todavía no cuenta con certificado NOM."
+   },
+   "expected": [],
+   "why_zh": "真实录制误报：同句后半否认"
+  },
+  {
+   "id": "D28",
+   "platform": "alibaba_rfq",
+   "product_id": "GS-12H",
+   "fields": {
+    "reply": "We can look into ETL or UL certification for the GS-12H."
+   },
+   "expected": [
+    "CERT_OFFER"
+   ],
+   "why_zh": "真实录制：评估办理，应为黄"
+  },
+  {
+   "id": "D29",
+   "platform": "alibaba_rfq",
+   "product_id": "KET-17S",
+   "fields": {
+    "reply": "Estamos evaluando la posibilidad de tramitar la certificación conforme a la NOM-003-SCFI-2014."
+   },
+   "expected": [
+    "CERT_OFFER"
+   ],
+   "why_zh": "真实录制：西语评估办理，应为黄"
+  }
+ ]
+}

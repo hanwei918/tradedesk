@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>TradeDesk 海报</title>
+<style>
+:root{--ink:#10203f;--muted:#5b667a;--brand:#0b5fff;--red:#c62828;--amber:#b26500;--green:#1b7a3d;--bg:#f4f6fb}
+*{box-sizing:border-box}
+html,body{margin:0;background:#fff}
+.poster{width:800px;height:1800px;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);display:flex;flex-direction:column;overflow:hidden}
+.hero{background:linear-gradient(150deg,#0b5fff 0%,#10203f 85%);color:#fff;padding:44px 50px 36px}
+.tag{font-size:15px;letter-spacing:.12em;color:#cfe0ff;font-weight:700}
+.hero h1{font-size:76px;margin:14px 0 6px;letter-spacing:.02em}
+.hero .sub{font-size:28px;font-weight:700;margin:0}
+.hero p{font-size:18px;line-height:1.55;color:#dbe6ff;margin:12px 0 0}
+section{padding:18px 50px 2px}
+h2{font-size:28px;margin:0 0 10px;display:flex;gap:12px;align-items:center}
+h2 i{font-style:normal;display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--brand);color:#fff;font-size:20px}
+.quote{font-family:ui-monospace,Menlo,monospace;font-size:15px;line-height:1.55;background:var(--bg);border-left:6px solid var(--brand);padding:14px 18px;border-radius:8px}
+.quote u{text-decoration:none;background:#ffe58a}
+.pits{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.pit{border-top:5px solid var(--red);background:var(--bg);border-radius:8px;padding:10px 8px;font-size:15px;line-height:1.35}
+.pit b{display:block;font-size:17px}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.step{background:var(--bg);border-radius:10px;padding:12px;text-align:center;font-size:16px;line-height:1.4}
+.step b{display:block;font-size:21px;color:var(--brand)}
+.shot{width:100%;border:2px solid #dfe4ee;border-radius:12px;display:block;margin-top:10px}
+.cap{font-size:15px;color:var(--muted);margin:6px 0 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.box{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.5}
+.box b{font-size:19px;display:block;margin-bottom:4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center}
+.stat{background:var(--bg);border-radius:12px;padding:14px 8px}
+.stat .n{font-size:46px;font-weight:800;color:var(--brand);line-height:1.1}
+.stat .l{font-size:15px;color:var(--muted)}
+.risk{display:inline-block;border-radius:999px;padding:2px 12px;font-weight:700;font-size:15px}
+.r{background:#fdecec;color:var(--red)}.a{background:#fff4e0;color:var(--amber)}.g{background:#e7f6ec;color:var(--green)}
+.foot{margin-top:auto;background:var(--ink);color:#cfd8ea;padding:22px 50px;font-size:15px;line-height:1.6}
+.foot b{color:#fff}
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="hero">
+    <div class="tag">INTERCITY HACK · 宁波站 · 赛道二 AI+外贸/跨境</div>
+    <h1>TradeDesk</h1>
+    <p class="sub">出海工作台：询盘 → 回复 → 上架</p>
+    <p>给宁波中小外贸工厂的 AI 助手。<b style="color:#fff">每一条风险提示都有出处</b>——公开规则的原文与链接，或工厂资料卡上的那一个字段。说不出出处的话，系统不让 AI 说。</p>
+  </div>
+
+  <section>
+    <h2><i>1</i>一条询盘里的五个坑</h2>
+    <div class="quote">“…Need it <u>UL listed</u> and <u>BPA free</u>… quote <u>FOB Ningbo by air</u>, we need goods in <u>20 days</u>. Payment: <u>100% 60 days after delivery</u>.”</div>
+    <div class="pits">
+      <div class="pit"><b>没有 UL</b>只有 CB、CE</div>
+      <div class="pit"><b>没测 BPA</b>无检测报告</div>
+      <div class="pit"><b>FOB≠空运</b>Incoterms 2020</div>
+      <div class="pit"><b>20 天</b>标准交期 35 天</div>
+      <div class="pit"><b>货到付</b>收款风险</div>
+    </div>
+  </section>
+
+  <section>
+    <h2><i>2</i>收件箱 + 询盘回复 + 派发任务</h2>
+    <div class="flow">
+      <div class="step"><b>理解</b>买家要什么<br>哪里对不上</div>
+      <div class="step"><b>生成</b>英/西语回复<br>+ 中文内部备忘</div>
+      <div class="step"><b>校验</b>代码规则<br>+ 模型审核</div>
+      <div class="step"><b>反馈</b>高亮批注<br>红黄绿 · 逐词对比</div>
+    </div>
+    <img class="shot" src="../img/poster-inquiry.png" alt="询盘回复截图">
+    <p class="cap" id="cap-a">收件箱按优先级排序；中文一句“按风险提示全部修改”进入第 2 轮；需要采购、生产、美工跟进的事自动派成任务。</p>
+  </section>
+
+  <section>
+    <h2><i>3</i>工作流 B + C · 批量上品与商品看板</h2>
+    <div class="two">
+      <div class="box"><b>多平台上架</b>一份中文资料 → Amazon 美国站英文 Listing + TikTok 墨西哥西语种草脚本，按各自平台规则检查（标题 ≤75 字符、禁用促销语、不留站外联系方式…）</div>
+      <div class="box"><b>商品看板 + 主图检查</b>所有产品 × 主图 / Amazon / TikTok 一屏看清；一键批量生成；主图按 Amazon 10 条要求检查：尺寸、白底、占比由代码测量，文字、徽章、道具、是否实拍由模型看图</div>
+    </div>
+    <img class="shot" src="../img/poster-board.png" alt="商品看板截图">
+  </section>
+
+  <section>
+    <h2><i>4</i>为什么可信</h2>
+    <div class="stats">
+      <div class="stat"><div class="n">38</div><div class="l">条规则<br>每条对照原文核实</div></div>
+      <div class="stat"><div class="n">2</div><div class="l">层校验<br>代码 + 模型（须带出处）</div></div>
+      <div class="stat"><div class="n">92%</div><div class="l">盲测精确率（首次）<br>没看过代码的人出题</div></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <b>怎么用：</b>工厂填一张产品资料卡（价格阶梯、MOQ、交期、认证）→ 粘贴询盘 → 发出前看风险等级 <span class="risk r">红</span> <span class="risk a">黄</span> <span class="risk g">绿</span><br>
+    Python 标准库即可运行 · 模型接口可换 · 断网可回放演示 · <b>摊位扫码玩“AI 找茬挑战”</b><br>
+    示例工厂、产品、询盘均为虚构；规则以来源页面为准，不构成法律意见。
+  </div>
+</div>
+</body>
+</html>

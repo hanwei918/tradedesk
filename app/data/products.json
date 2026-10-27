@@ -1,0 +1,193 @@
+{
+  "note": "示例数据：工厂与产品均为虚构，仅用于演示。价格、产能、认证状态都是假设值，不代表任何真实企业。",
+  "factory": {
+    "name_zh": "甬江小家电（示例工厂）",
+    "name_en": "Yongjiang Small Appliances (demo factory)",
+    "city": "Ningbo",
+    "port": "Ningbo-Zhoushan",
+    "capacity_units_per_month": 20000,
+    "standard_lead_time_days": 35,
+    "payment_terms_accepted": [
+      "30% T/T deposit, 70% against B/L copy",
+      "L/C at sight"
+    ],
+    "sales_contact_role": "业务员",
+    "services": [
+      "可寄样：样品按出厂单价收费，国际运费由买家承担；量产订单可抵扣样品费",
+      "可安排视频验厂（阿里国际站视频通话）",
+      "彩盒可印买家 logo：1000 个以上免费，以下每个加收 USD 0.15，需买家提供矢量稿"
+    ]
+  },
+  "products": [
+    {
+      "id": "KET-17S",
+      "name_zh": "1.7L 不锈钢电热水壶",
+      "name_en": "1.7L Stainless Steel Electric Kettle",
+      "specs": {
+        "capacity_l": 1.7,
+        "power_w_us": 1500,
+        "voltage_us": "120V 60Hz",
+        "power_w_mx": 1500,
+        "voltage_mx": "127V 60Hz",
+        "inner_material": "304 stainless steel",
+        "lid_handle_material": "PP plastic",
+        "features": [
+          "auto shut-off",
+          "boil-dry protection",
+          "360° swivel base",
+          "concealed heating element"
+        ]
+      },
+      "certifications_held": [
+        "CB report (IEC 60335-2-15)",
+        "CE (LVD/EMC)"
+      ],
+      "certifications_not_held": [
+        "UL",
+        "ETL",
+        "NOM",
+        "FDA registration"
+      ],
+      "material_tests": {
+        "BPA": "未做 BPA 检测报告",
+        "LFGB": "未做"
+      },
+      "moq_units": 500,
+      "fob_ningbo_usd": {
+        "500-1999": 9.8,
+        "2000-4999": 9.2,
+        "5000+": 8.7
+      },
+      "packaging": "color box, 6 units per carton",
+      "selling_points_zh": [
+        "304 不锈钢内胆",
+        "干烧自动断电",
+        "360° 旋转底座",
+        "隐藏式发热盘，好清洁",
+        "5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）"
+      ]
+    },
+    {
+      "id": "AF-45D",
+      "name_zh": "4.5L 数显空气炸锅",
+      "name_en": "4.5L Digital Air Fryer",
+      "specs": {
+        "capacity_l": 4.5,
+        "power_w_us": 1400,
+        "voltage_us": "120V 60Hz",
+        "basket_coating": "PTFE non-stick coating",
+        "features": [
+          "8 presets",
+          "digital touch panel",
+          "60-min timer",
+          "dishwasher-safe basket"
+        ]
+      },
+      "certifications_held": [
+        "CB report (IEC 60335-2-9)",
+        "CE (LVD/EMC)"
+      ],
+      "certifications_not_held": [
+        "UL",
+        "ETL",
+        "FCC SDoC test report",
+        "NOM"
+      ],
+      "material_tests": {
+        "PFOA": "供应商声明，无第三方报告"
+      },
+      "moq_units": 1000,
+      "fob_ningbo_usd": {
+        "1000-2999": 24.5,
+        "3000+": 22.8
+      },
+      "packaging": "color box, 2 units per carton",
+      "selling_points_zh": [
+        "8 个预设菜单",
+        "触摸数显",
+        "篮子可进洗碗机",
+        "少油烹饪"
+      ]
+    },
+    {
+      "id": "GS-12H",
+      "name_zh": "手持挂烫机",
+      "name_en": "Handheld Garment Steamer",
+      "specs": {
+        "water_tank_ml": 260,
+        "power_w_us": 1200,
+        "voltage_us": "120V 60Hz",
+        "heat_up_s": "约 25 秒（工厂内部测试）",
+        "features": [
+          "vertical and horizontal steaming",
+          "detachable water tank",
+          "auto shut-off",
+          "fabric brush included"
+        ]
+      },
+      "certifications_held": [
+        "CB report (IEC 60335-2-3)",
+        "CE (LVD/EMC)"
+      ],
+      "certifications_not_held": [
+        "UL",
+        "ETL",
+        "NOM"
+      ],
+      "material_tests": {},
+      "moq_units": 800,
+      "fob_ningbo_usd": {
+        "800-2999": 11.6,
+        "3000+": 10.9
+      },
+      "packaging": "color box, 12 units per carton",
+      "selling_points_zh": [
+        "约 25 秒出蒸汽（工厂内部测试）",
+        "可竖挂可平烫",
+        "水箱可拆，好加水",
+        "附带刷头"
+      ]
+    },
+    {
+      "id": "BL-35P",
+      "name_zh": "便携榨汁杯",
+      "name_en": "Portable Blender Cup",
+      "specs": {
+        "capacity_ml": 350,
+        "battery_mah": 2000,
+        "charging": "USB-C",
+        "blades": "6 stainless steel blades",
+        "features": [
+          "one-button operation",
+          "safety lock when cup is detached",
+          "about 12 blends per charge (factory test)"
+        ]
+      },
+      "certifications_held": [
+        "CE (EMC)",
+        "UN38.3 battery test report"
+      ],
+      "certifications_not_held": [
+        "UL",
+        "ETL",
+        "FCC SDoC test report",
+        "NOM"
+      ],
+      "material_tests": {
+        "BPA": "杯体 Tritan 材料，有材料供应商的 BPA-free 声明，无成品第三方报告"
+      },
+      "moq_units": 1000,
+      "fob_ningbo_usd": {
+        "1000-4999": 6.2,
+        "5000+": 5.7
+      },
+      "packaging": "color box, 40 units per carton",
+      "selling_points_zh": [
+        "USB-C 充电",
+        "一键操作",
+        "杯体分离时自动断电",
+        "一次充电约 12 次（工厂内部测试）"
+      ]
+    }
+  ]
+}

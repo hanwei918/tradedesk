@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TradeDesk 路演</title>
+<style>
+:root{--ink:#10203f;--muted:#5b667a;--brand:#0b5fff;--red:#c62828;--amber:#a35c00;--green:#1b7a3d;--bg:#f4f6fb}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0d1426;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+.deck{position:fixed;inset:0;display:grid;place-items:center}
+.slide{display:none;width:1920px;height:1080px;background:#fff;padding:90px 120px;position:absolute;transform-origin:center;overflow:hidden}
+.slide.on{display:block}
+h1{font-size:84px;margin:0 0 30px;line-height:1.15}
+h2{font-size:60px;margin:0 0 40px}
+p,li{font-size:38px;line-height:1.55}
+.kicker{color:var(--brand);font-weight:700;font-size:30px;letter-spacing:.08em;margin-bottom:20px}
+.big{font-size:46px;line-height:1.5}
+.muted{color:var(--muted)}
+.pits{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-top:40px}
+.pit{color:var(--ink);background:var(--bg);border-top:8px solid var(--red);border-radius:16px;padding:28px}
+.pit b{display:block;font-size:34px;margin-bottom:10px}.pit span{font-size:28px;color:var(--muted)}
+.quote{font-family:ui-monospace,Menlo,monospace;font-size:30px;background:var(--bg);border-left:8px solid var(--brand);padding:24px 30px;border-radius:10px;line-height:1.5}
+.shot{display:block;margin:0 auto;max-width:100%;max-height:690px;border:2px solid #dfe4ee;border-radius:16px;box-shadow:0 20px 50px rgba(16,32,63,.12)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:start}
+.layer{background:var(--bg);border-radius:18px;padding:36px;margin-bottom:28px}
+.layer b{font-size:40px}.layer p{font-size:32px;margin:12px 0 0}
+.num{font-size:120px;font-weight:800;color:var(--brand);line-height:1}
+.foot{position:absolute;left:120px;right:120px;bottom:40px;display:flex;justify-content:space-between;font-size:22px;color:var(--muted)}
+.title-slide{background:linear-gradient(135deg,#0b5fff,#10203f);color:#fff}
+.title-slide .muted,.title-slide .kicker{color:#cfe0ff}
+.dots{position:fixed;bottom:12px;left:0;right:0;text-align:center;color:#8da0c8;font-size:13px}
+@media print{body{background:#fff}.deck{position:static;display:block}.slide{display:block!important;position:relative;transform:none!important;page-break-after:always}.dots{display:none}@page{size:1920px 1080px;margin:0}}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<section class="slide title-slide">
+  <div class="kicker">INTERCITY HACK · 宁波站 · AI+外贸/跨境</div>
+  <h1>一条询盘里的五个坑</h1>
+  <div class="quote" style="background:rgba(255,255,255,.1);color:#fff;border-color:#fff">“…Need it <u>UL listed</u> and <u>BPA free</u>… Please quote <u>FOB Ningbo by air</u>, we need goods in <u>20 days</u>. Payment: we usually pay <u>100% 60 days after delivery</u>.”</div>
+  <div class="pits">
+    <div class="pit"><b>没有 UL</b><span>工厂只有 CB、CE</span></div>
+    <div class="pit"><b>没测 BPA</b><span>无检测报告</span></div>
+    <div class="pit"><b>FOB 不能空运</b><span>Incoterms 2020</span></div>
+    <div class="pit"><b>20 天做不出</b><span>标准交期 35 天</span></div>
+    <div class="pit"><b>货到 60 天付</b><span>收款风险</span></div>
+  </div>
+  <p class="muted" style="font-size:26px;margin-top:30px">示例询盘为虚构，用于演示</p>
+</section>
+
+<section class="slide">
+  <div class="kicker">我们做了什么</div>
+  <h1>TradeDesk 出海工作台</h1>
+  <p class="big">询盘 → 回复 → 上架，<b>每一条风险提示都有出处</b>：</p>
+  <ul>
+    <li>公开规则的<b>原文和链接</b>（Amazon、FTC、ICC、TikTok、墨西哥 NOM…）</li>
+    <li>或者工厂<b>自己资料卡上的那个字段</b>（价格、MOQ、交期、认证）</li>
+  </ul>
+  <p class="big" style="margin-top:50px">说不出出处的话，系统不让 AI 说。</p>
+  <div class="foot"><span>TradeDesk</span><span>2 / 8</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">收件箱 → 询盘回复 → 跨岗位任务</div>
+  <h2>理解 → 生成 → 校验 → 反馈</h2>
+  <img class="shot" src="../img/slide-inquiry.png" alt="询盘回复界面截图">
+  <div class="foot"><span>收件箱按优先级排序（每一分有依据）· 英/西语回复 · 自动派发采购/生产/美工任务 · 中文多轮修改</span><span>3 / 8</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">工作流 B · 多平台上架</div>
+  <h2>一份中文资料，两个平台、两种语言</h2>
+  <img class="shot" src="../img/slide-listing.png" alt="多平台上架界面截图">
+  <div class="foot"><span>Amazon 美国站（英语）· TikTok Shop 墨西哥（西语）· 各按各的平台规则检查</span><span>4 / 8</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">工作流 C · 商品看板 + 主图检查</div>
+  <h2>所有产品的状态，一屏看清</h2>
+  <div class="two" style="grid-template-columns:1.55fr 1fr;gap:30px">
+    <img class="shot" style="max-height:640px" src="../img/slide-board.png" alt="商品看板截图">
+    <img class="shot" style="max-height:640px" src="../img/slide-image.png" alt="主图检查截图">
+  </div>
+  <div class="foot"><span>批量生成上品 · 主图按 Amazon 10 条要求检查（像素由代码测量，文字/徽章/道具/实拍由模型看图）· 导出 CSV</span><span>5 / 8</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">为什么可信</div>
+  <h2>两层校验</h2>
+  <div class="two">
+    <div>
+      <div class="layer"><b>① 代码规则</b><p>价格、MOQ、交期、认证、付款方式、FOB 运输方式、标题长度、禁用词 —— 用代码和资料卡比对，不让大模型算数。</p></div>
+      <div class="layer"><b>② 模型审核 + 出处守卫</b><p>模型提出的问题必须带<b>知识库规则编号</b>，并且<b>原文里真的有那句话</b>，否则代码直接丢弃。</p></div>
+    </div>
+    <div>
+      <div class="num" id="n-rules" style="font-size:96px">38</div><p style="font-size:32px">条规则，每条都对照原文核实<br><span class="muted" style="font-size:26px">Amazon 文案/主图 · 阿里 · TikTok · 美国/墨西哥合规 · Incoterms · 商务礼仪</span></p>
+      <div class="num" style="margin-top:24px;font-size:96px">97% / 92%</div><p style="font-size:32px">两份盲测集首次运行的精确率<br><span class="muted" style="font-size:26px">召回率 94% / 83% · 没看过代码的人出题 · 问题已修复 · 35 项测试</span></p>
+    </div>
+  </div>
+  <div class="foot"><span>Amazon 标题上限：网上多写 200 字符，官方页面现为 75（2026-10-26 核实）</span><span>6 / 8</span></div>
+</section>
+
+<section class="slide">
+  <div class="kicker">落地</div>
+  <h2>不改变工厂现有流程</h2>
+  <ul>
+    <li>工厂填一张<b>产品资料卡</b>：价格阶梯、MOQ、交期、已有/没有的认证</li>
+    <li>询盘直接从<b>阿里国际站后台</b>粘贴进来</li>
+    <li>模型接口可换（OpenAI 兼容 / Claude），<b>Python 标准库</b>即可运行，一台笔记本部署</li>
+    <li>商品看板<b>一键导出 CSV</b>，直接贴进批量上传表</li>
+    <li>断网可用<b>回放模式</b>演示和培训新业务员</li>
+  </ul>
+  <p class="big" style="margin-top:40px">下一步：接询盘接口 · 扩充品类认证知识 · 宁波工厂两周试用</p>
+  <div class="foot"><span>TradeDesk</span><span>7 / 8</span></div>
+</section>
+
+<section class="slide title-slide">
+  <div class="kicker">TradeDesk 出海工作台</div>
+  <h1 style="font-size:100px;margin-top:200px">让每一句对外承诺<br>都有依据。</h1>
+  <p class="muted">谢谢</p>
+</section>
+
+</div>
+<div class="dots" id="dots"></div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);slides.forEach(el=>el.style.transform=`scale(${s})`)}
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('on',k===i));document.getElementById('dots').textContent=`${i+1} / ${slides.length} · ← → 翻页`}
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key))show(i+1);if(['ArrowLeft','PageUp'].includes(e.key))show(i-1)});
+addEventListener('click',e=>show(e.clientX>innerWidth/2?i+1:i-1));
+addEventListener("resize",fit);fit();show((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+ "request": {
+  "provider": "anthropic",
+  "model": "claude-opus-5-5",
+  "effort": "medium",
+  "system": "你是 Amazon 美国站的主图审核员。下面给你一张产品主图、产品资料，以及一组只能靠看图判断的规则（每条有编号、原文摘录和要判断的问题）。\n\n逐条看图判断。对每一个问题：\n- 必须写 `rule_id`：只能是下面列出的规则编号之一。\n- 必须写 `evidence_zh`：你在图里具体看到了什么（例如\"左上角有红色圆形徽章，文字 BEST SELLER\"）。说不出看到了什么，就不要报。\n- severity：red = 明确违反规则；amber = 有风险、需要人确认。\n- problem_zh / suggestion_zh 用简体中文，建议要具体可执行。\n- 尺寸、白底、产品占比这些像素指标已经由代码测量，不需要你判断。\n\n只输出 JSON：\n{\"findings\": [{\"rule_id\": \"...\", \"evidence_zh\": \"...\", \"severity\": \"red|amber\", \"problem_zh\": \"...\", \"suggestion_zh\": \"...\"}], \"description_zh\": \"一句话描述这张图\"}\n如果没有问题：{\"findings\": [], \"description_zh\": \"...\"}\n",
+  "messages": [
+   {
+    "role": "user",
+    "content": [
+     {
+      "type": "image",
+      "source": {
+       "type": "base64",
+       "media_type": "image/png",
+       "data": "<image sha256 81068c76d29c98df, 25876 b64 chars>"
+      }
+     },
+     {
+      "type": "text",
+      "text": "## 规则\n[\n {\n  \"rule_id\": \"IMG-06\",\n  \"title_zh\": \"主图须是真实、专业的产品照片\",\n  \"excerpt\": \"Accurately represent the product as a realistic, professional-quality image.\",\n  \"question_zh\": \"这张图是不是真实拍摄的专业产品照片？如果是插画、示意图、渲染草图或占位图，请指出。\"\n },\n {\n  \"rule_id\": \"IMG-07\",\n  \"title_zh\": \"产品在图中只出现一次\",\n  \"excerpt\": \"Only show the product once in the image.\",\n  \"question_zh\": \"图中同一产品是否出现了不止一次（多个视图或多个产品）？\"\n },\n {\n  \"rule_id\": \"IMG-08\",\n  \"title_zh\": \"不能出现非随附的道具\",\n  \"excerpt\": \"Don't show accessories or any props that aren't included with the product and could confuse the customer.\",\n  \"question_zh\": \"图中是否有产品本身不附带的道具或配件（杯子、食物、植物等）？\"\n },\n {\n  \"rule_id\": \"IMG-09\",\n  \"title_zh\": \"图片中不能有促销宣称和评价\",\n  \"excerpt\": \"No images of customer reviews, five-star imagery, claims (for example, free shipping), or selling partner-specific information.\",\n  \"question_zh\": \"图中是否有文字宣称、促销语、五星或评价图案、卖家信息？请写出看到的文字。\"\n },\n {\n  \"rule_id\": \"IMG-10\",\n  \"title_zh\": \"不能使用类似 Amazon 的徽章\",\n  \"excerpt\": \"No badges used on Amazon, or variations, modifications, or anything confusingly similar to such badges.\",\n  \"question_zh\": \"图中是否有类似 Best seller、Top seller、Amazon's Choice 的徽章或标签？\"\n }\n]\n\n## 产品资料\n{\n \"id\": \"BL-35P\",\n \"name_zh\": \"便携榨汁杯\",\n \"name_en\": \"Portable Blender Cup\",\n \"specs\": {\n  \"capacity_ml\": 350,\n  \"battery_mah\": 2000,\n  \"charging\": \"USB-C\",\n  \"blades\": \"6 stainless steel blades\",\n  \"features\": [\n   \"one-button operation\",\n   \"safety lock when cup is detached\",\n   \"about 12 blends per charge (factory test)\"\n  ]\n },\n \"certifications_held\": [\n  \"CE (EMC)\",\n  \"UN38.3 battery test report\"\n ],\n \"certifications_not_held\": [\n  \"UL\",\n  \"ETL\",\n  \"FCC SDoC test report\",\n  \"NOM\"\n ],\n \"material_tests\": {\n  \"BPA\": \"杯体 Tritan 材料，有材料供应商的 BPA-free 声明，无成品第三方报告\"\n },\n \"moq_units\": 1000,\n \"fob_ningbo_usd\": {\n  \"1000-4999\": 6.2,\n  \"5000+\": 5.7\n },\n \"packaging\": \"color box, 40 units per carton\",\n \"selling_points_zh\": [\n  \"USB-C 充电\",\n  \"一键操作\",\n  \"杯体分离时自动断电\",\n  \"一次充电约 12 次（工厂内部测试）\"\n ]\n}\n\n## 代码已测量的像素指标（仅供参考）\n{\n \"width\": 450,\n \"height\": 450,\n \"longest_side\": 450,\n \"white_border\": 1.0,\n \"exact_white_border\": 1.0,\n \"fill\": 0.895,\n \"bbox\": [\n  0.2875,\n  0.05,\n  0.425,\n  0.895\n ],\n \"touches_edge\": false\n}"
+     }
+    ]
+   }
+  ]
+ },
+ "content": "{\"findings\": [{\"rule_id\": \"IMG-06\", \"evidence_zh\": \"图中产品由纯色和简单渐变的几何图形构成：上部是浅蓝色渐变圆角矩形（杯体），下部是深蓝色圆角矩形底座，底座中央有一个白色实心圆点（按钮）。没有真实材质质感、光影反射、刀片、USB-C 接口等细节，明显是矢量插画或示意图，不是实拍照片。\", \"severity\": \"red\", \"problem_zh\": \"主图是矢量示意图或占位图，不是真实、专业的产品照片，违反主图须真实呈现产品的要求。\", \"suggestion_zh\": \"用实物在纯白背景（RGB 255,255,255）下拍摄专业产品照：光线均匀，清晰呈现 Tritan 透明杯体、杯盖和底座按钮，产品约占画面 85%。也可以使用照片级写实、与实物完全一致的渲染图。替换现有插画图。\"}], \"description_zh\": \"白底上的一张简化矢量插画：浅蓝色渐变圆角杯体立在深蓝色底座上，底座中间有一个白色圆形按钮，代表便携榨汁杯。\"}",
+ "usage": {
+  "input_tokens": 1958,
+  "output_tokens": 420
+ }
+}

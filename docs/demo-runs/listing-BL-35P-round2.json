@@ -1,0 +1,787 @@
+{
+ "run_id": "bd456f2b",
+ "round": 2,
+ "platforms": {
+  "amazon_us": {
+   "content": {
+    "title": "[Brand] Portable Smoothie Blender 350ml Tritan Cup, USB-C Rechargeable",
+    "bullets": [
+     "BLEND ON THE GO: This compact personal blender holds 350 ml (about 11.8 oz), enough for a single smoothie, protein shake, or juice. Its small, portable size lets you make a drink at the office, at the gym, or while you travel.",
+     "USB-C CHARGING: The built-in 2000mAh rechargeable battery charges through USB-C, the same connector many phones and laptops use. Plug it into a wall adapter, power bank, or computer, so you don't need a separate proprietary charger.",
+     "ABOUT 12 BLENDS PER CHARGE: In-house factory testing showed about 12 blending cycles on a full charge. Your results may vary with ingredients and usage, but one charge can cover several days of morning shakes.",
+     "ONE-BUTTON OPERATION: There are no settings to adjust. Add your ingredients, press the single button, and the 6 stainless steel blades blend your drink. It's simple enough to use on a busy morning.",
+     "SAFETY LOCK WHEN DETACHED: The blender will not run when the cup is separated from the base. This helps prevent accidental starts while you fill, empty, or clean it."
+    ],
+    "description": "Make fresh smoothies, shakes, and juices wherever your day takes you. This portable blender pairs a 350 ml Tritan cup with 6 stainless steel blades and a 2000mAh rechargeable battery, so you can blend a single serving without a full-size countertop appliance.\n\nIt is easy to use. Charge it with a USB-C cable, add your ingredients, and press the one button to start. In-house factory testing showed about 12 blends per full charge. Actual results depend on what you blend and how long you run it. A built-in safety lock keeps the motor from running when the cup is detached from the base.\n\nThe compact size works well at the office, at the gym, on trips, and in dorm rooms. You can make a single-serve drink wherever you need one.",
+    "search_terms": "personal blender mini juicer cup travel shake mixer protein electric smoothie maker cordless juice bottle gym office dorm fruit mixer single serve rechargeable small",
+    "notes_zh": "关于 Prop 65 警示：供应商资料没有说明产品是否会让消费者接触清单化学物质，所以本版没有自行加警示，也没有自行填写任何化学物质名称。上架前请完成以下事项：(1) 向工厂索取电线、PCB、塑料件等部件的成分资料或第三方检测报告（例如铅、邻苯二甲酸酯），确认是否需要警示；(2) 如果需要，在 Seller Central 的 Prop 65 合规字段中按 27 CCR 25603(a) 填写完整警示，包括 WARNING:、具体化学物质名称、危害类型和 P65Warnings.ca.gov。警示放在合规字段而不是描述里，是因为 AMZ-06 禁止在描述中出现网址；(3) 如果确认不需要警示，请留存依据。其他修改：删除了资料中没有的“杯子可直接饮用、少洗”等说法。标题 70 字符，符合 AMZ-01。续航已注明为工厂内部测试。未提及 UL、ETL、FCC 认证，也未写 BPA-free。"
+   },
+   "fields": {
+    "title": "[Brand] Portable Smoothie Blender 350ml Tritan Cup, USB-C Rechargeable",
+    "bullets[1]": "BLEND ON THE GO: This compact personal blender holds 350 ml (about 11.8 oz), enough for a single smoothie, protein shake, or juice. Its small, portable size lets you make a drink at the office, at the gym, or while you travel.",
+    "bullets[2]": "USB-C CHARGING: The built-in 2000mAh rechargeable battery charges through USB-C, the same connector many phones and laptops use. Plug it into a wall adapter, power bank, or computer, so you don't need a separate proprietary charger.",
+    "bullets[3]": "ABOUT 12 BLENDS PER CHARGE: In-house factory testing showed about 12 blending cycles on a full charge. Your results may vary with ingredients and usage, but one charge can cover several days of morning shakes.",
+    "bullets[4]": "ONE-BUTTON OPERATION: There are no settings to adjust. Add your ingredients, press the single button, and the 6 stainless steel blades blend your drink. It's simple enough to use on a busy morning.",
+    "bullets[5]": "SAFETY LOCK WHEN DETACHED: The blender will not run when the cup is separated from the base. This helps prevent accidental starts while you fill, empty, or clean it.",
+    "description": "Make fresh smoothies, shakes, and juices wherever your day takes you. This portable blender pairs a 350 ml Tritan cup with 6 stainless steel blades and a 2000mAh rechargeable battery, so you can blend a single serving without a full-size countertop appliance.\n\nIt is easy to use. Charge it with a USB-C cable, add your ingredients, and press the one button to start. In-house factory testing showed about 12 blends per full charge. Actual results depend on what you blend and how long you run it. A built-in safety lock keeps the motor from running when the cup is detached from the base.\n\nThe compact size works well at the office, at the gym, on trips, and in dorm rooms. You can make a single-serve drink wherever you need one.",
+    "search_terms": "personal blender mini juicer cup travel shake mixer protein electric smoothie maker cordless juice bottle gym office dorm fruit mixer single serve rechargeable small"
+   },
+   "diff": {
+    "title": [
+     {
+      "op": "equal",
+      "text": "[Brand] Portable Smoothie Blender 350ml Tritan Cup, USB-C Rechargeable"
+     }
+    ],
+    "bullets[1]": [
+     {
+      "op": "equal",
+      "text": "BLEND "
+     },
+     {
+      "op": "delete",
+      "text": "ANYWHERE"
+     },
+     {
+      "op": "insert",
+      "text": "ON THE GO"
+     },
+     {
+      "op": "equal",
+      "text": ": This compact personal blender holds 350 ml (about 11.8 oz), enough for a single smoothie, protein shake, or juice. "
+     },
+     {
+      "op": "delete",
+      "text": "It"
+     },
+     {
+      "op": "insert",
+      "text": "Its"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "fits"
+     },
+     {
+      "op": "insert",
+      "text": "small,"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "easily"
+     },
+     {
+      "op": "insert",
+      "text": "portable"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "in"
+     },
+     {
+      "op": "insert",
+      "text": "size lets you make"
+     },
+     {
+      "op": "equal",
+      "text": " a "
+     },
+     {
+      "op": "delete",
+      "text": "gym bag, backpack, or desk drawer, so you can blend"
+     },
+     {
+      "op": "insert",
+      "text": "drink"
+     },
+     {
+      "op": "equal",
+      "text": " at "
+     },
+     {
+      "op": "delete",
+      "text": "work"
+     },
+     {
+      "op": "insert",
+      "text": "the office"
+     },
+     {
+      "op": "equal",
+      "text": ", at the gym, or "
+     },
+     {
+      "op": "delete",
+      "text": "on"
+     },
+     {
+      "op": "insert",
+      "text": "while"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "the"
+     },
+     {
+      "op": "insert",
+      "text": "you"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "road"
+     },
+     {
+      "op": "insert",
+      "text": "travel"
+     },
+     {
+      "op": "equal",
+      "text": "."
+     }
+    ],
+    "bullets[2]": [
+     {
+      "op": "equal",
+      "text": "USB-C CHARGING: The built-in 2000mAh rechargeable battery charges through USB-C, "
+     },
+     {
+      "op": "delete",
+      "text": "so you can use "
+     },
+     {
+      "op": "equal",
+      "text": "the same "
+     },
+     {
+      "op": "delete",
+      "text": "cable as"
+     },
+     {
+      "op": "insert",
+      "text": "connector"
+     },
+     {
+      "op": "equal",
+      "text": " many phones and laptops"
+     },
+     {
+      "op": "insert",
+      "text": " use"
+     },
+     {
+      "op": "equal",
+      "text": ". Plug it into a wall adapter, power bank, or computer"
+     },
+     {
+      "op": "insert",
+      "text": ","
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "and"
+     },
+     {
+      "op": "insert",
+      "text": "so"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "skip"
+     },
+     {
+      "op": "insert",
+      "text": "you"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "the"
+     },
+     {
+      "op": "insert",
+      "text": "don't"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "extra"
+     },
+     {
+      "op": "insert",
+      "text": "need a separate proprietary"
+     },
+     {
+      "op": "equal",
+      "text": " charger."
+     }
+    ],
+    "bullets[3]": [
+     {
+      "op": "equal",
+      "text": "ABOUT 12 BLENDS PER CHARGE: In-house factory testing showed about 12 blending cycles on a full charge. Your results may vary with ingredients and usage, but one charge can cover several days of morning shakes."
+     }
+    ],
+    "bullets[4]": [
+     {
+      "op": "equal",
+      "text": "ONE-BUTTON OPERATION: There are no settings to "
+     },
+     {
+      "op": "delete",
+      "text": "fiddle with"
+     },
+     {
+      "op": "insert",
+      "text": "adjust"
+     },
+     {
+      "op": "equal",
+      "text": ". Add your ingredients, press the single button, and the 6 stainless steel blades blend your drink. "
+     },
+     {
+      "op": "delete",
+      "text": "The"
+     },
+     {
+      "op": "insert",
+      "text": "It's"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "cup"
+     },
+     {
+      "op": "insert",
+      "text": "simple"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "doubles as your drinking cup, so there is less"
+     },
+     {
+      "op": "insert",
+      "text": "enough"
+     },
+     {
+      "op": "equal",
+      "text": " to "
+     },
+     {
+      "op": "delete",
+      "text": "wash"
+     },
+     {
+      "op": "insert",
+      "text": "use"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "afterward"
+     },
+     {
+      "op": "insert",
+      "text": "on a busy morning"
+     },
+     {
+      "op": "equal",
+      "text": "."
+     }
+    ],
+    "bullets[5]": [
+     {
+      "op": "equal",
+      "text": "SAFETY LOCK WHEN DETACHED: The blender will not run when the cup is separated from the base. This helps prevent accidental starts while you "
+     },
+     {
+      "op": "delete",
+      "text": "are filling"
+     },
+     {
+      "op": "insert",
+      "text": "fill"
+     },
+     {
+      "op": "equal",
+      "text": ", "
+     },
+     {
+      "op": "delete",
+      "text": "emptying"
+     },
+     {
+      "op": "insert",
+      "text": "empty"
+     },
+     {
+      "op": "equal",
+      "text": ", or "
+     },
+     {
+      "op": "delete",
+      "text": "cleaning"
+     },
+     {
+      "op": "insert",
+      "text": "clean"
+     },
+     {
+      "op": "equal",
+      "text": " it."
+     }
+    ],
+    "description": [
+     {
+      "op": "equal",
+      "text": "Make fresh smoothies, shakes, and juices wherever your day takes you. This portable blender pairs a 350 ml Tritan cup with 6 stainless steel blades and a 2000mAh rechargeable battery, so you can blend a single serving without a full-size countertop appliance.\n\nIt is easy to use. Charge it with "
+     },
+     {
+      "op": "delete",
+      "text": "any"
+     },
+     {
+      "op": "insert",
+      "text": "a"
+     },
+     {
+      "op": "equal",
+      "text": " USB-C cable, add your ingredients, and press the one button to start. In-house factory testing showed about 12 blends per full charge"
+     },
+     {
+      "op": "delete",
+      "text": ";"
+     },
+     {
+      "op": "insert",
+      "text": "."
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "actual"
+     },
+     {
+      "op": "insert",
+      "text": "Actual"
+     },
+     {
+      "op": "equal",
+      "text": " results depend on what you blend and how long you run it. A built-in safety lock keeps the motor from running when the cup is detached from the base.\n\n"
+     },
+     {
+      "op": "delete",
+      "text": "Its"
+     },
+     {
+      "op": "insert",
+      "text": "The"
+     },
+     {
+      "op": "equal",
+      "text": " compact size works "
+     },
+     {
+      "op": "delete",
+      "text": "for"
+     },
+     {
+      "op": "insert",
+      "text": "well at"
+     },
+     {
+      "op": "equal",
+      "text": " the office, "
+     },
+     {
+      "op": "insert",
+      "text": "at the "
+     },
+     {
+      "op": "equal",
+      "text": "gym, "
+     },
+     {
+      "op": "delete",
+      "text": "travel"
+     },
+     {
+      "op": "insert",
+      "text": "on trips"
+     },
+     {
+      "op": "equal",
+      "text": ", and"
+     },
+     {
+      "op": "insert",
+      "text": " in"
+     },
+     {
+      "op": "equal",
+      "text": " dorm rooms. "
+     },
+     {
+      "op": "delete",
+      "text": "Blend,"
+     },
+     {
+      "op": "insert",
+      "text": "You"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "then"
+     },
+     {
+      "op": "insert",
+      "text": "can make a single-serve"
+     },
+     {
+      "op": "equal",
+      "text": " drink "
+     },
+     {
+      "op": "delete",
+      "text": "straight"
+     },
+     {
+      "op": "insert",
+      "text": "wherever"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "from"
+     },
+     {
+      "op": "insert",
+      "text": "you"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "the"
+     },
+     {
+      "op": "insert",
+      "text": "need"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "cup and rinse"
+     },
+     {
+      "op": "insert",
+      "text": "one"
+     },
+     {
+      "op": "equal",
+      "text": "."
+     }
+    ],
+    "search_terms": [
+     {
+      "op": "equal",
+      "text": "personal blender mini juicer cup travel shake mixer protein"
+     },
+     {
+      "op": "delete",
+      "text": " shaker"
+     },
+     {
+      "op": "equal",
+      "text": " electric smoothie maker cordless juice bottle gym office dorm fruit mixer single serve rechargeable small"
+     }
+    ]
+   },
+   "findings": [
+    {
+     "check": "model_review",
+     "severity": "amber",
+     "field": "title",
+     "quote": "Portable Smoothie Blender 350ml Tritan Cup, USB-C Rechargeable",
+     "problem_zh": "该产品为电子产品，含电池、线路及接触食品的部件，在加州销售时可能涉及 65 号提案。供应商资料未说明是否需要 Prop 65 警示，Listing 中也没有警示或 WARNING 链接，需人工确认。",
+     "suggestion_zh": "请向工厂索取产品所含化学物质的资料或检测报告，确认是否需要 Prop 65 警示。如需警示，在商品页加入符合要求的警示语，或标明“WARNING”的超链接，并写明具体化学物质名称、危害类型和 www.P65Warnings.ca.gov。如确认无需警示，请留存书面依据。不得自行编造化学物质名称。",
+     "source": {
+      "type": "kb",
+      "rule_id": "US-03",
+      "title_zh": "加州 65 号提案：网购须在商品页展示警示",
+      "excerpt": "a warning on the product display page, or (B) a clearly marked hyperlink using the word",
+      "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25602"
+     },
+     "by": "model"
+    }
+   ],
+   "dropped": [],
+   "risk": "amber",
+   "review_skipped": null,
+   "rules_checked": [
+    "AMZ-01",
+    "AMZ-02",
+    "AMZ-03",
+    "AMZ-04",
+    "AMZ-05",
+    "AMZ-06",
+    "AMZ-07",
+    "US-01",
+    "US-02",
+    "US-03",
+    "US-04"
+   ]
+  },
+  "tiktok_mx": {
+   "content": {
+    "hook": "¿Licuado en la oficina sin cargar la licuadora grandota? Mira esto 👀",
+    "script": [
+     {
+      "shot_zh": "创作者在办公桌前，从包里拿出榨汁杯，镜头特写杯身大小",
+      "line": "Este vasito es una licuadora portátil de 350 mililitros, te la llevas sin bronca."
+     },
+     {
+      "shot_zh": "往杯里放切好的水果和一点牛奶，特写杯底的刀头",
+      "line": "Le echas tu fruta, tu leche, y abajo trae seis cuchillas de acero inoxidable."
+     },
+     {
+      "shot_zh": "手指按下唯一的按钮，杯子开始搅拌，镜头跟拍",
+      "line": "Le picas a un solo botón y listo, ni le tienes que andar moviendo a nada."
+     },
+     {
+      "shot_zh": "把杯体从底座拧下来，再按按钮，机器不启动，创作者对镜头点头",
+      "line": "Y si quitas el vaso, se desactiva solito. Así no arranca cuando no debe."
+     },
+     {
+      "shot_zh": "插上 USB-C 线充电，然后举杯喝一口，对镜头微笑",
+      "line": "Se carga con USB-C y, según pruebas de fábrica, te rinde como 12 licuados por carga. ¡Salud!"
+     }
+    ],
+    "caption": "Mi nuevo compa para los licuados de la mañana 🥤 Vaso de 350 ml, un solo botón, 6 cuchillas de acero inoxidable y carga USB-C. Si quitas el vaso, se desactiva solito. Rinde alrededor de 12 licuados por carga (prueba interna de fábrica). Lo encuentras aquí en TikTok Shop 🛒",
+    "hashtags": [
+     "#LicuadoraPortatil",
+     "#Licuados",
+     "#TikTokShopMexico",
+     "#DesayunoRapido",
+     "#VidaFit",
+     "#GadgetsDeCocina",
+     "#Oficina"
+    ],
+    "notes_zh": "本条风险提示针对 amazon_us 商品页的加州 65 号提案警示，不适用于 TikTok Shop 墨西哥短视频；在视频或文案里加入 www.P65Warnings.ca.gov 还会违反 TT-03（禁止站外链接），所以没有照搬。是否需要 P65 警示，请另行向工厂索取材料检测资料，在亚马逊美国商品页上处理。本版沿用上一版写法：只写资料里的卖点，「约 12 次」注明为工厂内部测试，不提 BPA-free（只有供应商声明，没有成品报告），不提 NOM、UL 等未持有的认证。「装进背包」改成「随身带走」，以免多说资料外的尺寸信息。产品由电池供电、USB-C 充电，资料里没有 127V 额定电压，所以仍不写电压，避免写出不实参数。"
+   },
+   "fields": {
+    "hook": "¿Licuado en la oficina sin cargar la licuadora grandota? Mira esto 👀",
+    "script[1]": "Este vasito es una licuadora portátil de 350 mililitros, te la llevas sin bronca.",
+    "script[2]": "Le echas tu fruta, tu leche, y abajo trae seis cuchillas de acero inoxidable.",
+    "script[3]": "Le picas a un solo botón y listo, ni le tienes que andar moviendo a nada.",
+    "script[4]": "Y si quitas el vaso, se desactiva solito. Así no arranca cuando no debe.",
+    "script[5]": "Se carga con USB-C y, según pruebas de fábrica, te rinde como 12 licuados por carga. ¡Salud!",
+    "caption": "Mi nuevo compa para los licuados de la mañana 🥤 Vaso de 350 ml, un solo botón, 6 cuchillas de acero inoxidable y carga USB-C. Si quitas el vaso, se desactiva solito. Rinde alrededor de 12 licuados por carga (prueba interna de fábrica). Lo encuentras aquí en TikTok Shop 🛒",
+    "hashtags": "#LicuadoraPortatil #Licuados #TikTokShopMexico #DesayunoRapido #VidaFit #GadgetsDeCocina #Oficina"
+   },
+   "diff": {
+    "hook": [
+     {
+      "op": "equal",
+      "text": "¿Licuado en la oficina sin cargar la licuadora grandota? Mira esto 👀"
+     }
+    ],
+    "script[1]": [
+     {
+      "op": "equal",
+      "text": "Este vasito es una licuadora portátil de 350 mililitros, "
+     },
+     {
+      "op": "delete",
+      "text": "cabe en"
+     },
+     {
+      "op": "insert",
+      "text": "te"
+     },
+     {
+      "op": "equal",
+      "text": " la "
+     },
+     {
+      "op": "delete",
+      "text": "mochila"
+     },
+     {
+      "op": "insert",
+      "text": "llevas"
+     },
+     {
+      "op": "equal",
+      "text": " sin bronca."
+     }
+    ],
+    "script[2]": [
+     {
+      "op": "equal",
+      "text": "Le echas tu fruta, tu leche, y abajo trae seis cuchillas de acero inoxidable."
+     }
+    ],
+    "script[3]": [
+     {
+      "op": "equal",
+      "text": "Le picas a un solo botón y listo, ni le tienes que andar moviendo a nada."
+     }
+    ],
+    "script[4]": [
+     {
+      "op": "equal",
+      "text": "Y si quitas el vaso, se desactiva solito. Así no arranca cuando no debe."
+     }
+    ],
+    "script[5]": [
+     {
+      "op": "equal",
+      "text": "Se carga con USB-C y, según pruebas de fábrica, te rinde como 12 licuados por carga. ¡Salud!"
+     }
+    ],
+    "caption": [
+     {
+      "op": "equal",
+      "text": "Mi nuevo compa para los licuados de la mañana 🥤 Vaso de 350 ml, un solo botón, 6 cuchillas de acero inoxidable y carga USB-C. Si quitas el vaso, se desactiva solito. Rinde alrededor de 12 licuados por carga (prueba interna de fábrica). Lo encuentras aquí en TikTok Shop 🛒"
+     }
+    ],
+    "hashtags": [
+     {
+      "op": "equal",
+      "text": "#LicuadoraPortatil #Licuados #TikTokShopMexico #DesayunoRapido #VidaFit #GadgetsDeCocina #Oficina"
+     }
+    ]
+   },
+   "findings": [],
+   "dropped": [],
+   "risk": "green",
+   "review_skipped": null,
+   "rules_checked": [
+    "MX-01",
+    "MX-02",
+    "MX-03",
+    "TT-01",
+    "TT-02",
+    "TT-03"
+   ]
+  }
+ },
+ "trace": [
+  {
+   "step": "生成 Amazon 美国站 · Listing · 第 2 轮",
+   "role": "Amazon 运营",
+   "meta": {
+    "source": "replay",
+    "cache_key": "ffd701fa58eb",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 3532,
+     "output_tokens": 1823
+    }
+   }
+  },
+  {
+   "step": "合规审核 · amazon_us",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "19af77cd93ee",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2419,
+     "output_tokens": 498
+    }
+   }
+  },
+  {
+   "step": "生成 TikTok Shop 墨西哥 · 种草短视频 · 第 2 轮",
+   "role": "TikTok 内容运营",
+   "meta": {
+    "source": "replay",
+    "cache_key": "18eb59803695",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2933,
+     "output_tokens": 1397
+    }
+   }
+  },
+  {
+   "step": "合规审核 · tiktok_mx",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "a33811667273",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2262,
+     "output_tokens": 205
+    }
+   }
+  }
+ ]
+}

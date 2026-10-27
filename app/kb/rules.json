@@ -1,0 +1,839 @@
+{
+ "version": "2026-10-26",
+ "note": "Rules knowledge base for the exporter-assistant demo (1.7 L stainless-steel kettle with plastic handle/lid; US + MX). Every excerpt is a verbatim quote from the page at `url`, fetched 2026-10-26; summary_zh is a paraphrase. Not legal advice. Prop 65 text comes from Cornell LII's copy of 27 CCR (official OEHHA site blocked automated access), so it is marked secondary. Culture rules are secondary sources. Regex patterns use Python `re` syntax (inline (?i) flag). See SOURCES.md.",
+ "rules": [
+  {
+   "id": "AMZ-01",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "标题不超过 75 个字符",
+   "summary_zh": "亚马逊美国站现行规则：商品标题（Item name）含空格最多 75 个字符，适用于除媒体类以外的所有品类；放不下的卖点可写进 125 字符的 Item highlights。注意：网上很多文章还写着旧的 200 字符上限，2026-10-26 抓取的官方页面已是 75。",
+   "excerpt": "Titles must not exceed 75 characters, including spaces.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "length",
+    "field": "title",
+    "max": 75
+   }
+  },
+  {
+   "id": "AMZ-02",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "标题禁用特殊字符",
+   "summary_zh": "标题不得出现 ! $ ? _ { } ^ ¬ ¦ 这些字符（品牌名本身含有的除外，应填到 Brand 字段）；~ # < > * 只能用于型号或尺寸等特定场景，不能做装饰。",
+   "excerpt": "Titles must not use the following special characters: !, $, ?, _, {, }, ^, ¬, ¦.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "[!$?_{}^¬¦]",
+    "message_zh": "标题含亚马逊禁用的特殊字符（! $ ? _ { } ^ ¬ ¦），请删除。"
+   }
+  },
+  {
+   "id": "AMZ-03",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "标题不得含促销用语",
+   "summary_zh": "标题里不能写促销话术，官方举例是“free shipping”和“100% quality guaranteed”。",
+   "excerpt": "Titles must not contain promotional phrases, such as \"free shipping\" or \"100% quality guaranteed.\"",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "(?i)(free shipping|100% quality guaranteed)",
+    "message_zh": "标题含促销用语（如 free shipping），请删除。"
+   }
+  },
+  {
+   "id": "AMZ-04",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "标题不得含主观评价（Hot Item / Best seller）",
+   "summary_zh": "官方最佳实践把“Hot Item”“Best seller”列为主观评价，标题里不应使用；不合规示例里也出现了全大写和 ★ 装饰。",
+   "excerpt": "Subjective commentary examples are \"Hot Item\" or \"Best seller\".",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "(?i)\\b(hot item|best[- ]?seller)\\b",
+    "message_zh": "标题含主观评价词（Hot Item / Best seller），请删除。"
+   }
+  },
+  {
+   "id": "AMZ-05",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "五点描述禁用环保、抗菌等宣称",
+   "summary_zh": "亚马逊五点描述（bullet points）的禁止内容里明确列出 eco-friendly、environmentally friendly、ecologically friendly、anti-microbial、anti-bacterial 等宣称，含这些词的五点可能被删改。",
+   "excerpt": "\"eco-friendly,\" \"environmentally friendly,\" \"ecologically friendly,\" \"anti-microbial,\" \"anti-bacterial,\"",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GX5L8BF8GLMML6CX",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "bullets",
+    "pattern": "(?i)\\b(eco[- ]?friendly|environmentally[- ]friendly|ecologically[- ]friendly|anti-?microbial|anti-?bacterial)\\b",
+    "message_zh": "五点描述含亚马逊禁止的宣称（环保 / 抗菌类），请删除或改为可证实的具体事实。"
+   }
+  },
+  {
+   "id": "AMZ-06",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "详情页不得出现电话、地址、邮箱、网址",
+   "summary_zh": "商品详情页的标题、描述、五点和图片里都不允许出现电话号码、地址、邮箱或网址。",
+   "excerpt": "Phone numbers, addresses, email addresses, or website URLs.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G200390640",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)(https?://|\\bwww\\.|\\b[\\w.+-]+@[\\w-]+\\.[\\w.]+|\\+?\\d[\\d\\s().-]{7,}\\d)",
+    "message_zh": "文案含联系方式或网址，亚马逊详情页不允许，请删除。"
+   }
+  },
+  {
+   "id": "AMZ-07",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "详情页不得写价格、库存或成色",
+   "summary_zh": "标题、描述、五点和图片里不能写库存/供货情况、价格或成色信息。",
+   "excerpt": "Details of availability, price, or condition.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G200390640",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)(\\$\\s?\\d|\\bUSD\\s?\\d|\\b(in|out of) stock\\b)",
+    "message_zh": "文案含价格或库存信息，亚马逊详情页不允许，请删除。"
+   }
+  },
+  {
+   "id": "ALI-01",
+   "category": "platform_alibaba",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "产品属性必须与实物一致",
+   "summary_zh": "阿里国际站《产品信息填写规则》：产品属性要与实际情况一致，准确写明成分、材质、尺寸、品牌、型号、产地等。对这款水壶来说，壶身不锈钢、手柄和盖子是塑料，不能写成“全不锈钢”。该规则页标注为 2017 年修订版。",
+   "excerpt": "Product attributes must be consistent with the actual condition of the product, and accurately showing the ingredients, materials, sizes, brands, models, places of origin",
+   "url": "https://rule.alibaba.com/rule/detail/11000682.htm",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复或文案里的材质、尺寸、型号、产地等属性是否与已知产品资料一致（例如是否把塑料手柄/盖子的水壶说成全不锈钢）？"
+   }
+  },
+  {
+   "id": "ALI-02",
+   "category": "platform_alibaba",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "付款与发货条件须符合真实能力",
+   "summary_zh": "付款方式和物流选项必须与供应商的实际服务能力一致；起订量、港口、包装、交期、付款方式、单价等都要如实填写。回复询盘时不要承诺做不到的 MOQ、交期或付款条件。",
+   "excerpt": "Payment and shipping options must be consistent with the actual service capability of suppliers.",
+   "url": "https://rule.alibaba.com/rule/detail/11000682.htm",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复中承诺的起订量、交期、港口、付款方式或单价，是否都有供应商提供的资料支撑，而不是模型自己编的？"
+   }
+  },
+  {
+   "id": "ALI-03",
+   "category": "platform_alibaba",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "发布的信息须真实、准确、合法",
+   "summary_zh": "阿里国际站会员行为要点（2015 年发布）：会员在站内发布的所有信息必须真实、准确、合法，不得虚假或误导，不得违法或侵犯他人权利。",
+   "excerpt": "Member should ensure that all information you post on the Sites is true, accurate and lawful and should not be false or misleading",
+   "url": "https://rule.alibaba.com/rule/detail/2063.htm",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复中是否有无法由产品资料证实、可能虚假或误导买家的说法（例如未提供证书却声称已获某认证）？"
+   }
+  },
+  {
+   "id": "TT-01",
+   "category": "platform_tiktok",
+   "platforms": [
+    "tiktok_mx"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "禁止夸大描述和绝对化用语",
+   "summary_zh": "TikTok Shop 墨西哥内容政策 3.10.3：没有相关、有效、客观的证据时，不得使用夸大描述或绝对化说法，官方示例是“Producto Número 1”和“100% natural”。",
+   "excerpt": "descripciones exageradas o afirmaciones absolutas sin pruebas relacionadas, válidas y objetivas para apoyar la afirmación",
+   "url": "https://seller-mx.tiktok.com/university/essay?knowledge_id=8289533054535425&lang=es-419",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)(n[úu]mero\\s*(1|uno)\\b|100\\s*%\\s*natural)",
+    "message_zh": "含绝对化用语（如“Número 1”“100% natural”），TikTok Shop 墨西哥禁止无证据使用。"
+   }
+  },
+  {
+   "id": "TT-02",
+   "category": "platform_tiktok",
+   "platforms": [
+    "tiktok_mx"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "禁止对效果或价格作夸大承诺",
+   "summary_zh": "政策 3.10.2：不得夸大承诺产品的性能、效果或价格，官方示例包括“这是你在 TikTok Shop 能找到的最低/最便宜/最好的价格”。",
+   "excerpt": "promesas exageradas acerca del desempeño, el efecto o el precio de un producto",
+   "url": "https://seller-mx.tiktok.com/university/essay?knowledge_id=8289533054535425&lang=es-419",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)(precio\\s+m[áa]s\\s+(bajo|barato)|el\\s+m[áa]s\\s+barato|mejor\\s+precio)",
+    "message_zh": "含“最低价/最便宜/最好的价格”之类的价格承诺，TikTok Shop 墨西哥禁止。"
+   }
+  },
+  {
+   "id": "TT-03",
+   "category": "platform_tiktok",
+   "platforms": [
+    "tiktok_mx"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "禁止站外引流（电话、社媒账号、邮箱、链接）",
+   "summary_zh": "政策 3.12：内容里不能放其他网站链接、电话号码、社交媒体账号、邮箱、二维码，或任何把用户引到站外的信息，否则可能被删除。",
+   "excerpt": "Números de teléfono, identificadores de redes sociales o direcciones de correo electrónico",
+   "url": "https://seller-mx.tiktok.com/university/essay?knowledge_id=8289533054535425&lang=es-419",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)(https?://|\\bwww\\.|\\b[\\w.+-]+@[\\w-]+\\.[\\w.]+|\\+?\\d[\\d\\s().-]{7,}\\d|whats\\s?app|instagram|facebook|telegram)",
+    "message_zh": "含站外联系方式或社媒账号，TikTok Shop 墨西哥禁止引流到站外。"
+   }
+  },
+  {
+   "id": "US-01",
+   "category": "compliance_us",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "不得使用无限定的笼统环保宣称",
+   "summary_zh": "FTC《绿色指南》16 CFR 260.4(b)：营销者不应做无限定的笼统环保宣称。条文例 1 明确说“Eco-friendly”这类说法会被理解为具有广泛环保益处，难以证实，因此具有欺骗性；只有附上清晰、可证实的具体限定（比如具体用了多少再生材料）才可能合规。",
+   "excerpt": "marketers should not make unqualified general environmental benefit claims.",
+   "url": "https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-16?part=260&section=260.4",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)\\b(eco[- ]?friendly|environmentally[- ]friendly|greener)\\b",
+    "message_zh": "含笼统环保宣称（eco-friendly 等），FTC 绿色指南认为无限定使用具有欺骗性。"
+   }
+  },
+  {
+   "id": "US-02",
+   "category": "compliance_us",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "中国制造的产品不得标“Made in USA”",
+   "summary_zh": "FTC《Made in USA 标签规则》16 CFR 323.2：除非最终组装或加工在美国完成、所有重要加工在美国、且全部或几乎全部部件在美国生产和采购，否则不得标“美国制造”；323.1 定义里 made、manufactured、built、produced、created、crafted in USA/America 都算。在中国生产的水壶不能这样写。",
+   "excerpt": "to label any product as Made in the United States unless the final assembly or processing of the product occurs in the United States",
+   "url": "https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-16?part=323",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)\\b(made|manufactured|built|produced|created|crafted)\\s+in\\s+(the\\s+)?(usa|u\\.s\\.a\\.?|u\\.s\\.|united states|america)\\b",
+    "message_zh": "含美国原产宣称（Made in USA 等），产品在中国生产，违反 FTC 规则。"
+   }
+  },
+  {
+   "id": "US-03",
+   "category": "compliance_us",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "加州 65 号提案：网购须在商品页展示警示",
+   "summary_zh": "加州法规 27 CCR 25602(b)：如果产品需要 65 号提案警示，网购时警示须放在商品展示页，或在商品展示页放一个写着“WARNING”/“CA WARNING”/“CALIFORNIA WARNING”的明显链接，或在完成购买前醒目展示；买家要在网站里翻找才能看到的不算醒目。是否需要警示取决于产品是否会让消费者接触清单上的化学物质，需由供应商的检测资料确认，模型不能自行判断。",
+   "excerpt": "a warning on the product display page, or (B) a clearly marked hyperlink using the word",
+   "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25602",
+   "source_type": "secondary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "如果供应商资料表明该产品需要加州 65 号提案警示，商品页文案是否包含警示或标明 WARNING 的链接？（资料未说明时，应提示人工确认，不得自行编造化学物质）"
+   }
+  },
+  {
+   "id": "US-04",
+   "category": "compliance_us",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "加州 65 号提案警示的内容要素",
+   "summary_zh": "27 CCR 25603(a)：安全港警示须包含黄色等边三角形内黑色感叹号的标志、全大写加粗的“WARNING:”（或 CA WARNING: / CALIFORNIA WARNING:），写出至少一种化学物质的名称和危害类型（致癌 / 生殖危害），并附 www.P65Warnings.ca.gov。",
+   "excerpt": "A symbol consisting of a black exclamation point in a yellow equilateral triangle with a bold black outline.",
+   "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25603",
+   "source_type": "secondary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "若文案包含 65 号提案警示，是否有 WARNING:、具体化学物质名称、危害类型和 www.P65Warnings.ca.gov？"
+   }
+  },
+  {
+   "id": "MX-01",
+   "category": "compliance_mx",
+   "platforms": [
+    "tiktok_mx",
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "电器包装信息须用西班牙语（NOM-024-SCFI-2013）",
+   "summary_zh": "电器、电子产品和家用电器在墨西哥销售时，包装或外箱上须清晰标出以下西班牙语信息：产品名称或图示、墨西哥制造商或进口商的名称和地址、原产国（如“Hecho en China”），以及额定电气参数（电压 V、功率 W 或电流 A、频率 Hz）。对电热水壶，这条比通用标签标准 NOM-050 更具体；NOM-050 第 2.2 a) 条规定，已有专门 NOM 的产品不适用 NOM-050。",
+   "excerpt": "en el empaque o envase, de manera clara y legible, como mínimo, los siguientes datos en idioma español",
+   "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "面向墨西哥的产品资料或回复，是否提醒包装需用西班牙语标注产品名、进口商名称地址、原产国以及电压/功率/频率？"
+   }
+  },
+  {
+   "id": "MX-02",
+   "category": "compliance_mx",
+   "platforms": [
+    "tiktok_mx",
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "说明书和警示须用西班牙语",
+   "summary_zh": "NOM-024-SCFI-2013 第 6.3 条：使用说明和安全警示必须用西班牙语，用语易懂、清晰可读，可以同时附其他语言；计量单位须符合 NOM-008-SCFI-2002。",
+   "excerpt": "Los instructivos y las advertencias deben redactarse en idioma español y en términos comprensibles y legibles",
+   "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复墨西哥买家时，是否在需要时说明说明书和警示语会提供西班牙语版本，并且没有承诺只提供英文说明书？"
+   }
+  },
+  {
+   "id": "MX-03",
+   "category": "compliance_mx",
+   "platforms": [
+    "tiktok_mx",
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "电器安全须符合 NOM-003-SCFI-2014",
+   "summary_zh": "NOM-003-SCFI-2014《电气产品—安全规范》适用于交流 1000 V、直流 1500 V 以下、由公共电网等供电的电气产品，电热水壶在其范围内，需按该标准的合格评定程序取得证书。没有证书资料时，文案不得声称已通过 NOM 认证。",
+   "excerpt": "aplica a los productos eléctricos que utilizan para su alimentación la energía eléctrica del servicio público",
+   "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/003scfi2015.pdf",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "文案或回复是否在没有供应商提供 NOM-003 证书的情况下声称产品“已获 NOM 认证/符合 NOM”？"
+   }
+  },
+  {
+   "id": "INC-01",
+   "category": "contract",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "FOB / FAS 只适用于海运和内河运输",
+   "summary_zh": "国际商会学院（ICC Academy）解读 Incoterms 2020：FAS 和 FOB 都只适用于海运或内河运输（港到港）。空运、快递、陆运报价不能用 FOB。",
+   "excerpt": "Both apply only to sea or inland waterway transport (i.e. port-to-to port shipments).",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否在空运、快递或陆运场景下使用了 FOB/FAS/CFR/CIF？"
+   }
+  },
+  {
+   "id": "INC-02",
+   "category": "contract",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "集装箱货物更适合用 FCA",
+   "summary_zh": "集装箱货物通常交到集装箱码头，而不是直接装上船，可能在码头放好几天才装船；这种情况下 FCA（货交承运人）是更合适的术语。",
+   "excerpt": "FCA (Free Carrier) is the more appropriate Incoterms® rule.",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "整柜或拼柜的集装箱报价用了 FOB 时，回复是否提示 FCA 可能更合适（可以作为可选项，不要求替换）？"
+   }
+  },
+  {
+   "id": "INC-03",
+   "category": "contract",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "FOB：装上买方指定船只即完成交货，风险同时转移",
+   "summary_zh": "FOB 指卖方在装运港把货物装上买方指定的船只即完成交货，货物灭失或损坏的风险在这个时点转给买方；卖方负责出口清关，买方负责订船并支付主运费。",
+   "excerpt": "the seller delivers the goods loaded on board the vessel nominated by the buyer at the port of shipment",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复对 FOB 的解释（谁订船、谁付运费、风险何时转移）是否与“装上买方指定船只即交货、风险转移”一致？"
+   }
+  },
+  {
+   "id": "INC-04",
+   "category": "contract",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "CFR / CIF 只适用于海运和内河运输",
+   "summary_zh": "CFR 和 CIF 同样只适用于海运或内河运输。",
+   "excerpt": "Both Incoterms® CIF and Incoterms® CFR are used for sea or inland waterway transportation only.",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-cfr-or-cif/",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否在非海运场景下报了 CFR 或 CIF？"
+   }
+  },
+  {
+   "id": "INC-05",
+   "category": "contract",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "CFR / CIF 风险在装运港装船时转移",
+   "summary_zh": "CFR/CIF 下卖方付运费到目的港，但风险在装运港货物装上船时就转给买方，与货物能否完好到达无关。回复里不要写成卖方承担风险直到目的港。",
+   "excerpt": "risk of loss of or damage to the goods transfers when the goods are placed on board the vessel at the port of shipment",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-cfr-or-cif/",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否错误地表示 CFR/CIF 下卖方要承担运输途中直到目的港的风险？"
+   }
+  },
+  {
+   "id": "CUL-01",
+   "category": "culture",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "墨西哥商务邮件用正式语气",
+   "summary_zh": "墨西哥商务沟通以邮件为主，WhatsApp 用于快速回复；邮件应一律使用正式语言，结尾常用“Saludos”，写给高层可用“Saludos cordiales”。",
+   "excerpt": "E-mail communication should always be conducted in formal language.",
+   "url": "https://gringogazette.com/doing-business-in-mexico-dont-get-lost-in-translation/",
+   "source_type": "secondary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "给墨西哥买家的回复语气是否正式（没有俚语、表情符号或过度随意的表达）？"
+   }
+  },
+  {
+   "id": "CUL-02",
+   "category": "culture",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "B2B 西语回复默认用 usted，对方先用 tú 再改",
+   "summary_zh": "对方是高层时，用正式称谓（头衔加姓氏），直到对方表示可以随意些。对方开始用 tú 称呼你，就是这样的邀请，这时你也应改用 tú。所以 B2B 首次回复默认用 usted。注意：这条针对 B2B 询盘，不适用于 TikTok 面向消费者的文案。",
+   "excerpt": "a person using the informal pronoun “tú” instead of the formal “usted,”",
+   "url": "https://gringogazette.com/doing-business-in-mexico-dont-get-lost-in-translation/",
+   "source_type": "secondary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "西语 B2B 回复是否用 usted 称呼对方（除非买家先用了 tú）？"
+   }
+  },
+  {
+   "id": "CUL-03",
+   "category": "culture",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "称呼用 Señor/Señora 加姓",
+   "summary_zh": "墨西哥商务文化重视等级，称呼对方用 Señor / Señora 加姓氏，除非对方明确表示可以直呼名字。",
+   "excerpt": "addressing them using appropriate titles like 'Señor' (Mr.) or 'Señora' (Mrs.), followed by their last name",
+   "url": "https://cibtvisas.com/blog/business-etiquette-mexico",
+   "source_type": "secondary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "llm",
+    "question_zh": "西语回复的称呼是否用了 Señor/Señora 加姓（或买家签名里的头衔），而不是直接称呼名字？"
+   }
+  },
+  {
+   "id": "IMG-01",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "主图最长边不少于 500 像素",
+   "summary_zh": "Amazon 美国站：最长边小于 500 像素的图片无法上传。",
+   "excerpt": "Images below 500 pixels on the longest side cannot be uploaded.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "image",
+    "metric": "longest_side",
+    "min": 500,
+    "severity": "red"
+   }
+  },
+  {
+   "id": "IMG-02",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "最长边 1000 像素以上才能放大",
+   "summary_zh": "最长边 1000 像素以上才能启用放大功能；低于此值建议重拍。",
+   "excerpt": "Images with 1,000+ pixels on the longest side enable the zoom function.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "image",
+    "metric": "longest_side",
+    "min": 1000,
+    "severity": "amber"
+   }
+  },
+  {
+   "id": "IMG-03",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "主图必须纯白背景",
+   "summary_zh": "主图背景须为纯白（RGB 255,255,255）。代码检查图片四周边缘像素是否为白色。",
+   "excerpt": "Have a pure white background (RGB color values: 255, 255, 255)",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "image",
+    "metric": "white_border",
+    "min": 0.98,
+    "severity": "red"
+   }
+  },
+  {
+   "id": "IMG-04",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "产品占画面 85%",
+   "summary_zh": "主图中产品应占画面的 85%。代码用非白色区域的外接框估算占比（估算，需人工复核）。",
+   "excerpt": "Show the product as 85% of the image.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "image",
+    "metric": "fill",
+    "min": 0.85,
+    "severity": "amber"
+   }
+  },
+  {
+   "id": "IMG-05",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "产品完整出现在画面内",
+   "summary_zh": "不能裁掉产品的任何部分。代码检查非白色区域是否贴到图片边缘。",
+   "excerpt": "Show the entire product within the frame of the image.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "image",
+    "metric": "not_cropped",
+    "severity": "amber"
+   }
+  },
+  {
+   "id": "IMG-06",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "主图须是真实、专业的产品照片",
+   "summary_zh": "主图要真实反映产品的比例、数量和颜色，不能用占位图。",
+   "excerpt": "Accurately represent the product as a realistic, professional-quality image.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "vision",
+    "question_zh": "这张图是不是真实拍摄的专业产品照片？如果是插画、示意图、渲染草图或占位图，请指出。"
+   }
+  },
+  {
+   "id": "IMG-07",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "产品在图中只出现一次",
+   "summary_zh": "主图中产品只能出现一次，不能同时展示正面和背面等多个视图。",
+   "excerpt": "Only show the product once in the image.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "vision",
+    "question_zh": "图中同一产品是否出现了不止一次（多个视图或多个产品）？"
+   }
+  },
+  {
+   "id": "IMG-08",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "不能出现非随附的道具",
+   "summary_zh": "不能出现产品不附带、可能误导顾客的配件或道具。",
+   "excerpt": "Don't show accessories or any props that aren't included with the product and could confuse the customer.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "vision",
+    "question_zh": "图中是否有产品本身不附带的道具或配件（杯子、食物、植物等）？"
+   }
+  },
+  {
+   "id": "IMG-09",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "图片中不能有促销宣称和评价",
+   "summary_zh": "所有产品图都不能出现顾客评价、五星图案、促销宣称（如 free shipping）或卖家信息。",
+   "excerpt": "No images of customer reviews, five-star imagery, claims (for example, free shipping), or selling partner-specific information.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "vision",
+    "question_zh": "图中是否有文字宣称、促销语、五星或评价图案、卖家信息？请写出看到的文字。"
+   }
+  },
+  {
+   "id": "IMG-10",
+   "category": "platform_amazon_image",
+   "platforms": [
+    "amazon_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "不能使用类似 Amazon 的徽章",
+   "summary_zh": "不能出现 Best seller、Top seller、Amazon's Choice 等徽章或相似图形。",
+   "excerpt": "No badges used on Amazon, or variations, modifications, or anything confusingly similar to such badges.",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-26",
+   "check": {
+    "kind": "vision",
+    "question_zh": "图中是否有类似 Best seller、Top seller、Amazon's Choice 的徽章或标签？"
+   }
+  }
+ ]
+}

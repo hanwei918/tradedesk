@@ -1,0 +1,237 @@
+{
+  "app": "TradeDesk 出海工作台",
+  "model": {
+    "endpoint": "https://api.anthropic.com",
+    "model": "claude-opus-5-5",
+    "temperature": 0,
+    "seed": 42,
+    "response_format": "json_object",
+    "modes": [
+      "live",
+      "record",
+      "replay"
+    ]
+  },
+  "agents": [
+    {
+      "id": "analyst",
+      "prompt": "understand_inquiry",
+      "task_zh": "读询盘，抽取买家画像、需求、质量信号、与工厂资料的冲突；每条带询盘原文出处",
+      "interaction_zh": "收到新询盘时自动触发；结果显示在“询盘分析”面板",
+      "role_zh": "询盘分析员",
+      "prompt_file": "prompts/understand_inquiry.md",
+      "prompt_text": "你是外贸工厂的\"询盘分析员\"。读一条买家询盘，把买家要什么、和工厂能给什么之间的差距找出来，给业务员看。\n\n规则：\n- 只根据询盘原文和给你的工厂/产品资料判断，不猜测、不补充外部信息。\n- 每一条 requests、signals、conflicts 都必须带 `quote`：从询盘原文里逐字复制的一小段（不超过 20 个词），证明这条判断有出处。找不到原文依据的条目不要写。\n- conflicts 只写买家要求和工厂资料确实对不上的地方（认证、付款、交期、运输方式、价格、数量、材料宣称等）。\n- 所有说明用简体中文。\n\n只输出 JSON，结构如下：\n{\n  \"buyer\": {\"country_guess\": \"...\", \"language\": \"en|es|...\", \"business_type_zh\": \"...\", \"sales_channel_zh\": \"...\"},\n  \"requests\": [{\"topic_zh\": \"数量|价格条款|认证|付款|交期|包装|样品|其他\", \"value\": \"...\", \"quote\": \"...\"}],\n  \"signals\": [{\"signal_zh\": \"询盘质量信号，例如：给出具体数量、说明销售渠道、使用公司邮箱\", \"positive\": true, \"quote\": \"...\"}],\n  \"conflicts\": [{\"topic_zh\": \"...\", \"buyer_wants\": \"...\", \"factory_can\": \"...\", \"severity\": \"red|amber\", \"quote\": \"...\"}],\n  \"summary_zh\": \"一句话：这个买家是谁、值不值得优先跟进、最大的风险是什么\"\n}\n"
+    },
+    {
+      "id": "sales",
+      "prompt": "reply_inquiry",
+      "task_zh": "用买家语言写阿里国际站 RFQ 回复 + 给采购/生产的中文内部备忘",
+      "interaction_zh": "多轮：业务员用中文提修改意见，在上一版基础上改",
+      "role_zh": "外贸业务员",
+      "prompt_file": "prompts/reply_inquiry.md",
+      "prompt_text": "你是宁波一家小家电工厂的资深外贸业务员，在阿里巴巴国际站上回复买家询盘（RFQ）。\n\n你要产出两份东西：\n1. `reply`：发给买家的回复，用买家的语言（{language_name}）。像真人业务员写的商务邮件，不是翻译腔：\n   - 开头称呼得体，正文分段短句；西班牙语对 B2B 买家用 usted。\n   - 先回应买家最关心的点，再给报价、条款、下一步。下一步里提到的服务（寄样、验厂、印 logo 等）只能是\"工厂资料 services\"里有的，并按资料写清条件。\n   - 价格、MOQ、交期、付款方式、认证情况必须与\"工厂与产品资料\"和\"业务员意图\"一致。工厂没有的认证、没做过检测的材料宣称，一律不能写成\"有\"；要如实说明并给出替代方案。\n   - 不要在回复里留站外联系方式（邮箱、电话、WhatsApp）。\n2. `internal_brief_zh`：给工厂内部采购/生产同事的简短中文备忘（第二个角色），写清需要内部确认的事项。\n3. `tasks`：把需要其他岗位跟进的事拆成任务（0–5 条）。每条写清 `role_zh`（采购 / 生产 / 美工 / 运营 / 业务 之一）、`task_zh`（一句可执行的话）、`priority`（high / normal），以及 `quote`：从**询盘原文**里逐字复制的一小段，说明这条任务因为买家哪句话而产生。找不到询盘原文依据的任务不要写。\n\n如果给了\"上一版回复\"和\"修改意见\"，在上一版基础上按修改意见改，其他内容尽量保持不变。\n\n只输出 JSON：\n{\"reply\": \"...\", \"internal_brief_zh\": \"...\", \"tasks\": [{\"role_zh\": \"采购\", \"task_zh\": \"...\", \"priority\": \"high\", \"quote\": \"...\"}], \"notes_zh\": \"一句话说明你这版回复的策略\"}\n"
+    },
+    {
+      "id": "ops_amazon",
+      "prompt": "listing_amazon",
+      "task_zh": "中文产品资料 → Amazon 美国站英文 Listing",
+      "interaction_zh": "多轮：运营用中文提修改意见",
+      "role_zh": "Amazon 运营",
+      "prompt_file": "prompts/listing_amazon.md",
+      "prompt_text": "你是熟悉 Amazon US 的跨境运营。根据中文产品资料，写一个美国站 Listing（英文）。\n\n要求：\n- 用美国消费者的说法写卖点，不要逐字翻译中文。\n- 标题：品牌占位用 \"[Brand]\"，包含核心关键词、容量、材质、主要功能。\n- 5 条要点（bullets），每条先给一个大写短语，再解释好处。\n- 描述（description）2–3 段。\n- search_terms：后台搜索词，空格分隔。\n- 只写资料里有的事实。资料里写明\"没有\"的认证、\"未做\"的检测，不能写成具备；工厂内部测试的数据不要写成第三方认证结论。\n\n如果给了\"上一版\"和\"修改意见\"，在上一版基础上按意见修改。\n\n只输出 JSON：\n{\"title\": \"...\", \"bullets\": [\"...\", \"...\", \"...\", \"...\", \"...\"], \"description\": \"...\", \"search_terms\": \"...\", \"notes_zh\": \"一句话说明写法\"}\n"
+    },
+    {
+      "id": "ops_tiktok",
+      "prompt": "listing_tiktok",
+      "task_zh": "中文产品资料 → TikTok Shop 墨西哥西语种草脚本",
+      "interaction_zh": "多轮：运营用中文提修改意见",
+      "role_zh": "TikTok 内容运营",
+      "prompt_file": "prompts/listing_tiktok.md",
+      "prompt_text": "你是做 TikTok Shop 墨西哥站的内容运营。根据中文产品资料，写一条西班牙语（墨西哥用语）的短视频种草内容。\n\n要求：\n- 口语化、有画面感，像墨西哥本地创作者在说话，不是翻译腔；用墨西哥常见说法。\n- `hook`：视频前 3 秒的开场白。\n- `script`：15–30 秒口播脚本，分 3–5 个镜头（每个镜头一句画面描述 + 一句台词）。\n- `caption`：发布文案。\n- `hashtags`：5–8 个。\n- 只写资料里有的事实；不能夸大功效（例如\"最好的\"\"100% 安全\"\"保证健康\"），资料里没有的认证和检测不能说有。电压写 127V。\n\n如果给了\"上一版\"和\"修改意见\"，在上一版基础上按意见修改。\n\n只输出 JSON：\n{\"hook\": \"...\", \"script\": [{\"shot_zh\": \"画面描述（中文）\", \"line\": \"西语台词\"}], \"caption\": \"...\", \"hashtags\": [\"#...\"], \"notes_zh\": \"一句话说明写法\"}\n"
+    },
+    {
+      "id": "image_reviewer",
+      "prompt": "vision_review",
+      "task_zh": "看主图，按“模型判断”类主图规则（文字宣称、徽章、道具、是否实拍、只出现一次）审核；必须写出看到了什么",
+      "interaction_zh": "在商品看板上传或选择主图后触发；像素指标由代码先测量",
+      "role_zh": "主图审核员",
+      "prompt_file": "prompts/vision_review.md",
+      "prompt_text": "你是 Amazon 美国站的主图审核员。下面给你一张产品主图、产品资料，以及一组只能靠看图判断的规则（每条有编号、原文摘录和要判断的问题）。\n\n逐条看图判断。对每一个问题：\n- 必须写 `rule_id`：只能是下面列出的规则编号之一。\n- 必须写 `evidence_zh`：你在图里具体看到了什么（例如\"左上角有红色圆形徽章，文字 BEST SELLER\"）。说不出看到了什么，就不要报。\n- severity：red = 明确违反规则；amber = 有风险、需要人确认。\n- problem_zh / suggestion_zh 用简体中文，建议要具体可执行。\n- 尺寸、白底、产品占比这些像素指标已经由代码测量，不需要你判断。\n\n只输出 JSON：\n{\"findings\": [{\"rule_id\": \"...\", \"evidence_zh\": \"...\", \"severity\": \"red|amber\", \"problem_zh\": \"...\", \"suggestion_zh\": \"...\"}], \"description_zh\": \"一句话描述这张图\"}\n如果没有问题：{\"findings\": [], \"description_zh\": \"...\"}\n"
+    },
+    {
+      "id": "compliance",
+      "prompt": "compliance_review",
+      "task_zh": "按知识库中“模型判断”类规则审核文本；必须给出规则编号和原文片段，否则被代码丢弃",
+      "interaction_zh": "每次生成后自动触发",
+      "role_zh": "合规审核员",
+      "prompt_file": "prompts/compliance_review.md",
+      "prompt_text": "你是外贸合规审核员。下面给你一段待发布的文本，以及一组规则（每条有编号、规则原文摘录和要判断的问题）。\n\n只根据给出的规则判断。另外会给你工厂与产品资料，用来核对待审文本里的价格、条款、材料、认证等事实；资料本身不是待审对象。\n如果待审文本与资料一致、也符合规则，就不要报。对每一个问题：\n- 必须写 `rule_id`：只能是下面列出的规则编号之一。\n- 必须写 `quote`：从待审文本里逐字复制出有问题的那一小段（不超过 20 个词）。\n- 写不出规则编号或原文片段的问题，不要输出。宁可漏报，不要编造。\n- severity：red = 明确违反规则；amber = 有风险、需要人确认。\n- problem_zh / suggestion_zh 用简体中文，suggestion 给出具体改法。\n\n只输出 JSON：\n{\"findings\": [{\"rule_id\": \"...\", \"quote\": \"...\", \"severity\": \"red|amber\", \"problem_zh\": \"...\", \"suggestion_zh\": \"...\"}]}\n如果没有问题：{\"findings\": []}\n"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "D",
+      "name_zh": "询盘收件箱 + 跨岗位任务",
+      "trigger_zh": "整理收件箱 / 处理询盘",
+      "steps": [
+        {
+          "step_zh": "理解每条询盘（与工作流 A 共用同一步）",
+          "agent": "analyst",
+          "guard_zh": "无询盘原文出处的条目丢弃"
+        },
+        {
+          "step_zh": "优先级打分（代码）",
+          "agent": null,
+          "detail_zh": "50 + 正面信号×8 − 负面信号×8 − 硬冲突×6 − 待确认×3 + 数量加分，限制 0–100"
+        },
+        {
+          "step_zh": "回复时派发任务",
+          "agent": "sales",
+          "guard_zh": "岗位必须是 采购/生产/美工/运营/业务，quote 必须在询盘原文里"
+        },
+        {
+          "step_zh": "任务状态流转",
+          "agent": null,
+          "detail_zh": "待处理 → 进行中 → 已完成"
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "name_zh": "商品看板 · 批量上品 + 主图检查",
+      "trigger_zh": "批量生成 / 上传主图 / 标记上架",
+      "steps": [
+        {
+          "step_zh": "批量生成：对选中产品逐个跑工作流 B（Amazon + TikTok）",
+          "agent": "ops_amazon / ops_tiktok / compliance"
+        },
+        {
+          "step_zh": "主图像素测量（代码）",
+          "agent": null,
+          "detail_zh": "最长边、四周白色比例、产品占比、是否贴边；背景不是白色时不估算占比和贴边"
+        },
+        {
+          "step_zh": "主图看图审核",
+          "agent": "image_reviewer",
+          "guard_zh": "规则编号不在白名单、没写看到了什么 → 丢弃"
+        },
+        {
+          "step_zh": "状态流转",
+          "agent": null,
+          "detail_zh": "未生成 → 不能发/需人工确认/可上架 → 已上架（人工标记；红色时代码拒绝）"
+        },
+        {
+          "step_zh": "导出 CSV",
+          "agent": null
+        }
+      ]
+    },
+    {
+      "id": "A",
+      "name_zh": "询盘回复",
+      "trigger_zh": "收到新询盘 / 业务员修改意见",
+      "steps": [
+        {
+          "step_zh": "理解询盘",
+          "agent": "analyst",
+          "guard_zh": "丢弃在询盘原文里找不到 quote 的条目"
+        },
+        {
+          "step_zh": "生成回复（买家语言）+ 内部备忘（中文）",
+          "agent": "sales",
+          "kb_zh": "注入 alibaba_rfq 平台的规则摘要"
+        },
+        {
+          "step_zh": "规则校验",
+          "agent": null,
+          "detail_zh": "产品事实（认证、材料、价格、MOQ、交期、付款）+ 合同条款 + 知识库正则/长度规则"
+        },
+        {
+          "step_zh": "模型审核",
+          "agent": "compliance",
+          "guard_zh": "规则编号不在白名单、原文片段对不上 → 丢弃"
+        },
+        {
+          "step_zh": "反馈",
+          "agent": null,
+          "detail_zh": "原文高亮批注 + 红黄绿风险等级 + 与上一轮的逐词对比"
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "name_zh": "多平台上架",
+      "trigger_zh": "新品上架 / 运营修改意见",
+      "steps": [
+        {
+          "step_zh": "生成 Amazon 美国站 Listing（英语）",
+          "agent": "ops_amazon",
+          "kb_zh": "注入 amazon_us 规则摘要"
+        },
+        {
+          "step_zh": "生成 TikTok 墨西哥种草脚本（西语）",
+          "agent": "ops_tiktok",
+          "kb_zh": "注入 tiktok_mx 规则摘要"
+        },
+        {
+          "step_zh": "规则校验 + 模型审核（按平台分别进行）",
+          "agent": "compliance"
+        },
+        {
+          "step_zh": "反馈",
+          "agent": null,
+          "detail_zh": "逐字段高亮 + 风险等级 + 前后对比"
+        }
+      ]
+    }
+  ],
+  "platforms": {
+    "alibaba_rfq": "阿里巴巴国际站 · RFQ 回复",
+    "amazon_us": "Amazon 美国站 · Listing",
+    "tiktok_mx": "TikTok Shop 墨西哥 · 种草短视频"
+  },
+  "knowledge_base": {
+    "file": "kb/rules.json",
+    "version": "2026-10-26",
+    "rules_total": 38,
+    "rules_verified": 38,
+    "by_category": {
+      "platform_amazon": {
+        "verified": 7,
+        "total": 7
+      },
+      "platform_alibaba": {
+        "verified": 3,
+        "total": 3
+      },
+      "platform_tiktok": {
+        "verified": 3,
+        "total": 3
+      },
+      "compliance_us": {
+        "verified": 4,
+        "total": 4
+      },
+      "compliance_mx": {
+        "verified": 3,
+        "total": 3
+      },
+      "contract": {
+        "verified": 5,
+        "total": 5
+      },
+      "culture": {
+        "verified": 3,
+        "total": 3
+      },
+      "platform_amazon_image": {
+        "verified": 10,
+        "total": 10
+      }
+    },
+    "check_map": {
+      "fob_sea_only": "INC-01"
+    },
+    "product_cards": "data/products.json"
+  }
+}

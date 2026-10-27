@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI 找茬挑战 · TradeDesk</title>
+<link rel="stylesheet" href="style.css?v=9">
+<style>
+body{background:hsl(var(--background))}
+.wrap{max-width:560px;margin:0 auto;padding:16px 16px 40px}
+.hero{display:flex;gap:12px;align-items:center;margin:8px 0 16px}
+.hero h1{font-size:20px;margin:0}.hero p{margin:2px 0 0;font-size:13px;color:hsl(var(--muted-foreground))}
+.text{font-size:19px;line-height:2.1;padding:18px;user-select:none;-webkit-user-select:none}
+.tok{display:inline;padding:3px 2px;border-radius:6px;cursor:pointer;transition:background .12s}
+.tok.on{background:hsl(var(--brand) / .22);box-shadow:inset 0 -2px 0 hsl(var(--brand))}
+.tok.ai{box-shadow:inset 0 -3px 0 hsl(var(--red))}
+.tok.ai.on{background:hsl(var(--green) / .25);box-shadow:inset 0 -3px 0 hsl(var(--green))}
+.res{display:flex;gap:10px;padding:10px 0;border-top:1px solid hsl(var(--border));font-size:14px}
+.res .ok{color:hsl(var(--green))}.res .no{color:hsl(var(--red))}
+.big{font-size:44px;font-weight:800;letter-spacing:-.03em}
+.screen{display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:center;max-width:1200px;margin:40px auto;padding:0 24px}
+.screen h1{font-size:44px;margin:0 0 8px}.screen p{font-size:20px;color:hsl(var(--muted-foreground))}
+#qr{background:#fff;padding:18px;border-radius:18px;box-shadow:var(--shadow-lg)}
+#qr img{display:block;width:340px;height:340px;image-rendering:pixelated}
+.lb{font-size:22px}.lb .tbl td{padding:12px 14px;font-size:20px}
+@media (max-width:900px){.screen{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="vendor/qrcode.js"></script>
+<script src="play.js?v=1"></script>
+</body>
+</html>

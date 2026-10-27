@@ -1,0 +1,93 @@
+{
+ "recorded": "2026-10-27",
+ "note": "盲测集 2 第一次运行的结果，在任何针对它的修改之前记录。",
+ "summary": {
+  "cases": 30,
+  "passed": 24,
+  "tp": 24,
+  "fp": 2,
+  "fn": 5,
+  "precision": 0.923,
+  "recall": 0.828,
+  "clean_cases": 13,
+  "clean_flagged": 2
+ },
+ "failures": [
+  {
+   "id": "K01",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Hi Jason,\nYes sir, this kettle is UL listed, so no problem for US retail.\nMOQ 500 pcs, USD 9.80/pc FOB Ningbo, 35 days after deposit."
+   },
+   "expected": [
+    "CERT"
+   ],
+   "got": [],
+   "why_zh": "断言持有 UL，而 KET-17S 没有 UL；起订量、价格、交期都合规。"
+  },
+  {
+   "id": "K05",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Hi Tom, good news:\n1) We can finish production in 20 days after your deposit.\n2) For the balance, you can pay 60 days after the goods arrive in LA.\nLet me know!"
+   },
+   "expected": [
+    "LEAD",
+    "PAYMENT"
+   ],
+   "got": [
+    "LEAD"
+   ],
+   "why_zh": "交期 20 天短于 35 天；尾款到货后 60 天付属于货到后付款。"
+  },
+  {
+   "id": "K07",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Since you need them fast, we'll send by air on FOB Ningbo terms. Lead time stays 35 days, MOQ 800 pcs."
+   },
+   "expected": [
+    "FOB_AIR"
+   ],
+   "got": [],
+   "why_zh": "空运用 FOB 条款且同句没提 FCA；交期 35 天、起订量 800 都合规。"
+  },
+  {
+   "id": "K16",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Hola Carlos!\nGood news: the blender cup is ETL certified, so your Liverpool listing won't be a problem.\nAnd since it's your first order we can start at 500 pcs."
+   },
+   "expected": [
+    "CERT",
+    "MOQ"
+   ],
+   "got": [],
+   "why_zh": "断言有 ETL（实际没有）；起订量 500 低于 1000。"
+  },
+  {
+   "id": "K19",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Hi Mike,\nThanks for the target. USD 19.50 is noted, but we can't go that low.\n- 1000-2999 pcs: USD 24.50\n- 3000+ pcs: USD 22.80\nMOQ 1000 pcs, lead time 35-40 days."
+   },
+   "expected": [],
+   "got": [
+    "MOQ"
+   ],
+   "why_zh": "19.50 是复述买家目标价且明确拒绝；报价最低 22.80 等于最低档，不算低价。"
+  },
+  {
+   "id": "K23",
+   "platform": "alibaba_rfq",
+   "fields": {
+    "reply": "Hola Sr. Pérez,\nEl precio FOB Ningbo aplica solo para envío marítimo.\nSi lo necesita por avión, le cotizamos FCA aeropuerto de Ningbo.\nMOQ 1000 piezas."
+   },
+   "expected": [],
+   "got": [
+    "MOQ"
+   ],
+   "why_zh": "FOB 那句是海运；说空运的那句报的是 FCA，没有 FOB。"
+  }
+ ]
+}

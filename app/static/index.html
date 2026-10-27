@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TradeDesk 出海工作台</title>
+<link rel="stylesheet" href="style.css?v=10">
+<script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo"><svg class="ic lg"><use href="#i-globe"/></svg></div>
+      <div><b>TradeDesk</b><small>出海工作台</small></div>
+    </div>
+    <div class="nav-label">工作台</div>
+    <nav class="nav" id="nav">
+      <button data-page="overview" class="on"><svg class="ic"><use href="#i-layout-dashboard"/></svg><span class="t">概览</span><span class="kbd">1</span></button>
+      <button data-page="board"><svg class="ic"><use href="#i-package"/></svg><span class="t">商品看板</span><span class="kbd">2</span></button>
+      <button data-page="inbox"><svg class="ic"><use href="#i-history"/></svg><span class="t">询盘收件箱</span><span class="kbd">3</span></button>
+      <button data-page="inquiry"><svg class="ic"><use href="#i-mail-question"/></svg><span class="t">询盘回复</span><span class="kbd">4</span></button>
+      <button data-page="listing"><svg class="ic"><use href="#i-store"/></svg><span class="t">多平台上架</span><span class="kbd">5</span></button>
+      <button data-page="check"><svg class="ic"><use href="#i-scan-search"/></svg><span class="t">文案体检</span><span class="kbd">6</span></button>
+    </nav>
+    <div class="nav-label">依据与记录</div>
+    <nav class="nav">
+      <button data-page="eval"><svg class="ic"><use href="#i-shield-check"/></svg><span class="t">评测</span><span class="kbd">7</span></button>
+      <button data-page="kb"><svg class="ic"><use href="#i-book-open-check"/></svg><span class="t">规则知识库</span><span class="kbd">8</span></button>
+      <button data-page="logs"><svg class="ic"><use href="#i-scroll-text"/></svg><span class="t">调用日志</span><span class="kbd">9</span></button>
+      <button data-page="fair"><svg class="ic"><use href="#i-zap"/></svg><span class="t">游园会找茬</span></button>
+    </nav>
+    <div class="side-foot">
+      <div class="model-card" id="model-card"><div class="skel" style="height:34px"></div></div>
+      <button class="btn ghost sm" id="theme-btn" title="切换深浅色"><svg class="ic sm"><use href="#i-moon"/></svg><span>切换深浅色</span></button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumbs"><span>TradeDesk</span><svg class="ic sm"><use href="#i-chevron-right"/></svg><b id="crumb">概览</b></div>
+      <div class="spacer"></div>
+      <span class="small muted">示例数据均为虚构 · 规则以来源页面为准</span>
+    </header>
+
+    <div class="content">
+      <!-- ================= overview ================= -->
+      <section class="page on" id="page-overview">
+        <div class="page-head">
+          <div><h1>出海工作台</h1><p>询盘 → 回复 → 上架。每一条风险提示都有出处：公开规则的原文与链接，或工厂资料卡上的那个字段。</p></div>
+          <div class="row"><button class="btn" data-go="board"><svg class="ic"><use href="#i-package"/></svg>商品看板</button><button class="btn primary" data-go="inquiry"><svg class="ic"><use href="#i-mail-question"/></svg>处理一条询盘</button></div>
+        </div>
+        <div class="grid g4" id="ov-stats"></div>
+        <div class="card" style="margin-top:16px">
+          <div class="card-h"><div><h3><svg class="ic"><use href="#i-git-compare-arrows"/></svg>每一次生成都经过的流程</h3><p>代码负责数字和硬事实，模型负责语义判断；模型说不出出处的提示会被丢弃</p></div></div>
+          <div class="card-b"><div class="flow">
+            <div class="node"><b><svg class="ic sm"><use href="#i-search"/></svg>理解</b><p>抽取买家要求，每条带询盘原文</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
+            <div class="node"><b><svg class="ic sm"><use href="#i-sparkles"/></svg>生成</b><p>按平台、语言、角色生成，注入规则摘要</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
+            <div class="node"><b><svg class="ic sm"><use href="#i-cpu"/></svg>代码校验</b><p>价格、MOQ、交期、认证、付款、FOB、标题长度、禁用词</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
+            <div class="node guard"><b><svg class="ic sm"><use href="#i-shield-check"/></svg>模型审核 + 出处守卫</b><p>必须带规则编号，且原文里真有那句话</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
+            <div class="node"><b><svg class="ic sm"><use href="#i-message-square-text"/></svg>反馈</b><p>高亮批注 · 红黄绿 · 逐词对比</p></div>
+          </div></div>
+        </div>
+        <div class="grid g3" style="margin-top:16px">
+          <div class="card wf"><span class="tag">工作流 C · 运营每天从这里开始</span><h3>商品看板</h3><p>所有产品 × 主图 / Amazon / TikTok 的最新状态；一键批量生成上品，主图按 Amazon 要求逐条检查，导出 CSV。</p>
+            <div class="chips"><span class="badge">批量上品</span><span class="badge">主图检查</span><span class="badge">状态流转</span><span class="badge">导出 CSV</span></div>
+            <div><button class="btn sm" data-go="board">打开<svg class="ic sm"><use href="#i-arrow-right"/></svg></button></div></div>
+          <div class="card wf"><span class="tag">工作流 A</span><h3>询盘回复</h3><p>读买家询盘，找出和工厂资料对不上的地方；用买家语言写阿里国际站 RFQ 回复，同时给采购/生产写中文备忘。</p>
+            <div class="chips"><span class="badge">英语</span><span class="badge">西班牙语</span><span class="badge">2 类角色</span><span class="badge">多轮修改</span></div>
+            <div><button class="btn sm" data-go="inquiry">打开<svg class="ic sm"><use href="#i-arrow-right"/></svg></button></div></div>
+          <div class="card wf"><span class="tag">工作流 B</span><h3>多平台上架</h3><p>一份中文产品资料，生成 Amazon 美国站英文 Listing 和 TikTok Shop 墨西哥西语种草脚本，按各自平台规则检查。</p>
+            <div class="chips"><span class="badge">Amazon US</span><span class="badge">TikTok MX</span><span class="badge">2 种语言</span><span class="badge">逐字段批注</span></div>
+            <div><button class="btn sm" data-go="listing">打开<svg class="ic sm"><use href="#i-arrow-right"/></svg></button></div></div>
+        </div>
+        <div class="grid g2" style="margin-top:16px">
+          <div class="card"><div class="card-h"><div><h3><svg class="ic"><use href="#i-database"/></svg>知识库覆盖</h3><p id="ov-kb-note"></p></div><button class="btn sm ghost" data-go="kb">查看<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div><div class="card-b"><div class="bars" id="ov-kb"></div></div></div>
+          <div class="card"><div class="card-h"><div><h3><svg class="ic"><use href="#i-history"/></svg>最近运行</h3><p>来自调用日志</p></div><button class="btn sm ghost" data-go="logs">全部<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div><div id="ov-runs"></div></div>
+        </div>
+      </section>
+
+      <!-- ================= board ================= -->
+      <section class="page" id="page-board">
+        <div class="page-head">
+          <div><h1>商品看板</h1><p>所有产品在每个渠道的最新状态：主图、Amazon 美国站、TikTok 墨西哥。运营每天从这里开始。</p></div>
+          <div class="row">
+            <a class="btn" href="/api/board/export.csv"><svg class="ic"><use href="#i-file-text"/></svg>导出 CSV</a>
+            <button class="btn primary" id="board-batch"><svg class="ic"><use href="#i-zap"/></svg><span id="board-batch-label">批量生成全部 Listing</span></button>
+          </div>
+        </div>
+        <div class="grid g5" id="board-stats"></div>
+        <div id="board-progress"></div>
+        <div class="card" style="margin-top:16px"><div class="board-wrap"><table class="board">
+          <thead><tr><th style="width:36px"><input type="checkbox" class="ck" id="board-all"></th><th>产品</th><th>主图 · Amazon 要求</th><th>Amazon 美国站 · 英语</th><th>TikTok 墨西哥 · 西语</th></tr></thead>
+          <tbody id="board-body"></tbody></table></div></div>
+        <p class="small muted" style="margin-top:10px">状态：未生成 → 不能发 / 需人工确认 / 可上架 → 已上架。"已上架"由人标记；最近一次检查是红色时，系统不允许标记。</p>
+      </section>
+
+      <!-- ================= inbox ================= -->
+      <section class="page" id="page-inbox">
+        <div class="page-head"><div><h1>询盘收件箱</h1><p>先回最值得跟的买家。优先级由代码按公开的公式计算，每一分都能看到依据。</p></div>
+          <div class="row"><div class="seg" id="inbox-tabs"><button class="on" data-v="list">收件箱</button><button data-v="tasks">协同任务 <span id="task-count"></span></button></div>
+          <button class="btn primary" id="inbox-triage"><svg class="ic"><use href="#i-sparkles"/></svg>整理收件箱</button></div></div>
+        <div id="inbox-progress"></div>
+        <div id="inbox-list"></div>
+        <div id="inbox-tasks" hidden></div>
+      </section>
+
+      <!-- ================= inquiry ================= -->
+      <section class="page" id="page-inquiry">
+        <div class="page-head"><div><h1>询盘回复</h1><p>工作流 A · 理解 → 生成 → 校验 → 反馈</p></div><div class="rounds" id="inq-rounds"></div></div>
+        <div class="bench" id="inq-bench">
+          <div class="left card">
+            <div class="card-h"><div><h3><svg class="ic"><use href="#i-mail-question"/></svg>买家询盘</h3><p>选择示例，或粘贴阿里国际站后台的询盘</p></div></div>
+            <div class="card-b">
+              <div class="samples" id="inq-samples"></div>
+              <label class="field">产品<select id="inq-product" class="product-select"></select></label>
+              <label class="field">询盘原文<textarea id="inq-text" rows="7"></textarea></label>
+              <label class="field">业务员意图 <span class="muted" style="font-weight:400">一句中文：报什么价、什么条款、哪些做不到</span><textarea id="inq-intent" rows="3"></textarea></label>
+              <button class="btn primary" id="inq-run" style="width:100%"><svg class="ic"><use href="#i-play"/></svg>理解 → 生成 → 校验<span class="kbd">⌘↵</span></button>
+            </div>
+          </div>
+          <div id="inq-out"></div>
+        </div>
+      </section>
+
+      <!-- ================= listing ================= -->
+      <section class="page" id="page-listing">
+        <div class="page-head"><div><h1>多平台上架</h1><p>工作流 B · 一份中文产品资料 → 两个平台、两种语言</p></div><div class="rounds" id="lst-rounds"></div></div>
+        <div class="bench" id="lst-bench">
+          <div class="left card">
+            <div class="card-h"><div><h3><svg class="ic"><use href="#i-package"/></svg>产品资料卡</h3><p>工厂填写一次，所有平台共用</p></div></div>
+            <div class="card-b">
+              <div class="products" id="lst-products"></div>
+              <label class="toggle"><span class="plat"><span class="pl amz">a</span><span><b>Amazon 美国站</b><br><span class="small muted">英语 · Listing</span></span></span><input type="checkbox" id="lst-amz" checked><span class="switch"></span></label>
+              <label class="toggle"><span class="plat"><span class="pl tt">♪</span><span><b>TikTok Shop 墨西哥</b><br><span class="small muted">西班牙语 · 种草短视频</span></span></span><input type="checkbox" id="lst-tt" checked><span class="switch"></span></label>
+              <details style="margin:10px 0 14px"><summary class="small muted" style="cursor:pointer">查看资料卡 JSON</summary><pre class="json" id="lst-card"></pre></details>
+              <button class="btn primary" id="lst-run" style="width:100%"><svg class="ic"><use href="#i-play"/></svg>生成 → 校验<span class="kbd">⌘↵</span></button>
+            </div>
+          </div>
+          <div id="lst-out"></div>
+        </div>
+      </section>
+
+      <!-- ================= check ================= -->
+      <section class="page" id="page-check">
+        <div class="page-head"><div><h1>文案体检</h1><p>把店里正在用的标题、要点或回复贴进来，按同一套规则检查</p></div></div>
+        <div class="bench" id="chk-bench">
+          <div class="left card"><div class="card-b">
+            <label class="field">平台<div class="seg" id="chk-platform"></div></label>
+            <label class="field">产品<select id="chk-product" class="product-select"></select></label>
+            <label class="field">待检查的文案<textarea id="chk-text" rows="8"></textarea></label>
+            <button class="btn primary" id="chk-run" style="width:100%"><svg class="ic"><use href="#i-scan-search"/></svg>检查<span class="kbd">⌘↵</span></button>
+          </div></div>
+          <div id="chk-out"></div>
+        </div>
+      </section>
+
+      <!-- ================= eval ================= -->
+      <section class="page" id="page-eval">
+        <div class="page-head"><div><h1>评测：检查器到底准不准</h1><p>只测代码规则层（不调用模型），结果可以一字不差地复现。开发集是边做边写的，盲测集由没看过代码的人写。</p></div>
+          <label class="toggle" style="margin:0;min-width:220px"><span class="small">只看没通过的用例</span><input type="checkbox" id="eval-fails"><span class="switch"></span></label></div>
+        <div id="eval-out"></div>
+      </section>
+
+      <!-- ================= fair-ground ================= -->
+      <section class="page" id="page-fair">
+        <div class="page-head"><div><h1>游园会 · AI 找茬挑战</h1><p>观众用手机扫码答 3 道题，看谁比 AI 先找到坑。答案由代码规则计算，不调用模型；手机只能访问找茬页面。</p></div>
+          <div class="row"><a class="btn" href="/play" target="_blank">打开手机页</a><a class="btn primary" href="/play#screen" target="_blank">打开大屏（二维码 + 排行榜）</a></div></div>
+        <div id="fair-out"></div>
+      </section>
+
+      <!-- ================= kb ================= -->
+      <section class="page" id="page-kb">
+        <div class="page-head"><div><h1>规则知识库</h1><p id="kb-note"></p></div>
+          <div class="row"><input type="search" id="kb-q" placeholder="搜索编号、规则、原文…" style="width:260px"></div></div>
+        <div class="chips" id="kb-cats" style="margin-bottom:12px"></div>
+        <div class="card"><table class="tbl"><thead><tr><th>编号</th><th>规则</th><th>分类</th><th>检查方式</th><th>来源</th><th></th></tr></thead><tbody id="kb-body"></tbody></table></div>
+      </section>
+
+      <!-- ================= logs ================= -->
+      <section class="page" id="page-logs">
+        <div class="page-head"><div><h1>调用日志</h1><p>每一次运行：触发条件、角色、模型、耗时、输入、返回与校验结果</p></div><button class="btn sm" id="log-refresh"><svg class="ic sm"><use href="#i-history"/></svg>刷新</button></div>
+        <div id="log-list"></div>
+      </section>
+    </div>
+  </div>
+</div>
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" aria-hidden="true"><div class="sheet-h" id="sheet-h"></div><div class="sheet-b" id="sheet-b"></div><div class="sheet-f" id="sheet-f"></div></aside>
+<div class="toasts" id="toasts"></div>
+<script src="vendor/qrcode.js"></script>
+<script src="app.js?v=10"></script>
+</body>
+</html>

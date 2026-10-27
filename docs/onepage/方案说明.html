@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>TradeDesk 方案说明</title>
+<style>
+@page{size:A4;margin:12mm 13mm}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#10203f;font-size:9.5pt;line-height:1.45}
+h1{font-size:20pt;margin:0}
+.sub{color:#0b5fff;font-weight:700;margin:2px 0 8px}
+h2{font-size:11.5pt;margin:9px 0 4px;padding-bottom:2px;border-bottom:2px solid #0b5fff}
+p{margin:3px 0}
+ul{margin:2px 0;padding-left:16px}li{margin:1px 0}
+table{border-collapse:collapse;width:100%;font-size:9pt}
+td,th{border:1px solid #dfe4ee;padding:3px 5px;vertical-align:top;text-align:left}
+th{background:#f4f6fb}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+pre{font-size:8.2pt;line-height:1.35;background:#f4f6fb;padding:6px 8px;border-radius:6px;margin:3px 0;white-space:pre-wrap}
+.muted{color:#5b667a;font-size:8.5pt}
+</style>
+</head>
+<body>
+<h1>TradeDesk 出海工作台 · 方案说明</h1>
+<div class="sub">INTERCITY HACK 宁波站 · 赛道二 AI+外贸/跨境 —— 询盘 → 回复 → 上架，每一条风险提示都有出处</div>
+
+<div class="grid">
+<div>
+<h2>目标用户与问题</h2>
+<p><b>宁波中小外贸工厂的业务员和运营</b>：同时做阿里国际站和 Amazon、TikTok 等平台，英语一般，没有专职合规。</p>
+<ul>
+<li><b>询盘转化低</b>：买家要求和工厂能力对不上（认证、交期、付款、运输条款），回复要么慢，要么随口答应埋下纠纷。</li>
+<li><b>重复劳动多</b>：同一产品要为每个平台、每种语言重写一遍。</li>
+<li><b>跨岗位割裂</b>：业务答应的事，采购和生产不知道；平台规则散落在各处。</li>
+</ul>
+
+<h2>使用流程</h2>
+<p><b>工作流 A · 询盘回复</b>：粘贴询盘 + 一句中文意图 → 询盘分析（每条带原文）→ 买家语言的 RFQ 回复 + 给采购/生产的中文备忘 → 校验 → 中文多轮修改，逐词对比。</p>
+<p><b>工作流 B · 多平台上架</b>：中文产品资料 → Amazon 美国站英文 Listing + TikTok 墨西哥西语种草脚本 → 按各平台规则分别校验 → 多轮修改。</p>
+<p><b>询盘收件箱 + 跨岗位任务</b>：先理解每条询盘、按公开公式打优先级（每一分挂询盘原文）；回复时把需要采购/生产/美工跟进的事派成任务，任务同样必须挂询盘原文。</p>
+<p><b>工作流 C · 商品看板</b>：所有产品 × 主图 / Amazon / TikTok 的状态一屏看清；一键批量生成上品；主图按 Amazon 10 条要求检查；状态从“未生成”流转到“已上架”（红色时代码拒绝标记）；导出 CSV。</p>
+<p><b>文案体检</b>：把店里正在用的标题、回复贴进来，用同一套规则检查。</p>
+
+<h2>创新点</h2>
+<ul>
+<li><b>出处守卫</b>：模型提出的风险必须带知识库规则编号，并且引用的原文片段必须真的出现在待审文本里，否则由代码丢弃，界面上可以看到被丢弃的条数。</li>
+<li><b>硬事实交给代码</b>：价格底线、MOQ、交期、认证、材料宣称、付款方式、FOB 运输方式，都用代码和资料卡比对，不让大模型做数字判断。</li>
+<li><b>知识库逐条核实</b>：38 条规则都附原文摘录、链接、抓取日期；没核实的规则不参与检查。例如 Amazon 标题上限，官方页面现在写的是 75 字符，不是常见说法里的 200。</li>
+<li><b>可复现的评测</b>：两份由没看过代码的人写的盲测集，首次运行精确率 97.1% / 92.3%、召回率 94.4% / 82.8%（修复前冻结）；发现的缺陷均已修复并加回归测试。</li>
+<li><b>主图检查分工</b>：尺寸、纯白背景、产品占比、是否贴边由代码测量像素；文字、徽章、道具、是否实拍由模型看图，并且必须写出“看到了什么”。</li>
+<li><b>两种角色、两种语言、两个平台</b>同时产出：对外回复和对内备忘出自同一次理解，口径一致。</li>
+</ul>
+</div>
+
+<div>
+<h2>系统架构</h2>
+<pre>浏览器单页（中文界面）
+   │ 询盘 / 产品资料 / 中文修改意见
+   ▼
+本地服务 server.py（Python 标准库）
+   ├ 理解：询盘分析员 → JSON（条目无原文出处即丢弃）
+   ├ 生成：业务员 / Amazon 运营 / TikTok 运营
+   │        （注入对应平台、市场的规则摘要）
+   ├ 校验①：代码规则（资料卡比对 + 正则/长度规则）
+   ├ 校验②：合规审核员 → 出处守卫（编号 + 原文）
+   ├ 主图：像素测量（代码）→ 主图审核员看图（编号 + 看到的内容）
+   └ 反馈：高亮批注 · 红黄绿 · 逐词对比 · 调用日志
+   ▼
+kb/rules.json（38 条，原文+链接）  data/products.json（资料卡）
+state/board.json（看板状态）  ← 批量生成 / 主图检查 / 标记上架</pre>
+
+<h2>平台调用方式与智能体配置</h2>
+<table>
+<tr><th>智能体</th><th>任务</th><th>触发</th></tr>
+<tr><td>询盘分析员</td><td>买家画像、需求、质量信号、与资料卡的冲突</td><td>新询盘</td></tr>
+<tr><td>外贸业务员</td><td>买家语言回复 + 中文内部备忘</td><td>新询盘 / 修改意见</td></tr>
+<tr><td>Amazon 运营</td><td>美国站英文 Listing</td><td>新品上架 / 修改意见</td></tr>
+<tr><td>TikTok 运营</td><td>墨西哥西语种草脚本</td><td>新品上架 / 修改意见</td></tr>
+<tr><td>合规审核员</td><td>按“模型判断”类规则审核，须带编号和原文</td><td>每次生成后</td></tr>
+<tr><td>主图审核员</td><td>看图判断文字、徽章、道具、是否实拍，须写出看到的内容</td><td>上传主图后</td></tr>
+</table>
+<p class="muted">模型接口可配置：OpenAI 兼容 Chat Completions（如赛事 Tokenhub）或 Claude Messages API（官方 SDK）。三种模式：实时 / 录制 / 回放（断网演示）。完整配置导出见 app/config/agents.json；每一次调用的触发条件、输入、返回、校验结果写入调用日志。</p>
+
+<h2>反馈方式</h2>
+<p>① 原文高亮批注（点高亮跳到依据）② 红/黄/绿风险等级 ③ 与上一轮的逐词对比 ④ 模型审核没跑成时明确提示，并且风险等级不会显示为绿色。</p>
+
+<h2>数据与合规</h2>
+<p class="muted">演示用的工厂、产品、询盘均为虚构。规则摘录来自公开页面（Amazon Seller Central、eCFR、ICC Academy、TikTok Shop MX、墨西哥经济部 NOM 等），没有爬取付费数据，也没有绕过验证码。本工具给出的是风险提示，不构成法律意见。</p>
+</div>
+</div>
+</body>
+</html>

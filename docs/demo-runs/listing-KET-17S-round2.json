@@ -1,0 +1,718 @@
+{
+ "run_id": "fc1d06d8",
+ "round": 2,
+ "platforms": {
+  "amazon_us": {
+   "content": {
+    "title": "[Brand] 1.7L Electric Kettle, 304 Stainless Steel, Auto Shut-Off, 1500W",
+    "bullets": [
+     "304 STAINLESS STEEL INTERIOR: The inner pot is made of 304 stainless steel, so water heats in a sturdy metal interior that is easy to rinse. The lid and handle are made of PP plastic and are easy to grip.",
+     "AUTO SHUT-OFF & BOIL-DRY PROTECTION: The kettle turns off automatically once the water boils. If it is switched on with too little or no water, boil-dry protection cuts the power.",
+     "360° SWIVEL BASE: Lift the kettle off the base and set it back from any angle. It works the same for right- and left-handed users, and you can grab it from any side of the counter.",
+     "CONCEALED HEATING ELEMENT, EASY TO CLEAN: The heating element is hidden beneath a flat stainless steel floor. With no exposed coil to scrub around, you can simply wipe and rinse the interior.",
+     "1.7L CAPACITY, 1500W POWER: Holds up to 1.7 liters, enough for several mugs of tea, coffee, oatmeal, or instant noodles in one batch. It runs at 1500W on standard US 120V/60Hz outlets. In our in-house testing, a full 1.7L boiled in about 5 minutes. This is not a third-party test result. Actual time varies with starting water temperature and fill level."
+    ],
+    "description": "Get hot water for tea, pour-over coffee, oatmeal, or instant soup at the press of a switch. This 1.7L electric kettle has a 304 stainless steel inner pot and runs at 1500W on standard 120V US outlets, so it fits easily into your morning routine.\n\nThe kettle turns itself off when the water boils. Boil-dry protection shuts off the power if it is switched on without enough water. The 360° swivel base lets you lift the kettle off and set it back down from any direction. The heating element is concealed under a flat stainless steel floor, so cleanup is just a quick wipe and rinse.\n\nThe PP plastic lid and handle make pouring easy, and the 1.7L capacity fills several mugs at once. In our in-house testing (not a third-party report), a full kettle boiled in about 5 minutes. Actual boil time depends on starting water temperature and fill level.",
+    "search_terms": "electric tea kettle hot water boiler cordless teapot pour over coffee 1.7 liter large capacity water heater kitchen appliance office dorm swivel base boil dry protection concealed heating element",
+    "notes_zh": "针对 Prop 65 风险：供应商资料里没有化学物质检测信息，按 US-03 不能自行判断是否需要警示，也不能编造化学物质名称，所以文案里没有加任何警示。另外，AMZ-06 禁止在标题、五点和描述里写网址，而安全港警示必须附 www.P65Warnings.ca.gov，因此警示不能直接写进五点或描述。上线前需要人工完成以下事项：一，向工厂确认电源线、PP 塑料件、密封圈等部件是否含有 Prop 65 清单物质（如 DEHP 等邻苯类、铅），并索取检测报告；二，如果需要警示，在 Amazon 后台的 Prop 65 合规属性字段里填写完整警示，内容按 25603(a)：WARNING:、具体物质名、危害类型、官网网址，使商品页显示警示或 WARNING 链接；三，如果确认不需要警示，保留书面依据。其余合规点保持不变：标题 71 字符，没有任何认证、BPA-free 或 food-grade 宣称；5 分钟烧开注明为内部测试；没有写 eco-friendly、Made in USA、价格或库存信息。"
+   },
+   "fields": {
+    "title": "[Brand] 1.7L Electric Kettle, 304 Stainless Steel, Auto Shut-Off, 1500W",
+    "bullets[1]": "304 STAINLESS STEEL INTERIOR: The inner pot is made of 304 stainless steel, so water heats in a sturdy metal interior that is easy to rinse. The lid and handle are made of PP plastic and are easy to grip.",
+    "bullets[2]": "AUTO SHUT-OFF & BOIL-DRY PROTECTION: The kettle turns off automatically once the water boils. If it is switched on with too little or no water, boil-dry protection cuts the power.",
+    "bullets[3]": "360° SWIVEL BASE: Lift the kettle off the base and set it back from any angle. It works the same for right- and left-handed users, and you can grab it from any side of the counter.",
+    "bullets[4]": "CONCEALED HEATING ELEMENT, EASY TO CLEAN: The heating element is hidden beneath a flat stainless steel floor. With no exposed coil to scrub around, you can simply wipe and rinse the interior.",
+    "bullets[5]": "1.7L CAPACITY, 1500W POWER: Holds up to 1.7 liters, enough for several mugs of tea, coffee, oatmeal, or instant noodles in one batch. It runs at 1500W on standard US 120V/60Hz outlets. In our in-house testing, a full 1.7L boiled in about 5 minutes. This is not a third-party test result. Actual time varies with starting water temperature and fill level.",
+    "description": "Get hot water for tea, pour-over coffee, oatmeal, or instant soup at the press of a switch. This 1.7L electric kettle has a 304 stainless steel inner pot and runs at 1500W on standard 120V US outlets, so it fits easily into your morning routine.\n\nThe kettle turns itself off when the water boils. Boil-dry protection shuts off the power if it is switched on without enough water. The 360° swivel base lets you lift the kettle off and set it back down from any direction. The heating element is concealed under a flat stainless steel floor, so cleanup is just a quick wipe and rinse.\n\nThe PP plastic lid and handle make pouring easy, and the 1.7L capacity fills several mugs at once. In our in-house testing (not a third-party report), a full kettle boiled in about 5 minutes. Actual boil time depends on starting water temperature and fill level.",
+    "search_terms": "electric tea kettle hot water boiler cordless teapot pour over coffee 1.7 liter large capacity water heater kitchen appliance office dorm swivel base boil dry protection concealed heating element"
+   },
+   "diff": {
+    "title": [
+     {
+      "op": "equal",
+      "text": "[Brand] 1.7L Electric Kettle, 304 Stainless Steel, Auto Shut-Off, 1500W"
+     }
+    ],
+    "bullets[1]": [
+     {
+      "op": "equal",
+      "text": "304 STAINLESS STEEL INTERIOR: The inner pot is made of 304 stainless steel, so water heats in a sturdy"
+     },
+     {
+      "op": "delete",
+      "text": ", easy-to-rinse"
+     },
+     {
+      "op": "equal",
+      "text": " metal interior"
+     },
+     {
+      "op": "insert",
+      "text": " that is easy to rinse"
+     },
+     {
+      "op": "equal",
+      "text": ". The lid and handle are "
+     },
+     {
+      "op": "insert",
+      "text": "made of "
+     },
+     {
+      "op": "equal",
+      "text": "PP plastic "
+     },
+     {
+      "op": "delete",
+      "text": "for"
+     },
+     {
+      "op": "insert",
+      "text": "and"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "a"
+     },
+     {
+      "op": "insert",
+      "text": "are"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "lightweight,"
+     },
+     {
+      "op": "insert",
+      "text": "easy"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "comfortable"
+     },
+     {
+      "op": "insert",
+      "text": "to"
+     },
+     {
+      "op": "equal",
+      "text": " grip."
+     }
+    ],
+    "bullets[2]": [
+     {
+      "op": "equal",
+      "text": "AUTO SHUT-OFF & BOIL-DRY PROTECTION: The kettle "
+     },
+     {
+      "op": "delete",
+      "text": "switches"
+     },
+     {
+      "op": "insert",
+      "text": "turns"
+     },
+     {
+      "op": "equal",
+      "text": " off automatically once the water boils. If it is "
+     },
+     {
+      "op": "delete",
+      "text": "turned"
+     },
+     {
+      "op": "insert",
+      "text": "switched"
+     },
+     {
+      "op": "equal",
+      "text": " on with too little or no water, boil-dry protection cuts the power."
+     }
+    ],
+    "bullets[3]": [
+     {
+      "op": "equal",
+      "text": "360° SWIVEL BASE: Lift the kettle off the base and set it back from any angle. "
+     },
+     {
+      "op": "delete",
+      "text": "This"
+     },
+     {
+      "op": "insert",
+      "text": "It"
+     },
+     {
+      "op": "equal",
+      "text": " works the same for right- and left-handed users"
+     },
+     {
+      "op": "insert",
+      "text": ","
+     },
+     {
+      "op": "equal",
+      "text": " and "
+     },
+     {
+      "op": "delete",
+      "text": "makes"
+     },
+     {
+      "op": "insert",
+      "text": "you can grab"
+     },
+     {
+      "op": "equal",
+      "text": " it"
+     },
+     {
+      "op": "delete",
+      "text": " easy to grab"
+     },
+     {
+      "op": "equal",
+      "text": " from any side of the counter."
+     }
+    ],
+    "bullets[4]": [
+     {
+      "op": "equal",
+      "text": "CONCEALED HEATING ELEMENT, EASY TO CLEAN: The heating element "
+     },
+     {
+      "op": "delete",
+      "text": "sits"
+     },
+     {
+      "op": "insert",
+      "text": "is"
+     },
+     {
+      "op": "equal",
+      "text": " hidden beneath a flat stainless steel floor. "
+     },
+     {
+      "op": "delete",
+      "text": "There is"
+     },
+     {
+      "op": "insert",
+      "text": "With"
+     },
+     {
+      "op": "equal",
+      "text": " no exposed coil to scrub around,"
+     },
+     {
+      "op": "delete",
+      "text": " so"
+     },
+     {
+      "op": "equal",
+      "text": " you can simply wipe and rinse the interior."
+     }
+    ],
+    "bullets[5]": [
+     {
+      "op": "equal",
+      "text": "1.7L CAPACITY, 1500W POWER: Holds up to 1.7 liters, enough for several mugs of tea, coffee, oatmeal, or instant noodles in one batch. It runs "
+     },
+     {
+      "op": "insert",
+      "text": "at 1500W "
+     },
+     {
+      "op": "equal",
+      "text": "on standard US 120V/60Hz outlets"
+     },
+     {
+      "op": "delete",
+      "text": " at 1500W"
+     },
+     {
+      "op": "equal",
+      "text": ". In our in-house testing, a full 1.7L boiled in about 5 minutes. This is not a third-party test result"
+     },
+     {
+      "op": "delete",
+      "text": ","
+     },
+     {
+      "op": "insert",
+      "text": "."
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "and actual"
+     },
+     {
+      "op": "insert",
+      "text": "Actual"
+     },
+     {
+      "op": "equal",
+      "text": " time varies with "
+     },
+     {
+      "op": "insert",
+      "text": "starting "
+     },
+     {
+      "op": "equal",
+      "text": "water temperature and "
+     },
+     {
+      "op": "delete",
+      "text": "volume"
+     },
+     {
+      "op": "insert",
+      "text": "fill level"
+     },
+     {
+      "op": "equal",
+      "text": "."
+     }
+    ],
+    "description": [
+     {
+      "op": "delete",
+      "text": "Hot"
+     },
+     {
+      "op": "insert",
+      "text": "Get hot"
+     },
+     {
+      "op": "equal",
+      "text": " water for tea, pour-over coffee, oatmeal, or instant soup "
+     },
+     {
+      "op": "delete",
+      "text": "is ready with"
+     },
+     {
+      "op": "insert",
+      "text": "at"
+     },
+     {
+      "op": "equal",
+      "text": " the press of a switch. This 1.7L electric kettle has a 304 stainless steel inner pot and runs at 1500W on standard 120V US outlets, so it fits easily into your morning routine.\n\nThe kettle turns itself off when the water boils"
+     },
+     {
+      "op": "delete",
+      "text": ","
+     },
+     {
+      "op": "insert",
+      "text": "."
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "and boil"
+     },
+     {
+      "op": "insert",
+      "text": "Boil"
+     },
+     {
+      "op": "equal",
+      "text": "-dry protection shuts off"
+     },
+     {
+      "op": "insert",
+      "text": " the"
+     },
+     {
+      "op": "equal",
+      "text": " power if it is switched on without enough water. The 360° swivel base lets you lift the kettle off and set it back down from any direction. The heating element is concealed under a flat stainless steel floor, so cleanup is just a quick wipe and rinse.\n\nThe "
+     },
+     {
+      "op": "delete",
+      "text": "lightweight "
+     },
+     {
+      "op": "equal",
+      "text": "PP plastic lid and handle make pouring easy, and the 1.7L capacity "
+     },
+     {
+      "op": "delete",
+      "text": "lets you fill"
+     },
+     {
+      "op": "insert",
+      "text": "fills"
+     },
+     {
+      "op": "equal",
+      "text": " several mugs at once. In our in-house testing (not a third-party report), a full kettle boiled in about 5 minutes. Actual boil time depends on starting water temperature and fill level."
+     }
+    ],
+    "search_terms": [
+     {
+      "op": "equal",
+      "text": "electric tea kettle hot water boiler cordless teapot pour over coffee 1.7 liter large capacity "
+     },
+     {
+      "op": "delete",
+      "text": "fast boiling "
+     },
+     {
+      "op": "equal",
+      "text": "water heater kitchen appliance office dorm swivel base boil dry protection concealed heating element"
+     }
+    ]
+   },
+   "findings": [
+    {
+     "check": "model_review",
+     "severity": "amber",
+     "field": "bullets[1]",
+     "quote": "The lid and handle are made of PP plastic and are easy to grip.",
+     "problem_zh": "供应商资料未说明该产品是否需要加州 65 号提案警示。产品含 PP 塑料盖和手柄、不锈钢内胆，且资料注明未做 BPA 检测报告、未做 LFGB 检测，无法排除含有 65 号提案所列化学物质的可能。商品页文案目前没有任何警示，也没有标明 WARNING 的链接。",
+     "suggestion_zh": "请人工向工厂确认：产品材料（PP 塑料件、不锈钢、电线、焊料等）是否含有 65 号提案清单中的化学物质，并索取相关检测报告。若需要警示，按工厂提供的实际化学物质，在商品页添加符合要求的警示，或添加标明 WARNING 的链接，内容包括 WARNING:、具体化学物质名称、危害类型和 www.P65Warnings.ca.gov。不得自行编造化学物质名称。若确认不需要，保留确认记录即可。",
+     "source": {
+      "type": "kb",
+      "rule_id": "US-03",
+      "title_zh": "加州 65 号提案：网购须在商品页展示警示",
+      "excerpt": "a warning on the product display page, or (B) a clearly marked hyperlink using the word",
+      "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25602"
+     },
+     "by": "model"
+    }
+   ],
+   "dropped": [],
+   "risk": "amber",
+   "review_skipped": null,
+   "rules_checked": [
+    "AMZ-01",
+    "AMZ-02",
+    "AMZ-03",
+    "AMZ-04",
+    "AMZ-05",
+    "AMZ-06",
+    "AMZ-07",
+    "US-01",
+    "US-02",
+    "US-03",
+    "US-04"
+   ]
+  },
+  "tiktok_mx": {
+   "content": {
+    "hook": "¿Sigues calentando el agua en la olla para tu cafecito? Mira lo que encontré 👀",
+    "script": [
+     {
+      "shot_zh": "早上的厨房，手拿起电热水壶在水龙头下接水，镜头带到壶身。",
+      "line": "Le caben 1.7 litros, o sea, alcanza para el café de toda la familia de una sola vez."
+     },
+     {
+      "shot_zh": "打开壶盖，特写内胆和平整的底部。",
+      "line": "Por dentro es de acero inoxidable 304 y la resistencia va escondida, así que se limpia bien fácil, sin batallar con rinconcitos."
+     },
+     {
+      "shot_zh": "把壶从底座上拿起，再从不同角度放回去，底座旋转演示。",
+      "line": "La base gira 360°, lo agarras y lo pones como te acomode, seas zurdo o derecho."
+     },
+     {
+      "shot_zh": "水烧开，开关'咔'一声自动弹起，特写指示灯熄灭。",
+      "line": "Cuando hierve se apaga solito, y si se queda sin agua también se apaga. Un pendiente menos en la mañana."
+     },
+     {
+      "shot_zh": "往杯里倒热水冲咖啡/泡茶，冒热气，镜头转向创作者。",
+      "line": "Es de 127V y 1500W, para el contacto de tu casa. Si lo quieres, dale al carrito aquí abajito."
+     }
+    ],
+    "caption": "Adiós a calentar el agua en la olla 🙌 Hervidor eléctrico de 1.7 L con interior de acero inoxidable 304, apagado automático, protección contra hervido en seco y base giratoria 360°. 1500W, 127V 60Hz. En pruebas internas del fabricante hierve 1.7 L en unos 5 minutos aprox. ☕ Para tu cafecito, tecito o sopita instantánea. Lo encuentras en el carrito 🛒",
+    "hashtags": [
+     "#TikTokShopMX",
+     "#HervidorElectrico",
+     "#CafecitoMañanero",
+     "#CosasDeCocina",
+     "#HogarMX",
+     "#TikTokMeLoHizoComprar"
+    ],
+    "notes_zh": "本条风险提示针对 amazon_us 商品页 bullets[1]（PP 塑料盖与把手）的加州 Prop 65 警示，不适用于本条 TikTok 墨西哥内容。本内容未提 PP 材质，也未提任何化学物质，因此不加警示，也不编造物质名称。请在 Amazon 美国站单独处理：向工厂确认电源线、PP 件、密封圈等是否含 Prop 65 清单物质，并索取检测报告。借此复核：把“不用一直盯着”弱化为“少一件操心事”，避免暗示安全保障；把“清洁超容易”改为更平实的说法。其余维持只写资料内事实：127V/1500W 标注齐全，5 分钟烧开注明为工厂内部测试，未提 NOM/UL/BPA 等未持有的认证或检测，无绝对化用语，无站外引流。"
+   },
+   "fields": {
+    "hook": "¿Sigues calentando el agua en la olla para tu cafecito? Mira lo que encontré 👀",
+    "script[1]": "Le caben 1.7 litros, o sea, alcanza para el café de toda la familia de una sola vez.",
+    "script[2]": "Por dentro es de acero inoxidable 304 y la resistencia va escondida, así que se limpia bien fácil, sin batallar con rinconcitos.",
+    "script[3]": "La base gira 360°, lo agarras y lo pones como te acomode, seas zurdo o derecho.",
+    "script[4]": "Cuando hierve se apaga solito, y si se queda sin agua también se apaga. Un pendiente menos en la mañana.",
+    "script[5]": "Es de 127V y 1500W, para el contacto de tu casa. Si lo quieres, dale al carrito aquí abajito.",
+    "caption": "Adiós a calentar el agua en la olla 🙌 Hervidor eléctrico de 1.7 L con interior de acero inoxidable 304, apagado automático, protección contra hervido en seco y base giratoria 360°. 1500W, 127V 60Hz. En pruebas internas del fabricante hierve 1.7 L en unos 5 minutos aprox. ☕ Para tu cafecito, tecito o sopita instantánea. Lo encuentras en el carrito 🛒",
+    "hashtags": "#TikTokShopMX #HervidorElectrico #CafecitoMañanero #CosasDeCocina #HogarMX #TikTokMeLoHizoComprar"
+   },
+   "diff": {
+    "hook": [
+     {
+      "op": "equal",
+      "text": "¿Sigues calentando el agua en la olla para tu cafecito? Mira lo que encontré 👀"
+     }
+    ],
+    "script[1]": [
+     {
+      "op": "equal",
+      "text": "Le caben 1.7 litros, o sea, alcanza para el café de toda la familia de una sola vez."
+     }
+    ],
+    "script[2]": [
+     {
+      "op": "equal",
+      "text": "Por dentro es de acero inoxidable 304 y la resistencia va escondida, "
+     },
+     {
+      "op": "delete",
+      "text": "entonces"
+     },
+     {
+      "op": "insert",
+      "text": "así"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "limpiarlo"
+     },
+     {
+      "op": "insert",
+      "text": "que"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "está"
+     },
+     {
+      "op": "insert",
+      "text": "se"
+     },
+     {
+      "op": "equal",
+      "text": " "
+     },
+     {
+      "op": "delete",
+      "text": "facilísimo"
+     },
+     {
+      "op": "insert",
+      "text": "limpia bien fácil"
+     },
+     {
+      "op": "equal",
+      "text": ", "
+     },
+     {
+      "op": "delete",
+      "text": "nada de"
+     },
+     {
+      "op": "insert",
+      "text": "sin"
+     },
+     {
+      "op": "equal",
+      "text": " batallar"
+     },
+     {
+      "op": "insert",
+      "text": " con rinconcitos"
+     },
+     {
+      "op": "equal",
+      "text": "."
+     }
+    ],
+    "script[3]": [
+     {
+      "op": "equal",
+      "text": "La base gira 360°, lo agarras y lo pones como te acomode, seas zurdo o derecho."
+     }
+    ],
+    "script[4]": [
+     {
+      "op": "equal",
+      "text": "Cuando hierve se apaga solito, y si se queda sin agua también se apaga. "
+     },
+     {
+      "op": "delete",
+      "text": "Ya no tienes que estar al"
+     },
+     {
+      "op": "insert",
+      "text": "Un"
+     },
+     {
+      "op": "equal",
+      "text": " pendiente"
+     },
+     {
+      "op": "insert",
+      "text": " menos en la mañana"
+     },
+     {
+      "op": "equal",
+      "text": "."
+     }
+    ],
+    "script[5]": [
+     {
+      "op": "equal",
+      "text": "Es de 127V"
+     },
+     {
+      "op": "insert",
+      "text": " y 1500W"
+     },
+     {
+      "op": "equal",
+      "text": ", "
+     },
+     {
+      "op": "delete",
+      "text": "lo conectas en"
+     },
+     {
+      "op": "insert",
+      "text": "para"
+     },
+     {
+      "op": "equal",
+      "text": " el contacto de tu casa"
+     },
+     {
+      "op": "delete",
+      "text": " y listo"
+     },
+     {
+      "op": "equal",
+      "text": ". Si lo quieres, dale al carrito aquí abajito."
+     }
+    ],
+    "caption": [
+     {
+      "op": "equal",
+      "text": "Adiós a calentar el agua en la olla 🙌 Hervidor eléctrico de 1.7 L con interior de acero inoxidable 304, apagado automático, protección contra hervido en seco y base giratoria 360°. 1500W, 127V 60Hz. En pruebas internas del fabricante hierve 1.7 L en unos 5 minutos aprox. ☕ "
+     },
+     {
+      "op": "delete",
+      "text": "Ideal para"
+     },
+     {
+      "op": "insert",
+      "text": "Para"
+     },
+     {
+      "op": "equal",
+      "text": " tu cafecito, tecito o sopita instantánea. Lo encuentras en el carrito 🛒"
+     }
+    ],
+    "hashtags": [
+     {
+      "op": "equal",
+      "text": "#TikTokShopMX #HervidorElectrico #CafecitoMañanero #CosasDeCocina #HogarMX #TikTokMeLoHizoComprar"
+     }
+    ]
+   },
+   "findings": [],
+   "dropped": [],
+   "risk": "green",
+   "review_skipped": null,
+   "rules_checked": [
+    "MX-01",
+    "MX-02",
+    "MX-03",
+    "TT-01",
+    "TT-02",
+    "TT-03"
+   ]
+  }
+ },
+ "trace": [
+  {
+   "step": "生成 Amazon 美国站 · Listing · 第 2 轮",
+   "role": "Amazon 运营",
+   "meta": {
+    "source": "replay",
+    "cache_key": "fb8f8352fd86",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 3853,
+     "output_tokens": 1826
+    }
+   }
+  },
+  {
+   "step": "合规审核 · amazon_us",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "46fad530b2d2",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2652,
+     "output_tokens": 584
+    }
+   }
+  },
+  {
+   "step": "生成 TikTok Shop 墨西哥 · 种草短视频 · 第 2 轮",
+   "role": "TikTok 内容运营",
+   "meta": {
+    "source": "replay",
+    "cache_key": "c9d38cb4e133",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 3160,
+     "output_tokens": 1579
+    }
+   }
+  },
+  {
+   "step": "合规审核 · tiktok_mx",
+   "role": "合规审核员",
+   "meta": {
+    "source": "replay",
+    "cache_key": "bcb8358b2425",
+    "model": "claude-opus-5-5",
+    "seconds": 0.0,
+    "usage": {
+     "input_tokens": 2442,
+     "output_tokens": 245
+    }
+   }
+  }
+ ]
+}
