@@ -10,7 +10,7 @@ import os
 import re
 from pathlib import Path
 
-from .llm import ANTHROPIC_DEFAULT_BASE, ANTHROPIC_DEFAULT_MODEL, DEFAULT_ENDPOINT, DEFAULT_MODEL
+from .llm import ANTHROPIC_DEFAULT_BASE, ANTHROPIC_DEFAULT_MODEL, DEFAULT_ENDPOINT, DEFAULT_MODEL, normalize_endpoint
 
 ROOT = Path(__file__).resolve().parent.parent
 ENV_PATH = ROOT / ".env"
@@ -71,7 +71,8 @@ def validate(new, old):
     key = (new.get("api_key") or "").strip()
     if key and (len(key) > 400 or re.search(r"\s", key)):
         raise ValueError("key 格式不对（不能有空格或换行）")
-    moved = provider != old["provider"] or endpoint.rstrip("/") != old["endpoint"].rstrip("/")
+    endpoint = normalize_endpoint(provider, endpoint)  # …/v1 from the Tokenhub guide becomes the full URL
+    moved = provider != old["provider"] or endpoint != normalize_endpoint(provider, old["endpoint"])
     # A saved key is never carried over to a new provider or endpoint.
     final_key = key or ("" if moved else old["api_key"])
     if mode in ("live", "record") and not final_key:

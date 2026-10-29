@@ -520,6 +520,117 @@ class SettingsTests(unittest.TestCase):
             with self.assertRaises(ValueError, msg=bad):
                 self.s.save(dict({"mode": "replay"}, **bad), self.env)
 
+    def test_guide_base_url_is_stored_as_the_full_url_and_keeps_the_key(self):
+        self.s.save({"provider": "openai", "endpoint": "https://api.tokenhubcloud.net/v1", "model": "m1",
+                     "api_key": "sk-test-1234567890abcd", "mode": "live"}, self.env)
+        self.assertIn("LLM_ENDPOINT=https://api.tokenhubcloud.net/v1/chat/completions", self.env.read_text(encoding="utf-8"))
+        v = self.s.save({"endpoint": "https://api.tokenhubcloud.net/v1/chat/completions/", "model": "m2"}, self.env)
+        self.assertEqual(v["api_key"], "sk-test-1234567890abcd")    # same address written differently
+
+
+class GatewayTests(unittest.TestCase):
+    """The event's Tokenhub, played by a local stub: guide base URL, Bearer key, /v1/models."""
+
+    @classmethod
+    def setUpClass(cls):
+        import threading
+        from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+        seen = cls.seen = []
+
+        class Stub(BaseHTTPRequestHandler):
+            def log_message(self, *args):
+                pass
+
+            def _send(self, obj):
+                raw = json.dumps(obj).encode()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+
+            def do_GET(self):
+                seen.append((self.path, {k.lower(): v for k, v in self.headers.items()}, None))
+                self._send({"object": "list", "data": [{"id": "m-b"}, {"id": "m-a"}, {"id": "m-a"}, {"x": 1}]})
+
+            def do_POST(self):
+                body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+                seen.append((self.path, {k.lower(): v for k, v in self.headers.items()}, body))
+                if self.path.endswith("/messages"):
+                    self._send({"id": "msg_1", "type": "message", "role": "assistant", "model": body["model"],
+                                "content": [{"type": "text", "text": '{"ok": true}'}], "stop_reason": "end_turn",
+                                "stop_sequence": None, "usage": {"input_tokens": 3, "output_tokens": 2}})
+                else:
+                    self._send({"choices": [{"message": {"content": '{"ok": true}'}}],
+                                "usage": {"prompt_tokens": 3, "completion_tokens": 2}})
+
+        cls.srv = ThreadingHTTPServer(("127.0.0.1", 0), Stub)
+        threading.Thread(target=cls.srv.serve_forever, daemon=True).start()
+        cls.base = f"http://127.0.0.1:{cls.srv.server_port}"
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.srv.shutdown()
+        cls.srv.server_close()
+
+    def setUp(self):
+        self.seen.clear()
+
+    def test_endpoint_forms_from_the_guide(self):
+        from tradedesk.llm import DEFAULT_ENDPOINT, anthropic_base, chat_url, models_url
+        full = "https://api.tokenhubcloud.net/v1/chat/completions"
+        for given in ("https://api.tokenhubcloud.net/v1", "https://api.tokenhubcloud.net/v1/",
+                      "https://api.tokenhubcloud.net", full):
+            self.assertEqual(chat_url(given), full, given)
+        self.assertEqual(DEFAULT_ENDPOINT, full)
+        self.assertEqual(models_url(full), "https://api.tokenhubcloud.net/v1/models")
+        self.assertEqual(anthropic_base("https://api.tokenhubcloud.net/v1/"), "https://api.tokenhubcloud.net")
+
+    def test_openai_route_sends_the_key_as_bearer_to_chat_completions(self):
+        llm = LLM(provider="openai", endpoint=self.base + "/v1", model="m-a", api_key="sk-test", mode="live")
+        self.assertEqual(llm.transport(llm.body("s", "u")), '{"ok": true}')
+        path, headers, body = self.seen[-1]
+        self.assertEqual((path, headers["authorization"], body["model"]), ("/v1/chat/completions", "Bearer sk-test", "m-a"))
+
+    def test_model_list(self):
+        llm = LLM(provider="openai", endpoint=self.base + "/v1", api_key="sk-test", mode="live")
+        self.assertEqual(llm.list_models(), ["m-a", "m-b"])
+        self.assertEqual((self.seen[-1][0], self.seen[-1][1]["authorization"]), ("/v1/models", "Bearer sk-test"))
+        with self.assertRaises(LLMError):
+            LLM(provider="openai", endpoint=self.base + "/v1", api_key="", mode="replay").list_models()
+
+    def test_model_list_through_the_claude_route(self):
+        llm = LLM(provider="anthropic", endpoint=self.base, api_key="sk-test", mode="live")
+        self.assertEqual(llm.list_models(), ["m-a", "m-b"])        # OpenAI-shaped list, read by the Anthropic SDK
+        self.assertEqual((self.seen[-1][0].split("?")[0], self.seen[-1][1]["authorization"]), ("/v1/models", "Bearer sk-test"))
+
+    def test_claude_through_the_gateway_uses_bearer_and_no_official_only_fields(self):
+        import os
+        from unittest import mock
+        with mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "sk-env-not-this", "ANTHROPIC_AUTH_TOKEN": "sk-env-nor-this"}):
+            llm = LLM(provider="anthropic", endpoint=self.base + "/v1", model="claude-opus-5-5", api_key="sk-test", mode="live")
+            self.assertEqual(llm.transport(llm.body("s", "u")), '{"ok": true}')
+        path, headers, body = self.seen[-1]
+        self.assertEqual((path, headers.get("authorization")), ("/v1/messages", "Bearer sk-test"))
+        self.assertNotIn("x-api-key", headers)
+        self.assertNotIn("anthropic-beta", headers)
+        self.assertFalse({"output_config", "fallbacks"} & set(body))
+        self.assertEqual(llm.last_usage, {"input_tokens": 3, "output_tokens": 2})
+
+    def test_official_api_keeps_effort_and_fallback(self):
+        from tradedesk.llm import anthropic_request
+        body = LLM(provider="anthropic", api_key="k", mode="replay").body("s", "u")
+        self.assertEqual(anthropic_request("https://api.anthropic.com", body)["output_config"], {"effort": "medium"})
+        self.assertIn("betas", anthropic_request("https://api.anthropic.com", body))
+        self.assertNotIn("betas", anthropic_request("https://api.tokenhubcloud.net", body))
+
+    def test_errors_from_the_guide_table_get_the_right_hint(self):
+        import server
+        self.assertIn("查可用模型", server.friendly_error('HTTP 400: b\'{"error":{"code":"model_not_found"}}\''))
+        self.assertIn("权限", server.friendly_error("HTTP 403: forbidden"))
+        self.assertIn("key 不对", server.friendly_error("HTTP 401: invalid token"))
+        self.assertIn("api.tokenhubcloud.net/v1", server.friendly_error("HTTP 404: not found"))
+
 
 class CrossSiteTests(unittest.TestCase):
     def gate(self, path, method="POST", host="127.0.0.1:8765", origin=None, ctype="application/json"):

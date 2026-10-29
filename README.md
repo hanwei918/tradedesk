@@ -30,16 +30,20 @@ python3 server.py                          # 打开 http://127.0.0.1:8765
 
 ```
 LLM_API_KEY=...
-LLM_ENDPOINT=https://tokenhub-intl.tencentcloudmaas.com/v1/chat/completions
-LLM_MODEL=deepseek/deepseek-flash
+LLM_ENDPOINT=https://api.tokenhubcloud.net/v1
+LLM_MODEL=...
 ```
 
-任何 OpenAI 兼容的 Chat Completions 接口都可以用，例如赛事赞助的 Tokenhub。也可以用 Claude（Anthropic 官方 SDK，`pip install anthropic`）：
+任何 OpenAI 兼容的 Chat Completions 接口都可以用。赛事赞助的 Tokenhub 填到 `/v1` 即可，程序会补上 `/chat/completions`。模型名因 key 而异，用"模型设置"里的「查可用模型」从列表里选（等同于调用 `/v1/models`）。
+
+也可以用 Claude（Anthropic 官方 SDK，`pip install anthropic`）：
 
 ```
 LLM_PROVIDER=anthropic
 ANTHROPIC_API_KEY=...
 LLM_MODEL=claude-opus-5-5
+# 走赛事 Tokenhub 时加上这一行（不带 /v1），key 用 Tokenhub 的 key，按 Bearer 方式发送：
+# ANTHROPIC_API_BASE=https://api.tokenhubcloud.net
 ```
 
 仓库里的回放缓存（`app/cache/`）是用 `claude-opus-5-5` 录制的。换了模型或提示词，要重新运行 `tools/record_demo.py`。
@@ -56,7 +60,7 @@ LLM_MODEL=claude-opus-5-5
 cd app
 TRADEDESK_MODE=record python3 tools/record_demo.py   # 把固定演示输入跑一遍并缓存
 TRADEDESK_MODE=replay python3 server.py              # 断网也能演示
-python3 -m unittest discover -s tests -v             # 测试（47 项）
+python3 -m unittest discover -s tests -v             # 测试（55 项）
 python3 tools/cost_report.py                         # 每条询盘的调用成本（先跑 record_demo 生成日志）
 TRADEDESK_MODE=replay python3 tools/run_baseline.py  # 对照实验（缓存齐全时不联网）
 TRADEDESK_MODE=replay python3 server.py --lan        # 游园会：手机扫码访问 /play，大屏打开 /play#screen

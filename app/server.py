@@ -104,6 +104,18 @@ class App:
         return {"ok": ok, "seconds": round(time.time() - started, 2), "model": self.llm.model,
                 "usage": getattr(self.llm, "last_usage", None)}
 
+    def settings_models(self, payload):
+        """Model ids for the form as typed; nothing is saved. A saved key is only used for its own endpoint."""
+        v = settings.validate(dict(payload, mode="replay"), settings.current())
+        if not v["api_key"]:
+            raise ValueError("先填 key（换了接口类型或地址时要重新填）")
+        probe = LLM(provider=v["provider"], endpoint=v["endpoint"], model=v["model"],
+                    api_key=v["api_key"], mode="live", timeout=20)
+        try:
+            return {"ok": True, "models": probe.list_models()}
+        except LLMError as exc:
+            return {"ok": False, "error": friendly_error(str(exc))}
+
     def eval_view(self):
         return evaluate(self.kb)
 
@@ -345,6 +357,7 @@ class Handler(SimpleHTTPRequestHandler):
         routes = {"/api/play/check": APP.play_check, "/api/play/score": APP.play_score,
                   "/api/inbox/triage": APP.runner.triage, "/api/tasks/status": APP.task_status,
                   "/api/settings": APP.settings_save, "/api/settings/test": APP.settings_test,
+                  "/api/settings/models": APP.settings_models,
                   "/api/redteam": APP.redteam_run,"/api/inquiry": APP.runner.inquiry, "/api/listing": APP.runner.listing,
                   "/api/check": APP.runner.check_text, "/api/image-check": APP.runner.image_check,
                   "/api/board/mark": APP.board_mark}
@@ -367,8 +380,11 @@ class Handler(SimpleHTTPRequestHandler):
 def friendly_error(msg):
     """Turn transport errors into something a non-developer can act on."""
     hints = [(r"nodename|gaierror|Name or service not known|getaddrinfo", "找不到这个地址：检查接口地址有没有写错、电脑有没有联网"),
-             (r"HTTP 401|HTTP 403|key 无效|AuthenticationError", "key 不对或没有权限：重新复制 key（注意不要带空格）"),
-             (r"HTTP 404", "地址不对：接口地址一般以 /chat/completions 结尾"),
+             (r"model_not_found|模型不存在|无可用渠道|model.{0,40}(not exist|not found|does not exist)",
+              "模型名不对，或这个 key 的分组不能用它：点「查可用模型」从列表里选"),
+             (r"HTTP 401|key 无效|AuthenticationError", "key 不对：重新完整复制 key（注意不要带空格）"),
+             (r"HTTP 403", "这个 key 的分组没有这个模型的权限：点「查可用模型」换一个，或找现场技术组"),
+             (r"HTTP 404", "地址不对：赛事 Tokenhub 填 https://api.tokenhubcloud.net/v1"),
              (r"HTTP 402|quota|余额|insufficient", "额度不足或模型没有开通"),
              (r"HTTP 429|限流", "请求太频繁，稍等再试"),
              (r"timed out|timeout", "连接超时：网络慢或地址不可达"),

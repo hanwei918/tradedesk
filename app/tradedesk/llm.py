@@ -14,21 +14,69 @@ import json
 import os
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / "cache"
 
-DEFAULT_ENDPOINT = "https://tokenhub-intl.tencentcloudmaas.com/v1/chat/completions"
+# The event's Tokenhub (api.tokenhubcloud.net). Model names depend on the key: list them with /v1/models.
+DEFAULT_ENDPOINT = "https://api.tokenhubcloud.net/v1/chat/completions"
 DEFAULT_MODEL = "deepseek/deepseek-flash"
 # LLM_PROVIDER=anthropic switches to the Claude Messages API (official SDK).
 ANTHROPIC_DEFAULT_MODEL = "claude-opus-5-5"
 ANTHROPIC_DEFAULT_BASE = "https://api.anthropic.com"
+ANTHROPIC_OFFICIAL_HOST = "api.anthropic.com"
 
 
 class LLMError(RuntimeError):
     pass
+
+
+def chat_url(endpoint):
+    """Accept the base URL the Tokenhub guide hands out (…/v1) as well as the full …/chat/completions."""
+    url = endpoint.strip().rstrip("/")
+    if url.endswith("/chat/completions"):
+        return url
+    if urllib.parse.urlparse(url).path in ("", "/"):
+        url += "/v1"
+    return url + "/chat/completions"
+
+
+def models_url(endpoint):
+    return chat_url(endpoint)[:-len("/chat/completions")] + "/models"
+
+
+def anthropic_base(endpoint):
+    """The SDK appends /v1/messages itself, so a pasted …/v1 would be doubled."""
+    url = endpoint.strip().rstrip("/")
+    return url[:-3] if url.endswith("/v1") else url
+
+
+def is_official_anthropic(endpoint):
+    return urllib.parse.urlparse(endpoint).hostname == ANTHROPIC_OFFICIAL_HOST
+
+
+def normalize_endpoint(provider, endpoint):
+    return anthropic_base(endpoint) if provider == "anthropic" else chat_url(endpoint)
+
+
+def anthropic_request(endpoint, body):
+    """Messages API arguments. Effort, fallbacks and the beta flag go to the official API only:
+    a gateway such as Tokenhub may reject fields it does not know."""
+    kw = {"model": body["model"], "max_tokens": 16000,
+          "system": body["system"] + "\n\n只输出一个 JSON 对象，不要输出任何其他文字或代码块标记。",
+          "messages": body["messages"]}
+    if is_official_anthropic(endpoint):
+        kw.update(output_config={"effort": body["effort"]},
+                  betas=["server-side-fallback-2026-07-01"], fallbacks="default")
+    return kw
+
+
+def model_ids(payload):
+    """ids from an OpenAI-style {"data": [{"id": ...}]} model list."""
+    return sorted({m["id"] for m in (payload or {}).get("data") or [] if isinstance(m, dict) and m.get("id")})
 
 
 def _env_file_value(name):
@@ -60,6 +108,7 @@ class LLM:
             self.model = model or setting("LLM_MODEL", DEFAULT_MODEL)
             self.api_key = api_key if api_key is not None else setting("LLM_API_KEY")
             default_transport = self._http
+        self.endpoint = normalize_endpoint(self.provider, self.endpoint)
         self.effort = setting("LLM_EFFORT", "medium")
         if self.provider == "anthropic" and timeout == 120:
             timeout = 300  # thinking is always on for claude-opus-5-5
@@ -155,34 +204,58 @@ class LLM:
             time.sleep(1.5 * (attempt + 1))
         raise LLMError(f"模型调用失败：{last}")
 
+    def list_models(self):
+        """Model ids this key may use: the guide's /v1/models check, so nobody has to guess a name."""
+        if not self.api_key:
+            raise LLMError("还没有填写 key")
+        if self.provider == "anthropic":
+            import anthropic
+
+            try:
+                return sorted({m.id for m in self._anthropic_client().models.list(limit=100) if getattr(m, "id", None)})
+            except anthropic.APIStatusError as exc:
+                raise LLMError(f"HTTP {exc.status_code}: {exc.message}") from exc
+            except anthropic.APIConnectionError as exc:
+                raise LLMError(f"连不上接口：{exc!r}") from exc
+        req = urllib.request.Request(models_url(self.endpoint), headers={"Authorization": f"Bearer {self.api_key}"})
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                return model_ids(json.loads(resp.read().decode("utf-8")))
+        except urllib.error.HTTPError as exc:
+            raise LLMError(f"HTTP {exc.code}: {exc.read()[:300]!r}") from exc
+        except (urllib.error.URLError, TimeoutError, ValueError) as exc:
+            raise LLMError(repr(exc)) from exc
+
+    def _anthropic_client(self):
+        import anthropic  # only needed for this provider
+
+        if self._client is None:
+            # The official API takes x-api-key; gateways such as Tokenhub take the same key as a Bearer token
+            # (what ANTHROPIC_AUTH_TOKEN does in Claude Code). Explicit credentials and base_url mean
+            # ANTHROPIC_* variables in the shell are never picked up.
+            # gzip only: some Python installs ship a brotli/zstd decoder the HTTP client can't drive.
+            auth = {"api_key": self.api_key} if is_official_anthropic(self.endpoint) else {"auth_token": self.api_key}
+            self._client = anthropic.Anthropic(**auth, base_url=self.endpoint,
+                                               timeout=self.timeout, max_retries=2,
+                                               default_headers={"Accept-Encoding": "gzip"})
+        return self._client
+
     def _anthropic(self, body):
         """Claude Messages API via the official SDK. Returns the JSON text of the answer."""
         import anthropic  # only needed for this provider
 
         if not self.api_key:
             raise LLMError("没有配置 ANTHROPIC_API_KEY")
-        if self._client is None:
-            # base_url is explicit so an ANTHROPIC_BASE_URL in the shell is never picked up.
-            # gzip only: some Python installs ship a brotli/zstd decoder the HTTP client can't drive.
-            self._client = anthropic.Anthropic(api_key=self.api_key, base_url=self.endpoint,
-                                               timeout=self.timeout, max_retries=2,
-                                               default_headers={"Accept-Encoding": "gzip"})
+        client = self._anthropic_client()
+        kw = anthropic_request(self.endpoint, body)
         try:
-            msg = self._client.beta.messages.create(
-                model=body["model"],
-                max_tokens=16000,
-                system=body["system"] + "\n\n只输出一个 JSON 对象，不要输出任何其他文字或代码块标记。",
-                messages=body["messages"],
-                output_config={"effort": body["effort"]},
-                betas=["server-side-fallback-2026-07-01"],
-                fallbacks="default",
-            )
+            msg = (client.beta.messages if "betas" in kw else client.messages).create(**kw)
         except anthropic.AuthenticationError as exc:
             raise LLMError("Claude API key 无效") from exc
         except anthropic.RateLimitError as exc:
             raise LLMError("Claude API 限流，请稍后再试") from exc
         except anthropic.APIStatusError as exc:
-            raise LLMError(f"Claude API 错误 {exc.status_code}: {exc.message}") from exc
+            raise LLMError(f"Claude API 错误 HTTP {exc.status_code}: {exc.message}") from exc
         except anthropic.APIConnectionError as exc:
             raise LLMError("连不上 Claude API，请检查网络") from exc
         self.last_usage = {"input_tokens": msg.usage.input_tokens, "output_tokens": msg.usage.output_tokens}

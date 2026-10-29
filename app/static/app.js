@@ -876,8 +876,12 @@ async function renderLogs() {
 
 // ------------------------------------------------------------------ model settings
 const MODE_ZH = { live: "实时调用", record: "实时 + 录制缓存", replay: "回放（不联网）" };
-const PROVIDER_ZH = { openai: "OpenAI 兼容（如赛事 Tokenhub）", anthropic: "Claude（Anthropic）" };
-const DEFAULTS = { openai: { endpoint: "", model: "" }, anthropic: { endpoint: "https://api.anthropic.com", model: "claude-opus-5-5" } };
+const PROVIDER_ZH = { openai: "OpenAI 兼容（赛事 Tokenhub）", anthropic: "Claude（官方或 Tokenhub）" };
+const DEFAULTS = { openai: { endpoint: "https://api.tokenhubcloud.net/v1", model: "" }, anthropic: { endpoint: "https://api.anthropic.com", model: "claude-opus-5-5" } };
+const ENDPOINT_HINT = {
+  openai: "赛事 Tokenhub 填 https://api.tokenhubcloud.net/v1（使用指南「速查卡」里的 OpenAI 兼容 Base URL）",
+  anthropic: "官方填 https://api.anthropic.com；走赛事 Tokenhub 填 https://api.tokenhubcloud.net",
+};
 
 async function openSettings() {
   const cfg = await api("/api/settings");
@@ -887,8 +891,9 @@ async function openSettings() {
     ${cfg.env_overrides.length ? `<div class="callout warn" style="margin:0">${ic("triangle-alert")}<div>启动命令里设置了 ${esc(cfg.env_overrides.join("、"))}；保存后以这里的设置为准，重启服务时又会回到启动命令的设置。</div></div>` : ""}
     <div class="card"><div class="card-b">
       <label class="field">接口类型<div class="seg" id="set-prov">${Object.entries(PROVIDER_ZH).map(([k, v]) => `<button data-p="${k}" class="${k === provider ? "on" : ""}">${esc(v)}</button>`).join("")}</div></label>
-      <label class="field">接口地址 <span class="muted" style="font-weight:400">${provider === "openai" ? "以 /chat/completions 结尾，从 Tokenhub 使用指南复制" : "一般不用改"}</span><input type="text" id="set-endpoint" value="${esc(cfg.provider === provider ? cfg.endpoint : DEFAULTS[provider].endpoint)}" placeholder="https://…/v1/chat/completions"></label>
-      <label class="field">模型名<input type="text" id="set-model" value="${esc(cfg.provider === provider ? cfg.model : DEFAULTS[provider].model)}" placeholder="例如 deepseek-v3"></label>
+      <label class="field">接口地址 <span class="muted" style="font-weight:400">${esc(ENDPOINT_HINT[provider])}</span><input type="text" id="set-endpoint" value="${esc(cfg.provider === provider ? cfg.endpoint : DEFAULTS[provider].endpoint)}" placeholder="${esc(DEFAULTS[provider].endpoint || "https://…/v1")}"></label>
+      <label class="field">模型名 <span class="muted" style="font-weight:400">不同 key 能用的模型不一样，点「查可用模型」从列表里选</span><input type="text" id="set-model" value="${esc(cfg.provider === provider ? cfg.model : DEFAULTS[provider].model)}" placeholder="点「查可用模型」后选择"></label>
+      <div><button class="btn sm" id="set-list">${ic("search", "sm")}查可用模型</button><div class="chips" id="set-models" style="margin-top:8px"></div></div>
       <label class="field">API key <span class="muted" style="font-weight:400">${cfg.key_set && cfg.provider === provider ? `已保存 ${esc(cfg.key_hint)}，留空表示不修改` : "还没有保存 key"}</span>
         <input type="password" id="set-key" autocomplete="off" spellcheck="false" placeholder="${cfg.key_set && cfg.provider === provider ? "留空 = 不修改" : "粘贴 key"}"></label>
       <label class="field">模式<select id="set-mode">${Object.entries(MODE_ZH).map(([k, v]) => `<option value="${k}" ${k === cfg.mode ? "selected" : ""}>${esc(v)}</option>`).join("")}</select></label>
@@ -905,6 +910,17 @@ async function openSettings() {
         const r = await api("/api/settings", { provider, endpoint: $("#set-endpoint").value, model: $("#set-model").value, api_key: $("#set-key").value, mode: $("#set-mode").value });
         Object.assign(cfg, r); META.llm = r.active; renderModelCard(); toast("已保存，立即生效", "ok"); render();
       } catch (e) { $("#set-result").innerHTML = `<div class="callout warn" style="margin:0">${ic("circle-x")}<div>${esc(e.message)}</div></div>`; busy($("#set-save"), false); }
+    });
+    $("#set-list").addEventListener("click", async (e) => {
+      e.preventDefault();
+      busy($("#set-list"), true, "查询中…");
+      try {
+        const r = await api("/api/settings/models", { provider, endpoint: $("#set-endpoint").value, model: $("#set-model").value, api_key: $("#set-key").value });
+        $("#set-models").innerHTML = !r.ok ? `<div class="callout warn" style="margin:0">${ic("circle-x")}<div>${esc(r.error)}</div></div>`
+          : r.models.length ? r.models.map((m) => `<button class="chip" data-model="${esc(m)}">${esc(m)}</button>`).join("") : `<span class="small muted">这个 key 没有可用的模型，找现场技术组</span>`;
+        $$("#set-models [data-model]").forEach((b) => b.addEventListener("click", (ev) => { ev.preventDefault(); $("#set-model").value = b.dataset.model; $$("#set-models .chip").forEach((c) => c.classList.toggle("on", c === b)); }));
+      } catch (err) { $("#set-models").innerHTML = `<div class="callout warn" style="margin:0">${ic("circle-x")}<div>${esc(err.message)}</div></div>`; }
+      busy($("#set-list"), false);
     });
     $("#set-test").addEventListener("click", async () => {
       busy($("#set-test"), true, "测试中…");
