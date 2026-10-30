@@ -24,6 +24,9 @@ CACHE_DIR = ROOT / "cache"
 # The event's Tokenhub (api.tokenhubcloud.net). Model names depend on the key: list them with /v1/models.
 DEFAULT_ENDPOINT = "https://api.tokenhubcloud.net/v1/chat/completions"
 DEFAULT_MODEL = "deepseek/deepseek-flash"
+# Tokenhub sits behind Cloudflare, which answers urllib's default "Python-urllib/3.x" with 403 "error code: 1010"
+# (checked 2026-10-30, with a real token and a made-up one alike). Any other name gets through.
+USER_AGENT = "TradeDesk/1.0"
 # LLM_PROVIDER=anthropic switches to the Claude Messages API (official SDK).
 ANTHROPIC_DEFAULT_MODEL = "claude-opus-5-5"
 ANTHROPIC_DEFAULT_BASE = "https://api.anthropic.com"
@@ -142,7 +145,8 @@ class LLM:
             "temperature": 0,
             "seed": 42,
             "response_format": {"type": "json_object"},
-            "reasoning_effort": "none",
+            # The event's Tokenhub (GPT models only) rejects "none" with HTTP 400; low is its cheapest level.
+            "reasoning_effort": "low",
         }
 
     @staticmethod
@@ -185,7 +189,7 @@ class LLM:
             raise LLMError("没有配置 LLM_API_KEY")
         req = urllib.request.Request(
             self.endpoint, data=json.dumps(body).encode("utf-8"), method="POST",
-            headers={"Content-Type": "application/json",
+            headers={"Content-Type": "application/json", "User-Agent": USER_AGENT,
                      "Authorization": f"Bearer {self.api_key}"})
         last = None
         for attempt in range(1 if self.timeout <= 20 else 3):  # connection tests try once
@@ -217,7 +221,8 @@ class LLM:
                 raise LLMError(f"HTTP {exc.status_code}: {exc.message}") from exc
             except anthropic.APIConnectionError as exc:
                 raise LLMError(f"连不上接口：{exc!r}") from exc
-        req = urllib.request.Request(models_url(self.endpoint), headers={"Authorization": f"Bearer {self.api_key}"})
+        req = urllib.request.Request(models_url(self.endpoint),
+                                     headers={"Authorization": f"Bearer {self.api_key}", "User-Agent": USER_AGENT})
         try:
             with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                 return model_ids(json.loads(resp.read().decode("utf-8")))

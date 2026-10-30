@@ -591,11 +591,15 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual(llm.transport(llm.body("s", "u")), '{"ok": true}')
         path, headers, body = self.seen[-1]
         self.assertEqual((path, headers["authorization"], body["model"]), ("/v1/chat/completions", "Bearer sk-test", "m-a"))
+        self.assertNotIn("python-urllib", headers.get("user-agent", "").lower())   # Cloudflare 1010 at Tokenhub
+        # Tokenhub on 2026-10-30: 'does not support reasoning effort "none"; use low, medium, high, xhigh or max'
+        self.assertIn(body["reasoning_effort"], {"low", "medium", "high", "xhigh", "max"})
 
     def test_model_list(self):
         llm = LLM(provider="openai", endpoint=self.base + "/v1", api_key="sk-test", mode="live")
         self.assertEqual(llm.list_models(), ["m-a", "m-b"])
         self.assertEqual((self.seen[-1][0], self.seen[-1][1]["authorization"]), ("/v1/models", "Bearer sk-test"))
+        self.assertNotIn("python-urllib", self.seen[-1][1].get("user-agent", "").lower())
         with self.assertRaises(LLMError):
             LLM(provider="openai", endpoint=self.base + "/v1", api_key="", mode="replay").list_models()
 
@@ -630,6 +634,10 @@ class GatewayTests(unittest.TestCase):
         self.assertIn("权限", server.friendly_error("HTTP 403: forbidden"))
         self.assertIn("key 不对", server.friendly_error("HTTP 401: invalid token"))
         self.assertIn("api.tokenhubcloud.net/v1", server.friendly_error("HTTP 404: not found"))
+        # what Tokenhub really sent on 2026-10-30 for a valid token on an empty account, on both routes
+        for raw in ('HTTP 403: b\'{"code":"INSUFFICIENT_BALANCE","message":"Insufficient account balance"}\'',
+                    "Claude API 错误 HTTP 403: Error code: 403 - {'code': 'INSUFFICIENT_BALANCE'}"):
+            self.assertIn("余额不足", server.friendly_error(raw))
 
 
 class CrossSiteTests(unittest.TestCase):
