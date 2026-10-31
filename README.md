@@ -10,6 +10,8 @@
 - **对照实验**：同样 8 条询盘、同一个模型、同一套检查，比较四组回复。直接用通用 AI：8 条回复 8 条带红色问题（声称有 UL/ETL/NOM 认证、承诺免费样品、按低于起订量报价）；附上工厂资料：0 条红、20 条需确认；TradeDesk 第 1 轮：0 条红、13 条需确认；改一轮后：0 条红、8 条需确认、3 条可直接发。**差距主要来自工厂资料**，TradeDesk 的作用是每次自动带上资料、减少需人工确认的地方。结果在 `app/eval/baseline_run.json`，评测页可逐条查看回复全文。
 - **调用成本**：按 Claude 官方价和录制时的实测用量，每条询盘第 1 轮 3 次调用 0.087–0.150 美元（中位数 0.135），加改一轮中位数 0.236 美元（`python3 tools/cost_report.py`，结果在 `app/eval/cost_run.json`）。
 - **红队测试**：往审核结果里注入编造的模型提示（不存在的规则编号、原文里没有的话、不适用的规则、空引用），出处守卫逐条拦下并说明原因；评测页上可以自己改 JSON 再试。
+- **降本测算**：评测页里列出替换掉的工作、实测的模型费用和耗时（从仓库记录算出，写明出处），以及可改的示例假设（询盘量、人工用时、时薪、外包单价），按算式给出每月测算。人工节省没有实测，页面上写明了。
+- **工作流串联**：询盘回复结果下方一键带着同一份产品资料去生成上架文案，上架结果再写进商品看板。
 - **自动演示**：右上角一键播放 12 步带字幕的走查，`#tour=loop` 可在摊位循环播放。
 - **游园会找茬**：`python3 server.py --lan` 后手机扫码答题，答案由代码规则计算；局域网访问只开放找茬页面，其余接口一律 403。
 - **工作流 C · 商品看板**：所有产品 × 主图 / Amazon / TikTok 的最新状态一屏看清；一键批量生成上品，导出 CSV。主图按 Amazon 美国站的 10 条要求检查：尺寸、白底、产品占比、是否贴边由代码测量，文字、徽章、道具、是否实拍由模型看图判断。
@@ -64,7 +66,7 @@ LLM_MODEL=claude-opus-5-5
 cd app
 TRADEDESK_MODE=record python3 tools/record_demo.py   # 把固定演示输入跑一遍并缓存
 TRADEDESK_MODE=replay python3 server.py              # 断网也能演示
-python3 -m unittest discover -s tests -v             # 测试（56 项）
+python3 -m unittest discover -s tests -v             # 测试（60 项）
 python3 tools/cost_report.py                         # 每条询盘的调用成本（先跑 record_demo 生成日志）
 TRADEDESK_MODE=replay python3 tools/run_baseline.py  # 对照实验（缓存齐全时不联网）
 TRADEDESK_MODE=replay python3 server.py --lan        # 游园会：手机扫码访问 /play，大屏打开 /play#screen
@@ -96,7 +98,7 @@ app/
   static/                网页界面（设计规范移植自 shadcn/ui，图标 Lucide，全部本地文件）
   tests/                 单元测试
 eval/                    （在 app/ 下）开发集、两份盲测集、首次运行冻结记录
-docs/                    交付文档（方案说明、配置与调用说明、演示说明、数据来源说明、路演稿、海报）
+docs/                    交付文档（方案说明、配置与调用说明、演示说明、数据来源说明、路演稿、摊位讲解稿、海报）
 ```
 
 ## 诚信说明

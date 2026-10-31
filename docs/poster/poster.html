@@ -45,7 +45,7 @@ section{padding:16px 48px 0}
 h3{font-size:23px;margin:0 0 10px;display:flex;gap:12px;align-items:center;color:var(--ink);letter-spacing:-.01em}
 h3 i{font-style:normal;display:inline-grid;place-items:center;min-width:32px;height:32px;padding:0 8px;border-radius:9px;background:var(--brand);color:#fff;font:700 16px ui-monospace,Menlo,monospace}
 h3 small{font-size:14px;font-weight:500;color:var(--muted);margin-left:auto}
-.quote{font:14.5px/1.55 ui-monospace,Menlo,monospace;background:var(--canvas);border-left:5px solid var(--brand);padding:12px 16px;border-radius:8px;color:var(--ink)}
+.quote{font:14px/1.5 ui-monospace,Menlo,monospace;background:var(--canvas);border-left:5px solid var(--brand);padding:10px 14px;border-radius:8px;color:var(--ink)}
 .quote u{text-decoration:none;background:#fde68a;border-radius:3px;padding:0 2px}
 .pits{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
 .pit{border:1px solid var(--line);border-top:4px solid var(--red);border-radius:8px;padding:6px 9px;font-size:12.5px;line-height:1.35;color:var(--muted)}
@@ -60,10 +60,15 @@ h3 small{font-size:14px;font-weight:500;color:var(--muted);margin-left:auto}
 .box{background:var(--canvas);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;color:var(--muted)}
 .box b{font-size:15.5px;display:block;margin-bottom:2px}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.stat{border:1px solid var(--line);border-radius:10px;padding:10px 10px 9px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:8px 10px 7px}
 .stat .n{font-size:28px;font-weight:700;color:var(--brand);line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .stat .l{font-size:12px;color:var(--muted);line-height:1.4;margin-top:3px}
 .stat .l b{font-size:13px}
+.val3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.vb{background:var(--canvas);border-radius:10px;padding:9px 11px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.vb b{display:block;font-size:15px;margin-bottom:2px}.vb span{display:block;font-size:11.5px;margin-top:3px}
+.vb.m{background:var(--brand-soft)}.vb.m b{color:var(--brand)}
+.vb em{font-style:normal;font-size:10.5px;font-weight:700;background:#fff;color:var(--brand);border-radius:4px;padding:1px 5px;margin-right:5px;vertical-align:2px}
 .foot{margin-top:auto;background:#0b1324;color:#94a3b8;padding:16px 48px 18px;font-size:12.5px;line-height:1.6;display:grid;grid-template-columns:1fr 210px;gap:20px;align-items:center}
 .foot b{color:#fff}
 .play{border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 12px;color:#e2e8f0;font-size:13px;line-height:1.45;background:rgba(255,255,255,.05)}
@@ -76,7 +81,6 @@ h3 small{font-size:14px;font-weight:500;color:var(--muted);margin-left:auto}
     <div class="toprow"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk</div><div class="track">INTERCITY HACK 宁波站 · 赛道二 AI+出海</div></div>
     <h1>TradeDesk 出海工作台</h1>
     <p class="sub">给宁波中小外贸工厂的 AI 助手：询盘 → 回复 → 上架，<b>每一条风险提示都有出处</b>——公开规则的原文与链接，或工厂资料卡上的那个字段。</p>
-    <div class="chips"><span>3 个工作流 + 收件箱</span><span>6 个智能体</span><span>38 条核实规则</span><span>英语 · 西班牙语</span></div>
   </div>
 
   <div class="claim">
@@ -111,22 +115,32 @@ h3 small{font-size:14px;font-weight:500;color:var(--muted);margin-left:auto}
       <div class="step"><b>校验</b>代码 + 模型 + 出处守卫</div>
       <div class="step"><b>反馈</b>批注 · 红黄绿 · 第 2 轮</div>
     </div>
-    <div class="shot" style="height:246px"><img src="../img/poster-inquiry.png" alt="询盘回复截图"></div>
+    <div class="shot" style="height:185px"><img src="../img/poster-inquiry.png" alt="询盘回复截图"></div>
   </section>
 
   <section>
     <h3><i>B</i><span>多平台上架</span><i style="margin-left:6px">C</i><span>商品看板</span></h3>
     <p class="cap" style="margin:0">一份中文资料生成 Amazon 英文 Listing + TikTok 西语脚本，各按平台规则检查；看板批量上品，主图像素由代码测量、徽章和实拍由模型看图。</p>
-    <div class="shot" style="height:246px"><img src="../img/poster-board.png" alt="商品看板截图"></div>
+    <div class="shot" style="height:185px"><img src="../img/poster-board.png" alt="商品看板截图"></div>
   </section>
 
-  <section style="padding-bottom:16px">
+  <section>
+    <h3><i>¥</i>替换掉什么 · 花多少 · 怎么复制</h3>
+    <div class="val3">
+      <div class="vb"><b>替换掉</b>业务员写回复的时间、外包翻译、上架前人工自查<span>不替换：发出前的人工确认</span></div>
+      <div class="vb m"><b><em>实测</em>$0.24 / 条询盘</b>模型费用（回复 + 改一轮）<span>22.3 秒出结果（gpt-5.5 实时）</span></div>
+      <div class="vb"><b>可复制</b>换同品类工厂只换资料卡；加平台复用整套校验和出处守卫</div>
+    </div>
+    <p class="cap" style="margin-top:6px">省多少按工厂自己的数字现场算（实测和假设分开标）。故意不做：AI 生成主图、自动发送、爬付费数据。</p>
+  </section>
+
+  <section style="padding-bottom:14px">
     <h3><i>✓</i>为什么可信</h3>
     <div class="stats">
       <div class="stat"><div class="n">38/38</div><div class="l"><b>规则逐条核实</b><br>附原文和链接</div></div>
       <div class="stat"><div class="n">97.1%</div><div class="l"><b>盲测首次精确率</b><br>第二份 92.3%</div></div>
       <div class="stat"><div class="n">5/5</div><div class="l"><b>编造的提示被拦下</b><br>红队测试</div></div>
-      <div class="stat"><div class="n">22 秒</div><div class="l"><b>一次询盘回复</b><br>gpt-5.5 现场实测</div></div>
+      <div class="stat"><div class="n">60 项</div><div class="l"><b>自动化测试</b><br>离线可复现</div></div>
     </div>
   </section>
 
