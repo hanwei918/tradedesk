@@ -293,15 +293,15 @@ sup.fn{font-size:10px;font-weight:700;color:hsl(var(--muted-foreground));margin-
 .amz-preview .st{margin-top:12px;font-size:12px}
 .phone-wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;padding:16px;align-items:start}
 .phone{width:230px;height:460px;border-radius:34px;background:#0a0a0a;padding:9px;box-shadow:0 20px 40px -18px rgb(0 0 0 / .6),inset 0 0 0 2px #2a2a2a;position:relative}
-.screen{width:100%;height:100%;border-radius:26px;overflow:hidden;position:relative;color:#fff;
+.phone .screen{width:100%;height:100%;border-radius:26px;overflow:hidden;position:relative;color:#fff;
   background:radial-gradient(120% 70% at 30% 20%,#2b3a67 0%,#141a2e 45%,#07090f 100%)}
-.screen .notch{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:70px;height:18px;border-radius:12px;background:#000}
-.screen .hook{position:absolute;top:70px;left:14px;right:14px;font-size:19px;font-weight:800;line-height:1.25;text-shadow:0 2px 8px rgb(0 0 0 / .6)}
-.screen .kettle{position:absolute;top:170px;left:50%;transform:translateX(-50%);opacity:.9}
-.screen .cap{position:absolute;left:12px;right:50px;bottom:56px;font-size:11.5px;line-height:1.4;text-shadow:0 1px 4px rgb(0 0 0 / .7)}
-.screen .tags{position:absolute;left:12px;right:50px;bottom:18px;font-size:11px;font-weight:600;color:#e6f0ff;line-height:1.3}
-.screen .rail{position:absolute;right:10px;bottom:70px;display:flex;flex-direction:column;gap:14px;align-items:center;font-size:10px}
-.screen .rail i{width:30px;height:30px;border-radius:50%;background:rgb(255 255 255 / .16);display:block}
+.phone .screen .notch{position:absolute;top:7px;left:50%;transform:translateX(-50%);width:70px;height:18px;border-radius:12px;background:#000}
+.phone .screen .hook{position:absolute;top:70px;left:14px;right:14px;font-size:19px;font-weight:800;line-height:1.25;text-shadow:0 2px 8px rgb(0 0 0 / .6)}
+.phone .screen .kettle{position:absolute;top:170px;left:50%;transform:translateX(-50%);opacity:.9}
+.phone .screen .cap{position:absolute;left:12px;right:50px;bottom:56px;font-size:11.5px;line-height:1.4;text-shadow:0 1px 4px rgb(0 0 0 / .7)}
+.phone .screen .tags{position:absolute;left:12px;right:50px;bottom:18px;font-size:11px;font-weight:600;color:#e6f0ff;line-height:1.3}
+.phone .screen .rail{position:absolute;right:10px;bottom:70px;display:flex;flex-direction:column;gap:14px;align-items:center;font-size:10px}
+.phone .screen .rail i{width:30px;height:30px;border-radius:50%;background:rgb(255 255 255 / .16);display:block}
 .shots{display:flex;flex-direction:column;gap:8px}
 .shot{border:1px solid hsl(var(--border));border-radius:9px;padding:9px 11px;font-size:13px}
 .shot .s{font-size:11.5px;color:hsl(var(--muted-foreground));display:flex;gap:6px;align-items:center}
@@ -345,10 +345,10 @@ pre.json{margin:0;max-height:340px;overflow:auto;font-size:12px;line-height:1.5;
 .steps-wrap .steps{flex:1;border-bottom:0}
 .card>.steps-wrap{border-bottom:1px solid hsl(var(--border))}
 /* phone preview: clamp text so caption, tags and hook never overlap */
-.screen .hook{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;top:56px;font-size:18px}
-.screen .kettle{top:205px}
-.screen .cap{bottom:62px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.screen .tags{bottom:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.phone .screen .hook{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;top:56px;font-size:18px}
+.phone .screen .kettle{top:205px}
+.phone .screen .cap{bottom:62px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.phone .screen .tags{bottom:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 body.demo .toasts{display:none}
 
 /* ---------- product board */
