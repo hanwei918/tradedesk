@@ -4,89 +4,162 @@
 <meta charset="utf-8">
 <title>TradeDesk 方案说明</title>
 <style>
-@page{size:A4;margin:12mm 13mm}
+@page{size:A4;margin:11mm 12mm}
 *{box-sizing:border-box}
-body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#10203f;font-size:9.5pt;line-height:1.45}
-h1{font-size:20pt;margin:0}
-.sub{color:#0b5fff;font-weight:700;margin:2px 0 8px}
-h2{font-size:11.5pt;margin:9px 0 4px;padding-bottom:2px;border-bottom:2px solid #0b5fff}
-p{margin:3px 0}
-ul{margin:2px 0;padding-left:16px}li{margin:1px 0}
-table{border-collapse:collapse;width:100%;font-size:9pt}
-td,th{border:1px solid #dfe4ee;padding:3px 5px;vertical-align:top;text-align:left}
-th{background:#f4f6fb}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-pre{font-size:8.2pt;line-height:1.35;background:#f4f6fb;padding:6px 8px;border-radius:6px;margin:3px 0;white-space:pre-wrap}
-.muted{color:#5b667a;font-size:8.5pt}
+body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#10203f;font-size:9.1pt;line-height:1.42}
+.page{page-break-after:always}.page:last-child{page-break-after:auto}
+h1{font-size:19pt;margin:0}
+.sub{color:#0b5fff;font-weight:700;margin:2px 0 6px}
+h2{font-size:11pt;margin:7px 0 3px;padding-bottom:2px;border-bottom:2px solid #0b5fff}
+p{margin:2px 0}
+ul,ol{margin:2px 0;padding-left:16px}li{margin:1px 0}
+table{border-collapse:collapse;width:100%;font-size:8.6pt}
+td,th{border:1px solid #dfe4ee;padding:2.5px 5px;vertical-align:top;text-align:left}
+th{background:#f4f6fb;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+pre{font-size:7.9pt;line-height:1.32;background:#f4f6fb;padding:5px 7px;border-radius:6px;margin:3px 0;white-space:pre-wrap}
+.muted{color:#5b667a;font-size:8.2pt}
+img.shot{width:100%;border:1px solid #dfe4ee;border-radius:6px;display:block;margin:3px 0}
+.cap{font-size:8pt;color:#5b667a;margin:1px 0 4px}
+.kv td:first-child{width:74px;font-weight:700;background:#f8f9fc}
 </style>
 </head>
 <body>
+
+<section class="page">
 <h1>TradeDesk 出海工作台 · 方案说明</h1>
-<div class="sub">INTERCITY HACK 宁波站 · 赛道二 AI+外贸/跨境 —— 询盘 → 回复 → 上架，每一条风险提示都有出处</div>
+<div class="sub">INTERCITY HACK 宁波站 · 赛道二 AI+外贸/跨境 —— 从合规切入：询盘 → 回复 → 上架，每一条风险提示都有出处</div>
 
 <div class="grid">
 <div>
 <h2>目标用户与问题</h2>
-<p><b>宁波中小外贸工厂的业务员和运营</b>：同时做阿里国际站和 Amazon、TikTok 等平台，英语一般，没有专职合规。</p>
+<p><b>宁波中小外贸工厂的业务员和运营</b>：询盘回复对 B 端进口商（阿里国际站），上架文案对 C 端消费者（Amazon、TikTok 等），英语一般，没有专职合规。</p>
 <ul>
-<li><b>询盘转化低</b>：买家要求和工厂能力对不上（认证、交期、付款、运输条款），回复要么慢，要么随口答应埋下纠纷。</li>
-<li><b>重复劳动多</b>：同一产品要为每个平台、每种语言重写一遍。</li>
-<li><b>跨岗位割裂</b>：业务答应的事，采购和生产不知道；平台规则散落在各处。</li>
+<li><b>随口答应埋纠纷</b>：买家要的认证、交期、付款、运输条款和工厂能力对不上，回复里一句承诺就可能扣货、罚款、钱货两空。</li>
+<li><b>重复劳动</b>：同一产品要为每个平台、每种语言重写一遍。</li>
+<li><b>跨岗位割裂</b>：业务答应的事，采购、生产、美工不知道；平台和各国规则散在各处。</li>
 </ul>
 
 <h2>使用流程</h2>
-<p><b>工作流 A · 询盘回复</b>：粘贴询盘 + 一句中文意图 → 询盘分析（每条带原文）→ 买家语言的 RFQ 回复 + 给采购/生产的中文备忘 → 校验 → 中文多轮修改，逐词对比。</p>
-<p><b>工作流 B · 多平台上架</b>：中文产品资料 → Amazon 美国站英文 Listing + TikTok 墨西哥西语种草脚本 → 按各平台规则分别校验 → 多轮修改。</p>
-<p><b>询盘收件箱 + 跨岗位任务</b>：先理解每条询盘、按公开公式打优先级（每一分挂询盘原文）；回复时把需要采购/生产/美工跟进的事派成任务，任务同样必须挂询盘原文。</p>
-<p><b>工作流 C · 商品看板</b>：所有产品 × 主图 / Amazon / TikTok 的状态一屏看清；一键批量生成上品；主图按 Amazon 10 条要求检查；状态从“未生成”流转到“已上架”（红色时代码拒绝标记）；导出 CSV。</p>
-<p><b>文案体检</b>：把店里正在用的标题、回复贴进来，用同一套规则检查。</p>
+<p><b>A · 询盘回复</b>：粘贴询盘 + 一句中文意图 → 询盘分析（每条带原文）→ 买家语言回复 + 给采购 / 生产的中文备忘 + 派任务 → 校验 → 中文一句话改第 2 轮，逐词对比。</p>
+<p><b>B · 多平台上架</b>：同一张资料卡 → 11 个平台可选、每个平台选 6 种语言之一 → 按平台和所在市场的规则分别校验。</p>
+<p><b>E · 询盘 → 上架交接</b>：回完询盘一键生成上架文案，代码逐项核对回复和 Listing 有没有说法打架（没有的认证、没检测的材料宣称、容量、电压）。</p>
+<p><b>D · 收件箱</b>：按公开公式排优先级（每一分挂询盘原文），可从 CSV 导入询盘。<b>C · 商品看板</b>：产品 × 主图 / Amazon / TikTok 状态一屏看清，批量生成，主图按 Amazon 10 条要求检查，导出 CSV。</p>
+<p><b>角色模式</b>：评委选“商户 / 合规审查员 / 消费者”，左边只留这条线的页面，步骤条逐步执行真实操作。</p>
 
 <h2>创新点</h2>
 <ul>
-<li><b>出处守卫</b>：模型提出的风险必须带知识库规则编号，并且引用的原文片段必须真的出现在待审文本里，否则由代码丢弃，界面上可以看到被丢弃的条数。</li>
-<li><b>硬事实交给代码</b>：价格底线、MOQ、交期、认证、材料宣称、付款方式、FOB 运输方式，都用代码和资料卡比对，不让大模型做数字判断。</li>
-<li><b>知识库逐条核实</b>：61 条规则都附原文摘录、链接、抓取日期；没核实的规则不参与检查。例如 Amazon 标题上限，官方页面现在写的是 75 字符，不是常见说法里的 200。</li>
-<li><b>可复现的评测</b>：两份盲测集（出题人没看过代码）首次运行精确率 97.1% / 92.3%、召回率 94.4% / 82.8%。对照实验：通用 AI 直接回 8 条询盘，8 条都带红色问题，附上工厂资料后清零；TradeDesk 自动带资料，需人工确认从 20 条降到 8 条。红队注入 5 条编造提示，代码全部拦下。</li>
-<li><b>主图检查分工</b>：尺寸、纯白背景、产品占比、是否贴边由代码测量像素；文字、徽章、道具、是否实拍由模型看图，并且必须写出“看到了什么”。</li>
-<li><b>两种角色、两种语言、两个平台</b>同时产出：对外回复和对内备忘出自同一次理解，口径一致。</li>
+<li><b>出处守卫</b>：模型提出的风险必须带知识库规则编号，引用的原文必须真的出现在待审文本里，否则由代码丢弃。红队注入 5 条编造提示，全部拦下。</li>
+<li><b>硬事实交给代码</b>：价格底线、MOQ、交期、认证、材料宣称、付款方式、FOB 运输方式，都用代码和资料卡比对，不让模型做数字判断。</li>
+<li><b>知识库逐条核实，还能自检</b>：61 条规则都附原文、链接、日期。10-31 程序重新抓取：24 条原文仍在，35 条是脚本页面或 PDF（建档时人工逐字核对），2 条网站拒绝程序，0 条没找到。</li>
+<li><b>可复现的评测</b>：两份盲测集首次精确率 97.1% / 92.3%。对照实验（同样 8 条询盘）：通用 AI 只看询盘 8/8 条带红；手动贴资料后 0 红、20 处待确认；TradeDesk 自动带资料、改一轮后 3 条可直接发、待确认 8 处。</li>
+<li><b>只换资料卡</b>：第二家示例工厂（保温杯）只写资料卡，上架、体检、询盘回复直接跑通；原工厂的请求一字不变（测试逐条回放保证）。</li>
 </ul>
 </div>
 
 <div>
 <h2>系统架构</h2>
-<pre>浏览器单页（中文界面）
-   │ 询盘 / 产品资料 / 中文修改意见
+<pre>浏览器单页（中文界面，角色模式 / 完整工作台）
+   │ 询盘（粘贴或 CSV）/ 资料卡 / 中文修改意见 / 主图
    ▼
-本地服务 server.py（Python 标准库）
-   ├ 理解：询盘分析员 → JSON（条目无原文出处即丢弃）
-   ├ 生成：业务员 / Amazon 运营 / TikTok 运营
-   │        （注入对应平台、市场的规则摘要）
-   ├ 校验①：代码规则（资料卡比对 + 正则/长度规则）
+本地服务 server.py（Python 标准库，双击启动）
+   ├ 理解：询盘分析员 → JSON（无原文出处的条目丢弃）
+   ├ 生成：业务员 / 11 个平台运营角色（注入对应规则摘要）
+   ├ 校验①：代码规则（资料卡比对 + 正则 / 长度规则）
    ├ 校验②：合规审核员 → 出处守卫（编号 + 原文）
-   ├ 主图：像素测量（代码）→ 主图审核员看图（编号 + 看到的内容）
-   └ 反馈：高亮批注 · 红黄绿 · 逐词对比 · 调用日志
+   ├ 交接核对：回复 ↔ Listing（代码）
+   ├ 主图：像素测量（代码）→ 主图审核员（编号 + 看到的内容）
+   └ 反馈：高亮批注 · 红黄绿 · 逐词对比 · 任务 · 调用日志
    ▼
-kb/rules.json（61 条，原文+链接）  data/products.json（资料卡）
-state/board.json（看板状态）  ← 批量生成 / 主图检查 / 标记上架</pre>
+kb/rules.json（61 条）  data/products.json（两家工厂资料卡）
+config/agents.json（配置导出）  cache/（回放）  state/（看板、收件箱）</pre>
 
 <h2>平台调用方式与智能体配置</h2>
 <table>
 <tr><th>智能体</th><th>任务</th><th>触发</th></tr>
-<tr><td>询盘分析员</td><td>买家画像、需求、质量信号、与资料卡的冲突</td><td>新询盘</td></tr>
-<tr><td>外贸业务员</td><td>买家语言回复 + 中文内部备忘</td><td>新询盘 / 修改意见</td></tr>
-<tr><td>Amazon 运营</td><td>美国站英文 Listing</td><td>新品上架 / 修改意见</td></tr>
-<tr><td>TikTok 运营</td><td>墨西哥西语种草脚本</td><td>新品上架 / 修改意见</td></tr>
+<tr><td>询盘分析员</td><td>买家画像、需求、与资料卡的冲突（每条带原文）</td><td>新询盘 / 整理收件箱</td></tr>
+<tr><td>外贸业务员</td><td>买家语言回复 + 中文备忘 + 派任务</td><td>新询盘 / 修改意见</td></tr>
+<tr><td>平台运营 ×11</td><td>Amazon 美英德日、TikTok 墨西哥、eBay、Shopify、Etsy、Walmart、Mercado Libre、AliExpress 文案</td><td>新品上架 / 修改意见</td></tr>
 <tr><td>合规审核员</td><td>按“模型判断”类规则审核，须带编号和原文</td><td>每次生成后</td></tr>
-<tr><td>主图审核员</td><td>看图判断文字、徽章、道具、是否实拍，须写出看到的内容</td><td>上传主图后</td></tr>
+<tr><td>主图审核员</td><td>看图判断文字、徽章、道具、是否实拍</td><td>上传主图后</td></tr>
 </table>
-<p class="muted">模型接口可配置：OpenAI 兼容 Chat Completions（如赛事 Tokenhub）或 Claude Messages API（官方 SDK）。三种模式：实时 / 录制 / 回放（断网演示）。完整配置导出见 app/config/agents.json；每一次调用的触发条件、输入、返回、校验结果写入调用日志。按 Claude 官方价和实测用量，一条询盘回复加改一轮（5 次调用）约 0.24 美元。</p>
+<p class="muted">现场经赛事 Tokenhub 调用 gpt-5.5（OpenAI 兼容接口），也支持 Claude。温度 0、只输出 JSON。三种模式：实时 / 录制 / 回放（断网演示）。界面“智能体配置”页和 app/config/agents.json 是同一份配置（附录 A）。一条询盘回复加改一轮约 0.24 美元（实测用量 × 官方价）。94 项自动化测试。</p>
 
 <h2>反馈方式</h2>
-<p>① 原文高亮批注（点高亮跳到依据）② 红/黄/绿风险等级 ③ 与上一轮的逐词对比 ④ 模型审核没跑成时明确提示，并且风险等级不会显示为绿色。</p>
+<p>① 原文高亮批注，点高亮跳到依据 ② 红 / 黄 / 绿风险等级 ③ 与上一轮的逐词对比 ④ 派给采购 / 生产 / 美工的任务 ⑤ 模型审核没跑成时明确提示，风险等级不会显示绿色。系统不自动发送，红黄提示必须人看过。</p>
 
 <h2>数据与合规</h2>
-<p class="muted">演示用的工厂、产品、询盘均为虚构。规则摘录来自公开页面（Amazon Seller Central、eCFR、ICC Academy、TikTok Shop MX、墨西哥经济部 NOM 等），没有爬取付费数据，也没有绕过验证码。本工具给出的是风险提示，不构成法律意见。</p>
+<p class="muted">演示用的工厂、产品、询盘均为虚构。规则摘录来自公开页面（Amazon Seller Central、eCFR、ICC Academy、TikTok Shop MX、墨西哥经济部 NOM、EUR-Lex 等），没有爬取付费数据，没有绕过验证码。key 只存本机。本工具给出风险提示，不构成法律意见。</p>
 </div>
 </div>
+</section>
+
+<section class="page">
+<h1 style="font-size:15pt">附录 A · 配置与调用说明</h1>
+<div class="sub">智能体 / 工作流 / 知识库的关键配置，以及一次完整调用的标注</div>
+
+<h2>A1 · 关键配置（界面“智能体配置”页截图，导出文件 app/config/agents.json）</h2>
+<img class="shot" src="../img/agents.png" alt="智能体配置页：6 个智能体、11 个上架平台角色、5 条工作流、61 条规则，以及每条工作流哪步是模型、哪步是代码">
+<div class="cap">截图：智能体配置页上半部分。每个智能体的职责、输入、输出、护栏、提示词全文在同一页下方；可下载 JSON。</div>
+<table class="kv">
+<tr><td>智能体</td><td>6 个（询盘分析员、外贸业务员、Amazon 运营、TikTok 内容运营、合规审核员、主图审核员）+ 9 个其他平台的运营角色；每个有职责、输入、输出、护栏、提示词文件（app/prompts/*.md）</td></tr>
+<tr><td>工作流</td><td>A 询盘回复 · B 多平台上架 · C 商品看板 · D 收件箱 + 跨岗位任务 · E 询盘 → 上架交接；每一步标明是智能体还是代码</td></tr>
+<tr><td>知识库</td><td>app/kb/rules.json：61 条规则 / 17 类，每条有原文摘录、链接、抓取日期、检查方式（代码正则 / 长度，或交给模型判断）；按平台和市场挑出适用规则；未核实的不参与检查。出处自检结果在 app/kb/source_check.json</td></tr>
+<tr><td>模型</td><td>赛事 Tokenhub · gpt-5.5（OpenAI 兼容 Chat Completions），温度 0、seed 42、只输出 JSON；也可切 Claude。key 只在本机，界面不显示</td></tr>
+</table>
+
+<h2>A2 · 一次完整调用（工作流 A，美国热水壶询盘 INQ-US-01，第 1 轮）</h2>
+<div class="grid" style="grid-template-columns:1.5fr 1fr;align-items:start;gap:9px"><table class="kv">
+<tr><td>触发条件</td><td>业务员在“询盘回复”页选中询盘，点“理解 → 生成 → 校验”（日志 trigger = 收到新询盘）</td></tr>
+<tr><td>输入</td><td>询盘原文（要 UL、BPA free、FOB 空运、20 天交货、货到 60 天付款）+ 业务员中文意图 + 资料卡 KET-17S + 阿里国际站规则摘要</td></tr>
+<tr><td>调用过程</td><td>① 询盘分析员：抽出 5 条冲突，每条附询盘原文 → ② 外贸业务员：英文回复 + 中文备忘 + 4 条任务 → ③ 代码规则：认证、材料、价格、MOQ、交期、付款、FOB，0 条 → ④ 合规审核员：拿到 8 条规则，提出 1 条，规则编号和原文都通过出处守卫</td></tr>
+<tr><td>返回结果</td><td>风险等级黄：1,200 台海运走集装箱，FCA 比 FOB 更合适；依据 INC-02（ICC 原文与链接）。回复如实写明没有 UL、没测 BPA、FOB 只走海运、交期 35 天、不接受货到 60 天付款</td></tr>
+<tr><td>设备 / 界面反馈</td><td>笔记本浏览器：回复里对应句子高亮，点高亮跳到右侧风险卡（规则原文 + 链接）；“出处守卫”写明丢弃条数；调用日志记下每步的角色、输入、返回、耗时、token。业务员说一句“按风险提示全部修改”，第 2 轮变绿，逐词对比显示新增那句</td></tr>
+<tr><td>实时记录</td><td>2026-10-30 23:58 在赛事 Tokenhub 用 gpt-5.5 实时跑同一条询盘（运行 acd116ca）：理解 8.7 秒、生成 8.8 秒、审核 4.8 秒，共 22.3 秒，结果绿、0 条提示（docs/demo-runs/live-gpt-5.5-INQ-US-01.json）</td></tr>
+</table>
+<div><img class="shot" src="../img/onepage-inquiry.png" alt="询盘回复页：左边回复正文高亮一句，右边风险卡显示 INC-02 的原文和链接">
+<div class="cap">截图：这次调用的风险卡，给出 INC-02 的原文和链接；回复正文里对应的那句同时高亮（回放模式，结果来自录制的真实调用）。</div></div></div>
+</section>
+
+<section class="page">
+<h1 style="font-size:15pt">附录 B · 演示说明</h1>
+<div class="sub">用到的设备、平台、模型、数据，以及现场的准备步骤和恢复步骤</div>
+
+<h2>B1 · 设备 / 平台 / 模型 / 数据及作用</h2>
+<table>
+<tr><th>项</th><th>作用</th></tr>
+<tr><td>笔记本一台（macOS 或 Windows，Python 3.9+，Chrome 或 Edge）</td><td>运行本地服务 app/server.py，浏览器打开界面；双击 start-mac.command / start-windows.bat 启动，不装依赖</td></tr>
+<tr><td>大屏（可选第二块屏）</td><td>循环播放自动演示（#tour=loop）；或放“AI 找茬”二维码和排行榜，手机只能访问找茬页面</td></tr>
+<tr><td>赛事 Tokenhub · gpt-5.5</td><td>询盘理解、回复生成、上架文案生成、合规审核、主图看图审核（实时模式）</td></tr>
+<tr><td>回放缓存 app/cache/（179 条）</td><td>录好的真实模型返回；回放模式断网也能完整演示，结果一秒出来</td></tr>
+<tr><td>规则知识库 app/kb/rules.json（61 条）</td><td>生成时注入规则摘要，审核时作为唯一依据；每条附原文和链接</td></tr>
+<tr><td>资料卡 app/data/products.json（两家示例工厂、5 个产品）</td><td>认证、价格阶梯、MOQ、交期、付款方式；代码用它核对数字和认证</td></tr>
+<tr><td>示例询盘 app/data/inquiries.json（13 条，6 个市场）</td><td>固定演示输入（虚构），保证现场可重复；也可从 CSV 导入新询盘（要实时模式处理）</td></tr>
+<tr><td>示例主图 app/static/samples/</td><td>主图检查演示（示意图，不是实拍）</td></tr>
+</table>
+
+<h2>B2 · 准备步骤（开摊前 10 分钟）</h2>
+<ol>
+<li>启动：进入 app/，运行 <code>TRADEDESK_MODE=replay python3 server.py</code>（或双击启动脚本），浏览器打开 http://127.0.0.1:8765。</li>
+<li>打开左侧“开摊自检”页：13 步演示路径离线回放一遍，模型模式、知识库、出处自检、本地数据逐项打勾，全绿再开摊。</li>
+<li>新解压的包先点“一键预热”：把演示路径回放进看板、收件箱和调用日志，概览页才有数据。</li>
+<li>要演示实时调用：左下角模型卡片填 Tokenhub 的 key，点“测试模型连接”（自检页也有），再切到实时模式。</li>
+<li>笔记本打开 <code>#roles</code> 给评委选角色；大屏打开 <code>#tour=loop</code> 循环播放；需要找茬游戏时用 <code>--lan</code> 启动。</li>
+<li>浏览器全屏，宽度不小于 1280 像素；运行一次 <code>python3 -m unittest discover -s tests</code>，确认 94 项通过。</li>
+</ol>
+
+<h2>B3 · 恢复步骤</h2>
+<table>
+<tr><th>现象</th><th>处理</th></tr>
+<tr><td>页面打不开、状态栏红字</td><td>服务没起来：看终端报错，重新运行启动命令</td></tr>
+<tr><td>实时模式报“模型调用失败” / 超时</td><td>网络或额度问题：左下角模型卡片切回“回放 · 不联网”，按同样步骤重演；中文报错里写了是 key、地址、余额还是限流</td></tr>
+<tr><td>回放模式提示“这一步没有录好的结果”</td><td>输入和录制时不一样：点“换个角色”重新进入，或重新点示例询盘卡片；改稿只用“按风险提示全部修改”</td></tr>
+<tr><td>看板、收件箱是空的或被点乱了</td><td>开摊自检页点“一键预热”（不联网）；导入的询盘点“清除已导入的询盘”</td></tr>
+<tr><td>页面卡住超过 60 秒</td><td>刷新页面；仍不行就重启服务，用回放模式</td></tr>
+<tr><td>来不及手动操作</td><td>点右上角“自动演示”，跟着字幕讲；Esc 退出</td></tr>
+</table>
+<p class="muted" style="margin-top:6px">模型审核失败时，代码规则的结果仍然显示，风险等级不会是绿色；系统不自动发送任何内容。</p>
+</section>
+
 </body>
 </html>
