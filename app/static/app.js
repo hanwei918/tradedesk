@@ -198,9 +198,23 @@ function groupRuns(entries) {
   return [...runs.values()];
 }
 
+const pct = (n, total) => (total ? (n / total) * 100 : 0);
+// One stacked bar: segments [{n, cls, label}], each with a hover tip; zero-width segments are skipped.
+function sbar(segs) {
+  const total = segs.reduce((k, x) => k + x.n, 0);
+  return `<div class="sbar">${segs.filter((x) => x.n).map((x) => `<i class="${x.cls}" style="flex:${x.n}" data-tip="${esc(x.label)} ${x.n}（${Math.round(pct(x.n, total))}%）"></i>`).join("")}</div>`;
+}
+const swatch = (cls, label, n) => `<span class="sw"><i class="${cls}"></i>${esc(label)}${n == null ? "" : ` <b style="color:hsl(var(--foreground))">${n}</b>`}</span>`;
+const CHANNEL = { image: { name: "主图", sub: "Amazon 主图要求", ico: "img" }, amazon_us: { name: "Amazon 美国站", sub: "英语 · Listing", ico: "amz" }, tiktok_mx: { name: "TikTok 墨西哥", sub: "西语 · 种草脚本", ico: "tt" } };
+const CELL_STATES = [["listed", "已上架"], ["green", "可上架"], ["amber", "需人工确认"], ["red", "不能发"], ["none", "未生成"]];
+const cellState = (c) => (c.listed ? "listed" : c.risk || "none");
+const WF_SHORT = { "A 询盘回复": "询盘", "B 多平台上架": "上架", "C 主图检查": "主图", "收件箱整理": "收件箱", "已有文案检查": "体检" };
+const WF_ICON = { "收件箱整理": "history", "已有文案检查": "scan-search" };
+
 async function renderOverview() {
-  const [{ entries }, kb] = await Promise.all([api("/api/logs"), KB ? KB : api("/api/kb")]);
+  const [{ entries }, kb, board] = await Promise.all([api("/api/logs"), KB ? KB : api("/api/kb"), api("/api/board").catch(() => null)]);
   KB = kb;
+  if (META) $("#ov-eyebrow").innerHTML = `${ic("building-2", "sm")}${esc(META.factory.name_zh)}`;
   const runs = groupRuns(entries);
   const reviews = entries.filter((e) => e.findings);
   const all = reviews.flatMap((e) => e.findings);
@@ -209,23 +223,84 @@ async function renderOverview() {
   const calls = entries.filter((e) => e.meta).length;
   const verified = kb.rules.filter((r) => r.verified).length;
   const domains = new Set(kb.rules.map((r) => host(r.url))).size;
-  const stat = (k, iconName, v, d) => `<div class="card stat"><div class="k">${esc(k)}${ic(iconName)}</div><div class="v">${v}</div><div class="d">${d}</div></div>`;
+  const cats = new Set(kb.rules.map((r) => r.category)).size;
+  const byWf = {};
+  runs.forEach((r) => { const k = WF_SHORT[r.workflow] || r.workflow; byWf[k] = (byWf[k] || 0) + 1; });
+  const wfTop = Object.entries(byWf).sort((a, b) => b[1] - a[1]);
+  const wfRest = wfTop.slice(3).reduce((k, [, n]) => k + n, 0);
+  const kpi = (tone, iconName, k, v, viz, d) => `<div class="card kpi ${tone}"><div class="k">${ic(iconName)}${esc(k)}</div><div class="v">${v}</div><div class="viz">${viz}</div><div class="d">${d}</div></div>`;
   $("#ov-stats").innerHTML =
-    stat("已核实规则", "book-open-check", `${verified}<small> / ${kb.rules.length}</small>`, `来自 ${domains} 个公开来源，每条带原文与链接`) +
-    stat("运行次数", "zap", runs.length, `模型调用 ${calls} 次`) +
-    stat("拦下的风险", "shield-alert", all.length, `红色 ${reds} · 黄色 ${all.length - reds}`) +
-    stat("丢弃的无出处提示", "ban", dropped, "模型说不出依据，没有展示给用户");
-  const cats = {};
-  kb.rules.forEach((r) => { cats[r.category] = (cats[r.category] || 0) + 1; });
-  const max = Math.max(...Object.values(cats), 1);
-  const CAT = catNames();
-  $("#ov-kb-note").textContent = `${Object.keys(cats).length} 类 · ${kb.rules.length} 条`;
-  $("#ov-kb").innerHTML = Object.entries(cats).sort((a, b) => b[1] - a[1]).map(([c, n]) => `<div class="bar"><span>${esc(CAT[c] || c)}</span><span class="t"><i style="width:${(n / max) * 100}%"></i></span><b>${n}</b></div>`).join("");
+    kpi("", "book-open-check", "已核实规则", `${verified}<small> / ${kb.rules.length}</small>`,
+      sbar([{ n: verified, cls: "s-c1", label: "已核实" }, { n: kb.rules.length - verified, cls: "s-none", label: "待核实" }]),
+      `${cats} 类 · ${domains} 个公开来源，每条带原文与链接`) +
+    kpi("", "zap", "运行次数", runs.length,
+      `<div class="pills">${wfTop.slice(0, 3).map(([k, n]) => `<span>${esc(k)}<b>${n}</b></span>`).join("")}${wfRest ? `<span>其他<b>${wfRest}</b></span>` : ""}</div>`,
+      `模型调用 ${calls} 次`) +
+    kpi("red", "shield-alert", "拦下的风险", all.length,
+      sbar([{ n: reds, cls: "s-red", label: "红色 · 不能发" }, { n: all.length - reds, cls: "s-amber", label: "黄色 · 需人工确认" }]),
+      swatch("s-red", "红色", reds) + swatch("s-amber", "黄色", all.length - reds)) +
+    kpi("green", "ban", "丢弃的无出处提示", dropped, `<div class="pills"><span>出处守卫 · 代码执行</span></div>`, "模型说不出依据，没有展示给用户");
+
+  // channel health, from the product board
+  if (board) {
+    const rows = board.rows;
+    $("#ov-chan-note").textContent = `商品看板 · ${rows.length} 个产品 × ${board.channels.length} 个渠道的最新检查结果`;
+    $("#ov-chan-legend").innerHTML = CELL_STATES.map(([k, label]) => swatch(`s-${k}`, label)).join("");
+    $("#ov-chan").innerHTML = board.channels.map((ch) => {
+      const cells = rows.map((r) => r.cells[ch]);
+      const count = (k) => cells.filter((c) => cellState(c) === k).length;
+      const ok = count("listed") + count("green");
+      const C = CHANNEL[ch] || { name: ch, sub: "", ico: "img" };
+      const icoHtml = C.ico === "img" ? `<span class="cico img">${ic("package", "sm")}</span>` : `<span class="cico pl ${C.ico}">${PLAT[ch].mark}</span>`;
+      return `<div class="chan"><div class="nm">${icoHtml}<div><b>${esc(C.name)}</b><span>${esc(C.sub)}</span></div></div>
+        <div>${sbar(CELL_STATES.map(([k, label]) => ({ n: count(k), cls: `s-${k}`, label })))}
+          <div class="counts">${CELL_STATES.filter(([k]) => count(k)).map(([k, label]) => `<span>${esc(label)} <b>${count(k)}</b></span>`).join("")}</div></div>
+        <div class="rt"><b>${ok}<small class="muted" style="font-size:12px;font-weight:500"> / ${cells.length}</small></b>可上架或已上架</div></div>`;
+    }).join("");
+  } else {
+    $("#ov-chan").innerHTML = `<div class="empty">${ic("package")}<div>看板数据暂时读不到</div></div>`;
+  }
+
+  // where the findings came from
+  const byRule = all.filter((f) => f.by === "rule").length;
+  const fromKb = all.filter((f) => f.source && f.source.type === "kb").length;
+  $("#ov-risk-note").textContent = `调用日志里的 ${all.length} 条风险提示`;
+  $("#ov-risk").innerHTML = all.length ? `
+    <div class="split"><div class="h">谁发现的<span>代码规则先查，模型再审</span></div>
+      ${sbar([{ n: byRule, cls: "s-c1", label: "代码规则" }, { n: all.length - byRule, cls: "s-c2", label: "模型审核" }])}
+      <div class="lab">${swatch("s-c1", "代码规则", byRule)}${swatch("s-c2", "模型审核", all.length - byRule)}</div></div>
+    <div class="split"><div class="h">依据是什么<span>每条都挂出处</span></div>
+      ${sbar([{ n: fromKb, cls: "s-c1", label: "公开规则原文" }, { n: all.length - fromKb, cls: "s-c2", label: "工厂资料卡字段" }])}
+      <div class="lab">${swatch("s-c1", "公开规则原文", fromKb)}${swatch("s-c2", "工厂资料卡", all.length - fromKb)}</div></div>
+    <div class="note">${ic("info", "sm")}<span>模型审核的提示必须带规则编号，且引用的原文真的出现在规则里，否则由代码丢弃。</span></div>`
+    : `<div class="empty">${ic("shield-check")}<div>还没有风险提示</div></div>`;
+
+  // most cited sources
+  const ruleTitle = Object.fromEntries(kb.rules.map((r) => [r.id, r.title_zh]));
+  const cited = {};
+  all.forEach((f) => {
+    const s = f.source || {};
+    const id = s.type === "kb" ? s.rule_id : "资料卡";
+    const name = s.type === "kb" ? (ruleTitle[s.rule_id] || s.title_zh || s.rule_id) : (s.label_zh || "").replace(/^产品资料：/, "");
+    const key = `${id}|${name}`;
+    cited[key] = (cited[key] || 0) + 1;
+  });
+  const top = Object.entries(cited).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const topMax = top.length ? top[0][1] : 1;
+  $("#ov-rules").innerHTML = top.length ? top.map(([key, n]) => {
+    const [id, name] = key.split("|");
+    return `<div class="rank" data-tip="${esc(id)} · ${esc(name)} · ${n} 次"><div class="h"><span class="mono-chip">${esc(id)}</span><span class="nm">${esc(name)}</span><b>${n}</b></div><div class="t"><i style="width:${pct(n, topMax)}%"></i></div></div>`;
+  }).join("") : `<div class="empty">${ic("book-open-check")}<div>还没有引用记录</div></div>`;
+
   const recent = runs.slice(-6).reverse();
-  $("#ov-runs").innerHTML = recent.length ? `<table class="tbl"><tbody>${recent.map((r) => {
+  $("#ov-runs").innerHTML = recent.length ? `<table class="tbl runs"><thead><tr><th>工作流</th><th>时间</th><th>结果</th><th style="text-align:right">提示</th></tr></thead><tbody>${recent.map((r) => {
     const risk = worst(r.reviews.map((x) => x.risk));
     const n = r.reviews.reduce((k, x) => k + x.findings.length, 0);
-    return `<tr data-go="logs"><td><b>${esc(r.workflow)}</b><div class="small muted">${esc(r.trigger)} · ${esc(r.ts)}</div></td><td style="text-align:right"><span class="badge ${risk}">${RISK[risk]}</span> <span class="badge">${n} 条提示</span></td></tr>`;
+    const letter = /^[A-C] /.test(r.workflow) ? r.workflow[0] : "";
+    const name = letter ? r.workflow.slice(2) : r.workflow;
+    const mark = letter || ic(WF_ICON[r.workflow] || "zap", "sm");
+    return `<tr data-go="logs"><td><div class="wfc"><span class="wfk ${letter || "x"}">${mark}</span><div><b>${esc(name)}</b><span>${esc(r.trigger)}</span></div></div></td>
+      <td class="tm">${esc((r.ts || "").slice(5, 16))}</td><td><span class="badge ${risk}">${RISK[risk]}</span></td><td style="text-align:right;font-variant-numeric:tabular-nums">${n}</td></tr>`;
   }).join("")}</tbody></table>` : `<div class="empty">${ic("history")}<div>还没有运行记录</div></div>`;
   $$("#ov-runs [data-go]").forEach((t) => t.addEventListener("click", () => go("logs")));
 }
@@ -655,11 +730,11 @@ async function renderInbox() {
     const reds = (u.conflicts || []).filter((c) => c.severity === "red").length, ambers = (u.conflicts || []).length - reds;
     const reply = x.reply ? `<span class="badge ${x.reply.risk}">已生成第 ${x.reply.round} 轮 · ${RISK[x.reply.risk]}</span>` : `<span class="badge">未回复</span>`;
     const why = p ? `<details><summary class="small muted" style="cursor:pointer;margin-top:6px">为什么是 ${p.score} 分</summary><div class="why"><div><span class="d">50</span><span>基础分</span></div>${p.components.map((c) => `<div><span class="d ${c.delta > 0 ? "p" : "n"}">${c.delta > 0 ? "+" : ""}${c.delta}</span><span>${esc(c.label_zh)}${c.quote ? ` <span class="muted">“${esc(c.quote)}”</span>` : ""}</span></div>`).join("")}</div></details>` : "";
-    return `<div class="mail"><div class="prio ${p ? p.level : "none"}">${p ? `${p.score}<small>${p.level}优先</small>` : "未整理"}</div>
+    return `<div class="mail"><div class="prio ${p ? p.level : "none"}"${p ? ` style="--p:${Math.max(0, Math.min(100, p.score))}"` : ""}>${p ? `${p.score}<small>${p.level}优先</small>` : "未整理"}</div>
       <div class="body"><b>${FLAG[q.language] || ""} ${esc(q.label_zh)}</b> <span class="small muted">${esc(q.id)} · ${esc(b.country_guess || "")} ${esc(b.business_type_zh || "")}</span>
         <div class="sum">${esc(u.summary_zh || "")}</div><div class="q">${esc(q.text)}</div>${why}</div>
       <div class="side">${reds ? `<span class="badge red">硬冲突 ${reds}</span>` : ""}${ambers ? `<span class="badge amber">待确认 ${ambers}</span>` : ""}${reply}
-        <button class="btn sm primary" data-open="${esc(q.id)}">${ic("send", "sm")}处理</button></div></div>`;
+        <button class="btn sm" data-open="${esc(q.id)}">${ic("send", "sm")}处理</button></div></div>`;
   }).join("")}</div>
   <p class="small muted" style="margin-top:8px">已整理 ${triaged} / ${data.items.length} 条。分数 = 50 + 正面信号 ×8 − 负面信号 ×8 − 硬冲突 ×6 − 待确认 ×3 + 数量加分（≥MOQ +8，≥3×MOQ +15，低于 MOQ −10），限制在 0–100。</p>`;
   $$("#inbox-list [data-open]").forEach((b) => b.addEventListener("click", () => {
@@ -1019,6 +1094,14 @@ function renderModelCard() {
   $("#model-card").innerHTML = `<div class="row" style="justify-content:space-between"><b>${esc(m.model)}</b><span class="dot ${live ? "live" : "replay"}"></span></div>
     <div class="muted" style="margin-top:2px">${live ? (m.mode === "record" ? "实时 · 录制缓存" : "实时调用") : "回放模式 · 不联网"} · ${esc(m.provider === "anthropic" ? "Claude API" : "OpenAI 兼容")}</div>
     <div class="small" style="margin-top:6px;color:hsl(var(--brand))">${ic("cpu", "sm")} 点击设置模型和 key</div>`;
+  $("#mode-pill").innerHTML = `<span class="dot ${live ? "live" : "replay"}"></span><b>${live ? (m.mode === "record" ? "实时 · 录制" : "实时") : "回放 · 不联网"}</b>${esc(m.model)}`;
+}
+// Hover tips for chart marks (the same numbers are also printed beside each chart).
+function wireTips() {
+  const tip = document.createElement("div");
+  tip.className = "tip"; document.body.appendChild(tip);
+  addEventListener("mouseover", (e) => { const t = e.target.closest?.("[data-tip]"); if (t) { tip.textContent = t.dataset.tip; tip.classList.add("on"); } else tip.classList.remove("on"); });
+  addEventListener("mousemove", (e) => { if (!tip.classList.contains("on")) return; const w = tip.offsetWidth; tip.style.left = Math.min(e.clientX + 12, innerWidth - w - 8) + "px"; tip.style.top = e.clientY + 16 + "px"; });
 }
 function setTheme(t) { document.documentElement.dataset.theme = t; store.set("td-theme", t); $("#theme-btn use").setAttribute("href", t === "dark" ? "#i-sun" : "#i-moon"); }
 
@@ -1044,6 +1127,8 @@ async function boot() {
   addEventListener("keydown", (e) => { if (e.key === "Escape" && tourState.on) tourState.on = false; });
   $("#model-card").addEventListener("click", () => openSettings().catch((e) =>
     toast(/not found|404/i.test(e.message) ? "服务端还是旧版本：在终端按 Ctrl+C 停掉服务，再重新启动" : `打不开模型设置：${e.message}`)));
+  $("#mode-pill").addEventListener("click", () => $("#model-card").click());
+  wireTips();
   $("#model-card").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#model-card").click(); } });
   $("#inbox-triage").addEventListener("click", runTriage);
   $$("#inbox-tabs button").forEach((b) => b.addEventListener("click", () => showInboxTab(b.dataset.v)));

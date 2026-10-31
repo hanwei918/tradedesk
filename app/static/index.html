@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=16">
+<link rel="stylesheet" href="style.css?v=18">
 <script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
     <div class="brand">
-      <div class="logo"><svg class="ic lg"><use href="#i-globe"/></svg></div>
+      <div class="logo"><svg class="ic lg" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></div>
       <div><b>TradeDesk</b><small>出海工作台</small></div>
     </div>
     <div class="nav-label">工作台</div>
@@ -41,6 +41,7 @@
       <div class="crumbs"><span>TradeDesk</span><svg class="ic sm"><use href="#i-chevron-right"/></svg><b id="crumb">概览</b></div>
       <div class="spacer"></div>
       <span class="small muted">示例数据均为虚构 · 规则以来源页面为准</span>
+      <button class="mode-pill" id="mode-pill" title="模型设置"></button>
       <button class="btn sm primary" id="tour-btn" title="自动演示（约 90 秒，Esc 退出）"><svg class="ic sm"><use href="#i-play"/></svg>自动演示</button>
     </header>
 
@@ -48,34 +49,31 @@
       <!-- ================= overview ================= -->
       <section class="page on" id="page-overview">
         <div class="page-head">
-          <div><h1>出海工作台</h1><p>询盘 → 回复 → 上架。每一条风险提示都有出处：公开规则的原文与链接，或工厂资料卡上的那个字段。</p></div>
+          <div><div class="eyebrow" id="ov-eyebrow"></div><h1>出海工作台</h1><p>询盘 → 回复 → 上架。每一条风险提示都有出处：公开规则的原文与链接，或工厂资料卡上的那个字段。</p></div>
           <div class="row"><button class="btn" data-go="board"><svg class="ic"><use href="#i-package"/></svg>商品看板</button><button class="btn primary" data-go="inquiry"><svg class="ic"><use href="#i-mail-question"/></svg>处理一条询盘</button></div>
         </div>
         <div class="grid g4" id="ov-stats"></div>
-        <div class="card" style="margin-top:16px">
-          <div class="card-h"><div><h3><svg class="ic"><use href="#i-git-compare-arrows"/></svg>每一次生成都经过的流程</h3><p>代码负责数字和硬事实，模型负责语义判断；模型说不出出处的提示会被丢弃</p></div></div>
-          <div class="card-b"><div class="flow">
-            <div class="node"><b><svg class="ic sm"><use href="#i-search"/></svg>理解</b><p>抽取买家要求，每条带询盘原文</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
-            <div class="node"><b><svg class="ic sm"><use href="#i-sparkles"/></svg>生成</b><p>按平台、语言、角色生成，注入规则摘要</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
-            <div class="node"><b><svg class="ic sm"><use href="#i-cpu"/></svg>代码校验</b><p>价格、MOQ、交期、认证、付款、FOB、标题长度、禁用词</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
-            <div class="node guard"><b><svg class="ic sm"><use href="#i-shield-check"/></svg>模型审核 + 出处守卫</b><p>必须带规则编号，且原文里真有那句话</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
-            <div class="node"><b><svg class="ic sm"><use href="#i-message-square-text"/></svg>反馈</b><p>高亮批注 · 红黄绿 · 逐词对比</p></div>
-          </div></div>
+        <div class="dash">
+          <div class="card span-8"><div class="card-h"><div><h3><svg class="ic"><use href="#i-store"/></svg>渠道健康</h3><p id="ov-chan-note">商品看板里每个产品在每个渠道的最新检查结果</p></div><button class="btn sm ghost" data-go="board">看板<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div>
+            <div class="card-b"><div class="legend" id="ov-chan-legend"></div><div id="ov-chan"></div></div></div>
+          <div class="card span-4"><div class="card-h"><div><h3><svg class="ic"><use href="#i-shield-check"/></svg>风险提示从哪来</h3><p id="ov-risk-note">调用日志里的全部风险提示</p></div></div><div class="card-b" id="ov-risk"></div></div>
+          <div class="card span-8"><div class="card-h"><div><h3><svg class="ic"><use href="#i-history"/></svg>最近运行</h3><p>来自调用日志</p></div><button class="btn sm ghost" data-go="logs">全部<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div><div id="ov-runs"></div></div>
+          <div class="card span-4"><div class="card-h"><div><h3><svg class="ic"><use href="#i-book-open-check"/></svg>最常触发的规则</h3><p id="ov-rules-note">按风险提示引用的出处计数</p></div><button class="btn sm ghost" data-go="kb">知识库<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div><div class="card-b" id="ov-rules"></div></div>
+          <div class="card span-12">
+            <div class="card-h"><div><h3><svg class="ic"><use href="#i-git-compare-arrows"/></svg>每一次生成都经过的流程</h3><p>代码负责数字和硬事实，模型负责语义判断；模型说不出出处的提示会被丢弃</p></div></div>
+            <div class="card-b"><div class="flow">
+              <div class="node"><b><svg class="ic sm"><use href="#i-search"/></svg>理解</b><p>抽取买家要求，每条带询盘原文</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
+              <div class="node"><b><svg class="ic sm"><use href="#i-sparkles"/></svg>生成</b><p>按平台、语言、角色生成，注入规则摘要</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
+              <div class="node"><b><svg class="ic sm"><use href="#i-cpu"/></svg>代码校验</b><p>价格、MOQ、交期、认证、付款、FOB、标题长度、禁用词</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
+              <div class="node guard"><b><svg class="ic sm"><use href="#i-shield-check"/></svg>模型审核 + 出处守卫</b><p>必须带规则编号，且原文里真有那句话</p></div><div class="arrow"><svg class="ic"><use href="#i-arrow-right"/></svg></div>
+              <div class="node"><b><svg class="ic sm"><use href="#i-message-square-text"/></svg>反馈</b><p>高亮批注 · 红黄绿 · 逐词对比</p></div>
+            </div></div>
+          </div>
         </div>
         <div class="grid g3" style="margin-top:16px">
-          <div class="card wf"><span class="tag">工作流 C · 运营每天从这里开始</span><h3>商品看板</h3><p>所有产品 × 主图 / Amazon / TikTok 的最新状态；一键批量生成上品，主图按 Amazon 要求逐条检查，导出 CSV。</p>
-            <div class="chips"><span class="badge">批量上品</span><span class="badge">主图检查</span><span class="badge">状态流转</span><span class="badge">导出 CSV</span></div>
-            <div><button class="btn sm" data-go="board">打开<svg class="ic sm"><use href="#i-arrow-right"/></svg></button></div></div>
-          <div class="card wf"><span class="tag">工作流 A</span><h3>询盘回复</h3><p>读买家询盘，找出和工厂资料对不上的地方；用买家语言写阿里国际站 RFQ 回复，同时给采购/生产写中文备忘。</p>
-            <div class="chips"><span class="badge">英语</span><span class="badge">西班牙语</span><span class="badge">2 类角色</span><span class="badge">多轮修改</span></div>
-            <div><button class="btn sm" data-go="inquiry">打开<svg class="ic sm"><use href="#i-arrow-right"/></svg></button></div></div>
-          <div class="card wf"><span class="tag">工作流 B</span><h3>多平台上架</h3><p>一份中文产品资料，生成 Amazon 美国站英文 Listing 和 TikTok Shop 墨西哥西语种草脚本，按各自平台规则检查。</p>
-            <div class="chips"><span class="badge">Amazon US</span><span class="badge">TikTok MX</span><span class="badge">2 种语言</span><span class="badge">逐字段批注</span></div>
-            <div><button class="btn sm" data-go="listing">打开<svg class="ic sm"><use href="#i-arrow-right"/></svg></button></div></div>
-        </div>
-        <div class="grid g2" style="margin-top:16px">
-          <div class="card"><div class="card-h"><div><h3><svg class="ic"><use href="#i-database"/></svg>知识库覆盖</h3><p id="ov-kb-note"></p></div><button class="btn sm ghost" data-go="kb">查看<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div><div class="card-b"><div class="bars" id="ov-kb"></div></div></div>
-          <div class="card"><div class="card-h"><div><h3><svg class="ic"><use href="#i-history"/></svg>最近运行</h3><p>来自调用日志</p></div><button class="btn sm ghost" data-go="logs">全部<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div><div id="ov-runs"></div></div>
+          <button class="entry" data-go="board"><span class="ei"><svg class="ic"><use href="#i-package"/></svg></span><span class="tx"><small>工作流 C · 运营每天从这里开始</small><b>商品看板</b><span class="p">所有产品 × 主图 / Amazon / TikTok 的最新状态；批量生成上品，主图按 Amazon 要求逐条检查，导出 CSV。</span></span><svg class="ic go"><use href="#i-arrow-right"/></svg></button>
+          <button class="entry" data-go="inquiry"><span class="ei"><svg class="ic"><use href="#i-mail-question"/></svg></span><span class="tx"><small>工作流 A</small><b>询盘回复</b><span class="p">找出询盘和工厂资料对不上的地方，用买家语言写 RFQ 回复，同时给采购 / 生产写中文备忘。</span></span><svg class="ic go"><use href="#i-arrow-right"/></svg></button>
+          <button class="entry" data-go="listing"><span class="ei"><svg class="ic"><use href="#i-store"/></svg></span><span class="tx"><small>工作流 B</small><b>多平台上架</b><span class="p">一份中文产品资料，生成 Amazon 美国站英文 Listing 和 TikTok 墨西哥西语脚本，按各自平台规则检查。</span></span><svg class="ic go"><use href="#i-arrow-right"/></svg></button>
         </div>
       </section>
 
@@ -195,6 +193,6 @@
 <aside class="sheet" id="sheet" aria-hidden="true"><div class="sheet-h" id="sheet-h"></div><div class="sheet-b" id="sheet-b"></div><div class="sheet-f" id="sheet-f"></div></aside>
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
-<script src="app.js?v=16"></script>
+<script src="app.js?v=19"></script>
 </body>
 </html>
