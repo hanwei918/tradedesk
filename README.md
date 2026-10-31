@@ -36,6 +36,8 @@ LLM_MODEL=...
 
 任何 OpenAI 兼容的 Chat Completions 接口都可以用。赛事赞助的 Tokenhub 填到 `/v1` 即可，程序会补上 `/chat/completions`。模型名因 key 而异，用"模型设置"里的「查可用模型」从列表里选（等同于调用 `/v1/models`）。
 
+现场用的就是这条路：赛事发的 Tokenhub key 属于 Codex 周卡分组，`/v1/models` 里只有 GPT 系列。2026-10-30 用 `gpt-5.5` 实测跑通工作流 A（3 次调用，共 22.3 秒）。
+
 也可以用 Claude（Anthropic 官方 SDK，`pip install anthropic`）：
 
 ```
@@ -45,6 +47,8 @@ LLM_MODEL=claude-opus-5-5
 # 走赛事 Tokenhub 时加上这一行（不带 /v1），key 用 Tokenhub 的 key，按 Bearer 方式发送：
 # ANTHROPIC_API_BASE=https://api.tokenhubcloud.net
 ```
+
+注意：赛事这把 key 走 Claude 路线时，请求 `claude-opus-5-5` 也会"成功"，但网关实际换成了 GPT（回答自称 ChatGPT，返回 id 以 `resp_` 开头）。现场请用上面的 OpenAI 兼容方式。
 
 仓库里的回放缓存（`app/cache/`）是用 `claude-opus-5-5` 录制的。换了模型或提示词，要重新运行 `tools/record_demo.py`。
 

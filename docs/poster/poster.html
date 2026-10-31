@@ -4,113 +4,135 @@
 <meta charset="utf-8">
 <title>TradeDesk 海报</title>
 <style>
-:root{--ink:#10203f;--muted:#5b667a;--brand:#0b5fff;--red:#c62828;--amber:#b26500;--green:#1b7a3d;--bg:#f4f6fb}
+/* 0.8 m × 1.8 m at 1 CSS px = 1 mm; rendered at 6× (4800 × 10800 px, about 150 dpi). Same palette as the app and the deck. */
+:root{--ink:#0b1324;--text:#1e293b;--muted:#64748b;--line:#e2e8f0;--canvas:#f5f7fb;--brand:#2563eb;--brand-soft:#eff4ff;--cyan:#0891b2;
+  --red:#dc2626;--amber:#d97706;--amber-soft:#fffbeb;--green:#16a34a;--green-soft:#f0fdf4}
 *{box-sizing:border-box}
 html,body{margin:0;background:#fff}
-.poster{width:800px;height:1800px;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);display:flex;flex-direction:column;overflow:hidden}
-.hero{background:linear-gradient(150deg,#0b5fff 0%,#10203f 85%);color:#fff;padding:36px 50px 28px}
-.tag{font-size:15px;letter-spacing:.12em;color:#cfe0ff;font-weight:700}
-.hero h1{font-size:68px;margin:10px 0 4px;letter-spacing:.02em}
-.hero .sub{font-size:28px;font-weight:700;margin:0}
-.hero p{font-size:18px;line-height:1.55;color:#dbe6ff;margin:12px 0 0}
-section{padding:13px 50px 0}
-h2{font-size:27px;margin:0 0 8px;display:flex;gap:12px;align-items:center}
-h2 i{font-style:normal;display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--brand);color:#fff;font-size:20px}
-.quote{font-family:ui-monospace,Menlo,monospace;font-size:15px;line-height:1.55;background:var(--bg);border-left:6px solid var(--brand);padding:14px 18px;border-radius:8px}
-.quote u{text-decoration:none;background:#ffe58a}
+.poster>*{flex-shrink:0}
+.poster{width:800px;height:1800px;font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--text);display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased}
+b{color:var(--ink);font-weight:650}
+.hero{position:relative;color:#cbd5e1;padding:28px 48px 24px;overflow:hidden;
+  background:radial-gradient(90% 80% at 100% 0%,rgba(37,99,235,.45),transparent 60%),radial-gradient(70% 70% at 0% 100%,rgba(8,145,178,.28),transparent 60%),#0b1324}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:32px 32px;-webkit-mask-image:linear-gradient(180deg,#000,transparent);mask-image:linear-gradient(180deg,#000,transparent)}
+.hero>*{position:relative}
+.toprow{display:flex;justify-content:space-between;align-items:center}
+.mark{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:20px}
+.mark i{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(140deg,#3b6ff5,#0aa2c4)}
+.mark i svg{width:19px;height:19px}
+.track{font-size:13px;font-weight:650;letter-spacing:.08em;color:#93c5fd}
+.hero h1{font-size:56px;line-height:1.08;color:#fff;margin:22px 0 0;letter-spacing:-.02em}
+.hero .sub{font-size:19px;line-height:1.55;margin:12px 0 0;color:#cbd5e1}
+.hero .sub b{color:#fff}
+.chips{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.chips span{font-size:14px;font-weight:600;color:#e2e8f0;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);border-radius:999px;padding:5px 12px}
+.claim{padding:24px 48px 20px;border-bottom:1px solid var(--line)}
+.claim .lbl{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--brand)}
+.claim h2{font-size:34px;line-height:1.3;margin:8px 0 0;color:var(--ink);letter-spacing:-.015em}
+.claim h2 em{font-style:normal;color:var(--red)}
+.claim h2 strong{color:var(--green);font-weight:700}
+.claim p{font-size:17px;line-height:1.55;color:var(--muted);margin:10px 0 0}
+.arms{margin-top:14px;display:flex;flex-direction:column;gap:7px}
+.arm{display:grid;grid-template-columns:170px 1fr 120px;gap:12px;align-items:center;font-size:14px}
+.arm .nm{font-weight:650;color:var(--ink);font-size:14.5px;line-height:1.25}.arm .nm small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.bar{display:flex;gap:2px;height:24px;border-radius:5px;overflow:hidden}
+.bar i{display:flex;align-items:center;justify-content:center;color:#fff;font:700 13px ui-monospace,Menlo,monospace;font-style:normal}
+.bar .r{background:var(--red)}.bar .a{background:var(--amber)}.bar .g{background:var(--green)}
+.arm .iss{font-size:12.5px;color:var(--muted);text-align:right;line-height:1.3}.arm .iss b{font-size:15px}
+.legend{display:flex;gap:16px;font-size:12.5px;color:var(--muted);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+section{padding:16px 48px 0}
+h3{font-size:23px;margin:0 0 10px;display:flex;gap:12px;align-items:center;color:var(--ink);letter-spacing:-.01em}
+h3 i{font-style:normal;display:inline-grid;place-items:center;min-width:32px;height:32px;padding:0 8px;border-radius:9px;background:var(--brand);color:#fff;font:700 16px ui-monospace,Menlo,monospace}
+h3 small{font-size:14px;font-weight:500;color:var(--muted);margin-left:auto}
+.quote{font:14.5px/1.55 ui-monospace,Menlo,monospace;background:var(--canvas);border-left:5px solid var(--brand);padding:12px 16px;border-radius:8px;color:var(--ink)}
+.quote u{text-decoration:none;background:#fde68a;border-radius:3px;padding:0 2px}
 .pits{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
-.pit{border-top:5px solid var(--red);background:var(--bg);border-radius:8px;padding:10px 8px;font-size:15px;line-height:1.35}
-.pit b{display:block;font-size:17px}
-.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
-.step{background:var(--bg);border-radius:10px;padding:12px;text-align:center;font-size:16px;line-height:1.4}
-.step b{display:block;font-size:21px;color:var(--brand)}
-.shot{width:100%;border:2px solid #dfe4ee;border-radius:12px;display:block;margin-top:10px}
-.cap{font-size:15px;color:var(--muted);margin:5px 0 0;line-height:1.45}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.box{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:15px;line-height:1.5}
-.box b{font-size:19px;display:block;margin-bottom:4px}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
-.cmp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.arm{background:var(--bg);border-radius:10px;padding:10px 10px 9px;border-top:6px solid var(--brand);font-size:14px;line-height:1.35;color:var(--muted)}
-.arm b{display:block;font-size:15px;color:var(--ink)}
-.arm .n{font-size:40px;font-weight:800;color:var(--ink);line-height:1.15}
-.arm.bad{border-color:var(--red)}.arm.bad .n{color:var(--red)}.arm.mid{border-color:var(--amber)}
-.stat{background:var(--bg);border-radius:12px;padding:10px 6px}
-.stat .n{font-size:38px;font-weight:800;color:var(--brand);line-height:1.1}
-.stat .l{font-size:14px;color:var(--muted)}
-.risk{display:inline-block;border-radius:999px;padding:2px 12px;font-weight:700;font-size:15px}
-.r{background:#fdecec;color:var(--red)}.a{background:#fff4e0;color:var(--amber)}.g{background:#e7f6ec;color:var(--green)}
-.foot{margin-top:auto;background:var(--ink);color:#cfd8ea;padding:18px 50px;font-size:14.5px;line-height:1.55}
+.pit{border:1px solid var(--line);border-top:4px solid var(--red);border-radius:8px;padding:6px 9px;font-size:12.5px;line-height:1.35;color:var(--muted)}
+.pit b{display:block;font-size:15px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.step{background:var(--canvas);border-radius:10px;padding:9px 11px;font-size:13px;line-height:1.4;color:var(--muted)}
+.step b{display:block;font-size:16px;color:var(--brand);margin-bottom:1px}
+.shot{margin-top:10px;border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 10px 30px -14px rgba(11,19,36,.35)}
+.shot img{display:block;width:100%}
+.cap{font-size:13.5px;line-height:1.5;color:var(--muted);margin:8px 0 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{background:var(--canvas);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5;color:var(--muted)}
+.box b{font-size:15.5px;display:block;margin-bottom:2px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:10px 10px 9px}
+.stat .n{font-size:28px;font-weight:700;color:var(--brand);line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat .l{font-size:12px;color:var(--muted);line-height:1.4;margin-top:3px}
+.stat .l b{font-size:13px}
+.foot{margin-top:auto;background:#0b1324;color:#94a3b8;padding:16px 48px 18px;font-size:12.5px;line-height:1.6;display:grid;grid-template-columns:1fr 210px;gap:20px;align-items:center}
 .foot b{color:#fff}
+.play{border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 12px;color:#e2e8f0;font-size:13px;line-height:1.45;background:rgba(255,255,255,.05)}
+.play b{display:block;font-size:16px;color:#93c5fd}
 </style>
 </head>
 <body>
 <div class="poster">
   <div class="hero">
-    <div class="tag">INTERCITY HACK · 宁波站 · 赛道二 AI+外贸/跨境</div>
-    <h1>TradeDesk</h1>
-    <p class="sub">出海工作台：询盘 → 回复 → 上架</p>
-    <p>给宁波中小外贸工厂的 AI 助手。<b style="color:#fff">每一条风险提示都有出处</b>——公开规则的原文与链接，或工厂资料卡上的那一个字段。说不出出处的话，系统不让 AI 说。</p>
+    <div class="toprow"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk</div><div class="track">INTERCITY HACK 宁波站 · 赛道二 AI+出海</div></div>
+    <h1>TradeDesk 出海工作台</h1>
+    <p class="sub">给宁波中小外贸工厂的 AI 助手：询盘 → 回复 → 上架，<b>每一条风险提示都有出处</b>——公开规则的原文与链接，或工厂资料卡上的那个字段。</p>
+    <div class="chips"><span>3 个工作流 + 收件箱</span><span>6 个智能体</span><span>38 条核实规则</span><span>英语 · 西班牙语</span></div>
+  </div>
+
+  <div class="claim">
+    <div class="lbl">对照实验 · 同样 8 条询盘 · 同一套检查</div>
+    <h2>通用 AI 回 8 条询盘，<em>8 条不能发</em>；TradeDesk 带上资料和规则，<strong>红色问题清零</strong>。</h2>
+    <div class="arms">
+      <div class="arm"><div class="nm">直接用通用 AI</div><div class="bar"><i class="r" style="flex:8">8</i></div><div class="iss">红色问题 <b style="color:var(--red)">32</b></div></div>
+      <div class="arm"><div class="nm">通用 AI + 工厂资料</div><div class="bar"><i class="a" style="flex:8">8</i></div><div class="iss">红 0 · 黄色问题 20</div></div>
+      <div class="arm"><div class="nm">TradeDesk 第 1 轮</div><div class="bar"><i class="a" style="flex:7">7</i><i class="g" style="flex:1">1</i></div><div class="iss">红 0 · 黄色问题 13</div></div>
+      <div class="arm"><div class="nm">TradeDesk 改一轮后</div><div class="bar"><i class="a" style="flex:5">5</i><i class="g" style="flex:3">3</i></div><div class="iss">红 0 · 黄色问题 <b style="color:var(--green)">8</b></div></div>
+    </div>
+    <div class="legend"><span><i style="background:var(--red)"></i>不能发</span><span><i style="background:var(--amber)"></i>需人工确认</span><span><i style="background:var(--green)"></i>可直接发</span><span style="margin-left:auto">通用 AI 会声称有 UL / NOM 认证、承诺免费样品</span></div>
   </div>
 
   <section>
-    <h2><i>1</i>一条询盘里的五个坑</h2>
+    <h3><i>01</i>一条询盘里的五个坑<small>示例询盘，虚构</small></h3>
     <div class="quote">“…Need it <u>UL listed</u> and <u>BPA free</u>… quote <u>FOB Ningbo by air</u>, we need goods in <u>20 days</u>. Payment: <u>100% 60 days after delivery</u>.”</div>
     <div class="pits">
       <div class="pit"><b>没有 UL</b>只有 CB、CE</div>
       <div class="pit"><b>没测 BPA</b>无检测报告</div>
-      <div class="pit"><b>FOB≠空运</b>Incoterms 2020</div>
-      <div class="pit"><b>20 天</b>标准交期 35 天</div>
-      <div class="pit"><b>货到付</b>收款风险</div>
+      <div class="pit"><b>FOB 不空运</b>Incoterms 2020</div>
+      <div class="pit"><b>20 天做不出</b>标准交期 35 天</div>
+      <div class="pit"><b>货到 60 天付</b>收款风险</div>
     </div>
   </section>
 
   <section>
-    <h2><i>2</i>收件箱 + 询盘回复 + 派发任务</h2>
-    <div class="flow">
-      <div class="step"><b>理解</b>买家要什么<br>哪里对不上</div>
-      <div class="step"><b>生成</b>英/西语回复<br>+ 中文内部备忘</div>
-      <div class="step"><b>校验</b>代码规则<br>+ 模型审核</div>
-      <div class="step"><b>反馈</b>高亮批注<br>红黄绿 · 逐词对比</div>
+    <h3><i>A</i>询盘回复：理解 → 生成 → 校验 → 反馈</h3>
+    <div class="steps">
+      <div class="step"><b>理解</b>逐条找出冲突</div>
+      <div class="step"><b>生成</b>英 / 西语 + 中文备忘</div>
+      <div class="step"><b>校验</b>代码 + 模型 + 出处守卫</div>
+      <div class="step"><b>反馈</b>批注 · 红黄绿 · 第 2 轮</div>
     </div>
-    <img class="shot" src="../img/poster-inquiry.png" alt="询盘回复截图">
-    <p class="cap" id="cap-a">中文一句“按风险提示全部修改”进入第 2 轮；采购、生产、美工要跟进的事自动派成任务。</p>
+    <div class="shot" style="height:246px"><img src="../img/poster-inquiry.png" alt="询盘回复截图"></div>
   </section>
 
   <section>
-    <h2><i>3</i>工作流 B + C · 批量上品与商品看板</h2>
-    <div class="two">
-      <div class="box"><b>多平台上架</b>一份中文资料 → Amazon 美国站英文 Listing + TikTok 墨西哥西语脚本，各按平台规则检查</div>
-      <div class="box"><b>商品看板 + 主图检查</b>一键批量生成；主图按 Amazon 10 条要求：尺寸、白底、占比由代码测，徽章、道具、实拍由模型看图</div>
-    </div>
-    <img class="shot" src="../img/poster-board.png" alt="商品看板截图">
+    <h3><i>B</i><span>多平台上架</span><i style="margin-left:6px">C</i><span>商品看板</span></h3>
+    <p class="cap" style="margin:0">一份中文资料生成 Amazon 英文 Listing + TikTok 西语脚本，各按平台规则检查；看板批量上品，主图像素由代码测量、徽章和实拍由模型看图。</p>
+    <div class="shot" style="height:246px"><img src="../img/poster-board.png" alt="商品看板截图"></div>
   </section>
 
-  <section>
-    <h2><i>4</i>对照实验：直接问通用 AI 行不行？</h2>
-    <div class="cmp">
-      <div class="arm bad"><b>直接用通用 AI</b><div class="n">8/8</div>回复带红色问题<br>共 32 条</div>
-      <div class="arm mid"><b>+ 工厂资料</b><div class="n">0/8</div>红色清零<br>20 条需确认</div>
-      <div class="arm"><b>TradeDesk 第 1 轮</b><div class="n">0/8</div>13 条需确认<br>1 条可直接发</div>
-      <div class="arm"><b>改一轮后</b><div class="n">0/8</div>8 条需确认<br>3 条可直接发</div>
-    </div>
-    <p class="cap">同样 8 条询盘、同一模型、同一套检查。通用 AI 会声称有 UL/NOM 认证、承诺免费样品；附上资料后红色清零，差距来自资料。TradeDesk 让资料每次自动带上，条条有出处。</p>
-  </section>
-
-  <section>
-    <h2><i>5</i>为什么可信</h2>
+  <section style="padding-bottom:16px">
+    <h3><i>✓</i>为什么可信</h3>
     <div class="stats">
-      <div class="stat"><div class="n">38</div><div class="l">条规则<br>每条对照原文核实</div></div>
-      <div class="stat"><div class="n">92%</div><div class="l">盲测精确率（首次）<br>没看过代码的人出题</div></div>
-      <div class="stat"><div class="n">5/5</div><div class="l">编造的模型提示<br>被代码拦下（红队）</div></div>
-      <div class="stat"><div class="n">$0.24</div><div class="l">每条询盘模型费用<br>回复 + 改一轮（实测）</div></div>
+      <div class="stat"><div class="n">38/38</div><div class="l"><b>规则逐条核实</b><br>附原文和链接</div></div>
+      <div class="stat"><div class="n">97.1%</div><div class="l"><b>盲测首次精确率</b><br>第二份 92.3%</div></div>
+      <div class="stat"><div class="n">5/5</div><div class="l"><b>编造的提示被拦下</b><br>红队测试</div></div>
+      <div class="stat"><div class="n">22 秒</div><div class="l"><b>一次询盘回复</b><br>gpt-5.5 现场实测</div></div>
     </div>
   </section>
 
   <div class="foot">
-    <b>怎么用：</b>工厂填一张产品资料卡（价格阶梯、MOQ、交期、认证）→ 粘贴询盘 → 发出前看风险等级 <span class="risk r">红</span> <span class="risk a">黄</span> <span class="risk g">绿</span><br>
-    Python 标准库即可运行 · 模型接口可换 · 断网可回放演示 · <b>摊位扫码玩“AI 找茬挑战”</b><br>
-    数据：示例工厂、产品、询盘均为虚构；规则摘自公开页面，每条附链接；费用按 Claude 官方价与赛前实测用量计算。不构成法律意见。
+    <div><b>怎么用：</b>工厂填一张资料卡（价格阶梯、MOQ、交期、认证）→ 粘贴询盘 → 发出前看风险等级。Python 标准库即可运行，模型接口可换，断网可回放。<br>示例工厂、产品、询盘均为虚构；规则摘自公开页面，每条附链接和抓取日期。不构成法律意见。</div>
+    <div class="play"><b>摊位扫码玩</b>“AI 找茬挑战”：看谁比 AI 先找到文案里的坑</div>
   </div>
 </div>
 </body>

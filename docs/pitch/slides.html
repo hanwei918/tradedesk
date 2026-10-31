@@ -5,139 +5,387 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 路演</title>
 <style>
-:root{--ink:#10203f;--muted:#5b667a;--brand:#0b5fff;--red:#c62828;--amber:#a35c00;--green:#1b7a3d;--bg:#f4f6fb}
+/* Same palette as the app: navy ink, one blue accent, status colours only for status. */
+:root{--ink:#0b1324;--text:#1e293b;--muted:#64748b;--line:#e2e8f0;--canvas:#f5f7fb;--brand:#2563eb;--brand-soft:#eff4ff;--cyan:#0891b2;
+  --red:#dc2626;--red-soft:#fef2f2;--amber:#d97706;--amber-soft:#fffbeb;--green:#16a34a;--green-soft:#f0fdf4}
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#0d1426;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink)}
+html,body{margin:0;height:100%;background:#0b1324;font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
 .deck{position:fixed;inset:0;display:grid;place-items:center}
-.slide{display:none;width:1920px;height:1080px;background:#fff;padding:90px 120px;position:absolute;transform-origin:center;overflow:hidden}
+.slide{display:none;width:1920px;height:1080px;background:#fff;padding:0 96px;position:absolute;transform-origin:center;overflow:hidden}
 .slide.on{display:block}
-h1{font-size:84px;margin:0 0 30px;line-height:1.15}
-h2{font-size:60px;margin:0 0 40px}
-p,li{font-size:38px;line-height:1.55}
-.kicker{color:var(--brand);font-weight:700;font-size:30px;letter-spacing:.08em;margin-bottom:20px}
-.big{font-size:46px;line-height:1.5}
+b{font-weight:650;color:var(--ink)}
+/* chrome: top tracker, action title, footer */
+.top{height:84px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);margin:0 -96px;padding:0 96px}
+.mark{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.mark i{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(140deg,#3b6ff5,#0aa2c4)}
+.mark i svg{width:20px;height:20px}
+.mark span{font-weight:500;color:var(--muted);font-size:18px;margin-left:4px}
+.track{display:flex;gap:6px}
+.track span{font-size:17px;color:#94a3b8;padding:7px 16px;border-radius:999px;font-weight:500}
+.track span.on{background:var(--brand-soft);color:var(--brand);font-weight:650}
+.kicker{margin-top:44px;font-size:20px;font-weight:650;color:var(--brand);letter-spacing:.04em;display:flex;align-items:center;gap:12px}
+.kicker em{font-style:normal;font:600 18px ui-monospace,Menlo,monospace;color:#fff;background:var(--brand);border-radius:6px;padding:2px 8px}
+h2{font-size:44px;line-height:1.32;font-weight:650;color:var(--ink);letter-spacing:-.015em;margin:14px 0 0;max-width:1680px}
+.foot{position:absolute;left:96px;right:96px;bottom:0;height:64px;border-top:1px solid var(--line);display:flex;align-items:center;gap:24px;font-size:16px;color:var(--muted)}
+.foot .src{flex:1;min-width:0}
+.foot .pg{font:600 16px ui-monospace,Menlo,monospace;color:var(--ink);background:var(--canvas);border-radius:6px;padding:4px 10px}
+.body{position:absolute;left:96px;right:96px;top:330px;bottom:96px}
 .muted{color:var(--muted)}
-.pits{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-top:40px}
-.pit{color:var(--ink);background:var(--bg);border-top:8px solid var(--red);border-radius:16px;padding:28px}
-.pit b{display:block;font-size:34px;margin-bottom:10px}.pit span{font-size:28px;color:var(--muted)}
-.quote{font-family:ui-monospace,Menlo,monospace;font-size:30px;background:var(--bg);border-left:8px solid var(--brand);padding:24px 30px;border-radius:10px;line-height:1.5}
-.shot{display:block;margin:0 auto;max-width:100%;max-height:690px;border:2px solid #dfe4ee;border-radius:16px;box-shadow:0 20px 50px rgba(16,32,63,.12)}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:start}
-.layer{background:var(--bg);border-radius:18px;padding:36px;margin-bottom:28px}
-.layer b{font-size:40px}.layer p{font-size:32px;margin:12px 0 0}
-.num{font-size:120px;font-weight:800;color:var(--brand);line-height:1}
-.foot{position:absolute;left:120px;right:120px;bottom:40px;display:flex;justify-content:space-between;font-size:22px;color:var(--muted)}
-.title-slide{background:linear-gradient(135deg,#0b5fff,#10203f);color:#fff}
-.title-slide .muted,.title-slide .kicker{color:#cfe0ff}
-.cmp4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin:10px 0 44px}
-.arm{background:var(--bg);border-radius:18px;padding:30px 30px 26px;border-top:10px solid var(--brand)}
-.arm span{display:block;font-size:28px;font-weight:700;color:var(--muted)}
-.arm b{display:block;font-size:104px;line-height:1.1;margin:14px 0 4px;color:var(--ink)}
-.arm em{display:block;font-style:normal;font-size:28px;font-weight:700}
-.arm small{display:block;font-size:24px;color:var(--muted);margin-top:12px;line-height:1.45}
-.arm.bad{border-color:var(--red)}.arm.bad b,.arm.bad em{color:var(--red)}
-.arm.mid{border-color:var(--amber)}
-.dots{position:fixed;bottom:12px;left:0;right:0;text-align:center;color:#8da0c8;font-size:13px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px 30px}
+.card.soft{background:var(--canvas);border-color:transparent}
+.lbl{font-size:17px;font-weight:650;color:var(--muted);letter-spacing:.06em;margin-bottom:10px}
+.n{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--brand);color:#fff;font:700 20px ui-monospace,Menlo,monospace;flex:none}
+.big{font-size:84px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.red{color:var(--red)}.green{color:var(--green)}.amber{color:var(--amber)}.brand{color:var(--brand)}
+ul.tight{margin:0;padding-left:24px}ul.tight li{font-size:21px;line-height:1.55;margin:3px 0}
+/* dark slides */
+.dark{background:radial-gradient(90% 70% at 85% 10%,rgba(37,99,235,.35),transparent 60%),radial-gradient(60% 60% at 0% 100%,rgba(8,145,178,.22),transparent 60%),#0b1324;color:#cbd5e1}
+.dark b{color:#fff}
+.grid-bg::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:64px 64px;-webkit-mask-image:linear-gradient(180deg,#000,transparent 85%);mask-image:linear-gradient(180deg,#000,transparent 85%)}
+.tagline{font-size:22px;font-weight:650;letter-spacing:.08em;color:#93c5fd}
+.dots{display:none}
 @media print{body{background:#fff}.deck{position:static;display:block}.slide{display:block!important;position:relative;transform:none!important;page-break-after:always}.dots{display:none}@page{size:1920px 1080px;margin:0}}
+
+/* cover */
+.cover h1{font-size:96px;line-height:1.08;color:#fff;margin:26px 0 0;letter-spacing:-.03em;font-weight:700}
+.cover .lead{font-size:32px;line-height:1.55;color:#cbd5e1;margin:30px 0 0;max-width:760px}
+.cover .meta{display:flex;gap:12px;margin-top:44px;flex-wrap:wrap;max-width:760px}
+.cover .meta span{font-size:21px;font-weight:600;color:#e2e8f0;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);border-radius:999px;padding:8px 18px}
+.cover .frame{position:absolute;right:-140px;top:170px;width:1040px;border-radius:16px;overflow:hidden;box-shadow:0 40px 100px -30px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.12)}
+.cover .frame img{display:block;width:100%}
+/* exec summary */
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;height:100%}
+.sum .card{display:flex;flex-direction:column;gap:14px;padding:34px 34px 30px;border-top:6px solid var(--brand)}
+.sum .card.r{border-top-color:var(--red)}.sum .card.g{border-top-color:var(--green)}
+.sum p{margin:0;font-size:22px;line-height:1.6}
+.sum .unit{font-size:22px;color:var(--muted);font-weight:500;margin-top:4px}
+/* users */
+.users{display:grid;grid-template-columns:600px 1fr;gap:36px}
+.kv{display:grid;grid-template-columns:72px 1fr;gap:14px 16px;font-size:21px;line-height:1.5;margin:0}
+.kv dt{font-weight:650;color:var(--muted)}.kv dd{margin:0}
+.quote{font:22px/1.6 ui-monospace,Menlo,monospace;background:var(--canvas);border-left:6px solid var(--brand);padding:20px 26px;border-radius:12px;color:var(--ink)}
+.quote u{text-decoration:none;background:#fde68a;border-radius:4px;padding:0 3px}
+.pits{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:16px}
+.pit{border:1px solid var(--line);border-top:5px solid var(--red);border-radius:12px;padding:14px 16px 12px;font-size:18px;color:var(--muted);line-height:1.4}
+.pit b{display:block;font-size:21px;margin-bottom:4px}
+.map{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px}
+.map div{background:var(--canvas);border-radius:14px;padding:16px 22px;font-size:19px;line-height:1.5}
+.map div b{display:block;font-size:21px;margin-bottom:2px}
+.map div s{text-decoration:none;color:var(--brand);font-size:16px;font-weight:650;display:block;margin-bottom:6px}
+/* solution diagram */
+.sol{display:grid;grid-template-columns:400px 56px 440px 56px 1fr;align-items:stretch;height:100%}
+.arrow{display:grid;place-items:center;color:#94a3b8;font-size:34px}
+.col{display:flex;flex-direction:column;gap:12px}
+.col .card{padding:18px 22px}
+.col h4{margin:0 0 4px;font-size:21px;color:var(--ink)}
+.col p{margin:0;font-size:17.5px;line-height:1.5;color:var(--muted)}
+.wf{display:grid;grid-template-columns:46px 1fr;gap:16px;align-items:center}
+.wf .k{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font:700 22px ui-monospace,Menlo,monospace;background:var(--brand-soft);color:var(--brand)}
+.wf.b .k{background:#ecfeff;color:var(--cyan)}.wf.c .k{background:var(--amber-soft);color:var(--amber)}.wf.d .k{background:var(--canvas);color:var(--muted)}
+.roles{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:16px;color:var(--muted)}
+.roles span{font-size:17px;font-weight:600;border-radius:8px;padding:5px 12px;background:var(--canvas);color:var(--ink)}
+/* workflow slides */
+.wfl{display:grid;grid-template-columns:1120px 1fr;gap:44px;height:100%}
+.steps{display:flex;flex-direction:column;gap:24px}
+.step{display:grid;grid-template-columns:40px 1fr;gap:16px}
+.step h4{margin:4px 0 4px;font-size:24px;color:var(--ink)}
+.step p{margin:0;font-size:19px;line-height:1.55;color:var(--muted)}
+.two-shots{display:grid;grid-template-columns:1fr 1fr;gap:32px;height:100%}
+.two-shots figure{margin:0;display:flex;flex-direction:column;gap:16px;min-height:0}
+.two-shots figcaption{font-size:19px;line-height:1.55;color:var(--muted)}
+.two-shots figcaption b{font-size:21px}
+.clip{overflow:hidden;border-radius:14px;border:1px solid var(--line);box-shadow:0 24px 60px -24px rgba(11,19,36,.28);background:#fff}
+.clip img{display:block;width:100%}
+/* architecture */
+.arch{display:grid;grid-template-columns:1fr 520px;gap:36px;align-items:start}
+.pipe{display:grid;grid-template-columns:repeat(5,1fr)}
+.stage{border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin:0 12px 0 0;background:#fff;display:flex;flex-direction:column;gap:8px;position:relative}
+.stage:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:50%;transform:translate(50%,-50%);color:#94a3b8;font-size:22px}
+.stage:not(:first-child){margin-left:12px}
+.stage h4{margin:0;font-size:21px;color:var(--ink)}
+.stage .who{font-size:16px;font-weight:650;color:var(--brand)}
+.stage p{margin:0;font-size:18px;line-height:1.5;color:var(--muted)}
+.stage.guard{border:2px solid var(--brand);background:var(--brand-soft)}
+.layers{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:18px}
+.layers div{border-radius:14px;padding:20px 22px;font-size:19px;line-height:1.5;background:var(--canvas);color:var(--muted)}
+.layers div b{display:block;font-size:20px;margin-bottom:4px}
+.kb{margin-top:16px;border:1px dashed #94a3b8;border-radius:14px;padding:12px 20px;font-size:18px;color:var(--muted);display:flex;gap:16px;align-items:center}
+table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
+.t th{text-align:left;font-weight:650;color:var(--muted);font-size:17px;padding:12px 14px;border-bottom:2px solid var(--line)}
+.t td{padding:14px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.t tr:last-child td{border-bottom:0}
+/* config */
+.cfg{display:grid;grid-template-columns:1fr 720px;gap:36px;align-items:start}
+.trace{margin:0}
+.tr{display:grid;grid-template-columns:72px 1fr;gap:16px;padding:17px 0;border-top:1px solid #dfe5ee;font-size:19px;line-height:1.5}
+.tr:first-child{border-top:0}
+.tr dt{font-weight:650;color:var(--muted)}.tr dd{margin:0}
+.calls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.calls span{font-size:17px;font-weight:650;border-radius:8px;padding:4px 12px;background:var(--brand-soft);color:var(--brand)}
+.pill-g{display:inline-block;background:var(--green-soft);color:var(--green);border-radius:999px;padding:1px 12px;font-weight:700;font-size:17px;border:1px solid #bbf7d0}
+/* results */
+.res{display:grid;grid-template-columns:1fr 540px;gap:40px;height:100%}
+.arm{display:grid;grid-template-columns:240px 1fr 140px;gap:22px;align-items:center;padding:15px 0;border-top:1px solid var(--line)}
+.arm.first{border-top:0}
+.arm .nm{font-size:21px;font-weight:650;color:var(--ink)}.arm .nm small{display:block;font-size:16px;color:var(--muted);font-weight:500}
+.bar{display:flex;gap:3px;height:44px;border-radius:8px;overflow:hidden}
+.bar i{display:flex;align-items:center;justify-content:center;color:#fff;font:700 18px ui-monospace,Menlo,monospace;font-style:normal}
+.bar .r{background:var(--red)}.bar .a{background:var(--amber)}.bar .g{background:var(--green)}
+.arm .iss{font-size:16px;color:var(--muted);line-height:1.45;text-align:right}.arm .iss b{font-size:21px}
+.legend{display:flex;gap:22px;font-size:17px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:8px}.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.proof{display:flex;flex-direction:column;gap:18px}
+.proof .card{padding:22px 26px;display:grid;grid-template-columns:180px 1fr;gap:18px;align-items:center}
+.proof .v{font-size:46px;font-weight:700;letter-spacing:-.02em;color:var(--brand);line-height:1.05;font-variant-numeric:tabular-nums}
+.proof p{margin:0;font-size:18px;line-height:1.5;color:var(--muted)}
+.proof p b{font-size:20px;display:block;margin-bottom:2px}
+/* demo */
+.demo{display:grid;grid-template-columns:1fr 580px;gap:44px;align-items:start}
+.tl .it{display:grid;grid-template-columns:40px 1fr;gap:18px;padding:11px 0;position:relative}
+.tl .it:not(:last-child)::before{content:"";position:absolute;left:19px;top:52px;bottom:-11px;width:2px;background:var(--line)}
+.tl h4{margin:6px 0 2px;font-size:22px;color:var(--ink)}
+.tl p{margin:0;font-size:18px;color:var(--muted);line-height:1.5}
+.closing h1{font-size:104px;line-height:1.15;color:#fff;margin:0;letter-spacing:-.02em}
 </style>
 </head>
 <body>
 <div class="deck" id="deck">
 
-<section class="slide title-slide">
-  <div class="kicker">INTERCITY HACK · 宁波站 · AI+外贸/跨境</div>
-  <h1>一条询盘里的五个坑</h1>
-  <div class="quote" style="background:rgba(255,255,255,.1);color:#fff;border-color:#fff">“…Need it <u>UL listed</u> and <u>BPA free</u>… Please quote <u>FOB Ningbo by air</u>, we need goods in <u>20 days</u>. Payment: we usually pay <u>100% 60 days after delivery</u>.”</div>
-  <div class="pits">
-    <div class="pit"><b>没有 UL</b><span>工厂只有 CB、CE</span></div>
-    <div class="pit"><b>没测 BPA</b><span>无检测报告</span></div>
-    <div class="pit"><b>FOB 不能空运</b><span>Incoterms 2020</span></div>
-    <div class="pit"><b>20 天做不出</b><span>标准交期 35 天</span></div>
-    <div class="pit"><b>货到 60 天付</b><span>收款风险</span></div>
+<!-- 1 cover -->
+<section class="slide dark grid-bg cover">
+  <div style="position:relative;padding-top:120px;width:880px">
+    <div class="mark" style="color:#fff"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk</div>
+    <div class="tagline" style="margin-top:72px">INTERCITY HACK 宁波站 · 赛道二 AI+出海</div>
+    <h1>TradeDesk<br>出海工作台</h1>
+    <p class="lead">给宁波中小外贸工厂的 AI 助手：询盘 → 回复 → 上架，<b>每一条风险提示都有出处</b>。</p>
+    <div class="meta"><span>3 个工作流 + 收件箱</span><span>6 个智能体</span><span>38 条核实规则</span><span>英语 · 西班牙语</span></div>
   </div>
-  <p class="muted" style="font-size:26px;margin-top:30px">示例询盘为虚构，用于演示</p>
+  <div class="frame"><img src="../img/overview.png" alt="TradeDesk 概览看板"></div>
+  <div style="position:absolute;left:96px;bottom:56px;font-size:18px;color:#94a3b8">2026-11-01 · 示例工厂、产品、询盘均为虚构</div>
 </section>
 
+<!-- 2 executive summary -->
 <section class="slide">
-  <div class="kicker">我们做了什么</div>
-  <h1>TradeDesk 出海工作台</h1>
-  <p class="big">询盘 → 回复 → 上架，<b>每一条风险提示都有出处</b>：</p>
-  <ul>
-    <li>公开规则的<b>原文和链接</b>（Amazon、FTC、ICC、TikTok、墨西哥 NOM…）</li>
-    <li>或者工厂<b>自己资料卡上的那个字段</b>（价格、MOQ、交期、认证）</li>
-  </ul>
-  <p class="big" style="margin-top:50px">说不出出处的话，系统不让 AI 说。</p>
-  <div class="foot"><span>TradeDesk</span><span>2 / 9</span></div>
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span class="on">摘要</span><span>场景</span><span>方案</span><span>技术</span><span>效果</span><span>落地</span></div></div>
+  <div class="kicker">执行摘要</div>
+  <h2>直接用通用 AI，8 条外贸回复全部不能发；TradeDesk 把工厂资料和平台规则带进每次生成，红色问题清零，每条提示都有出处</h2>
+  <div class="body"><div class="sum">
+    <div class="card r"><div class="lbl">问题</div><div class="big red">8 / 8</div><div class="unit">条回复带红色问题，共 32 条</div>
+      <p>外贸业务员每天回询盘、上架、对接采购和生产。通用 AI 不知道工厂的认证、交期和价格，会替工厂乱承诺：<b>声称有 UL / ETL / NOM 认证、承诺免费样品、按低于起订量报价</b>。</p></div>
+    <div class="card"><div class="lbl">方案</div><div class="big brand">38</div><div class="unit">条公开规则，逐条对照原文核实</div>
+      <p>询盘回复、多平台上架、商品看板三个工作流加收件箱；6 个智能体按 <b>理解 → 生成 → 校验 → 反馈</b> 编排。代码管数字和硬事实，模型管语义；说不出出处的提示由代码丢弃。</p></div>
+    <div class="card g"><div class="lbl">证据</div><div class="big green">0 / 8</div><div class="unit">条回复带红色问题（TradeDesk）</div>
+      <p>改一轮后 <b>3 条可直接发</b>；盲测首次精确率 <b>97.1% / 92.3%</b>；红队注入 5 条编造提示，<b>全部拦下</b>；赛事 Tokenhub 上用 gpt-5.5 实测跑通。</p></div>
+  </div></div>
+  <div class="foot"><span class="src">来源：对照实验 8 条示例询盘，四组用同一模型和同一套检查；盲测、红队与实测调用见第 08、09 页</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">02</span></div>
 </section>
 
+<!-- 3 users & scene -->
 <section class="slide">
-  <div class="kicker">收件箱 → 询盘回复 → 跨岗位任务</div>
-  <h2>理解 → 生成 → 校验 → 反馈</h2>
-  <img class="shot" src="../img/slide-inquiry.png" alt="询盘回复界面截图">
-  <div class="foot"><span>收件箱按优先级排序（每一分有依据）· 英/西语回复 · 自动派发采购/生产/美工任务 · 中文多轮修改</span><span>3 / 9</span></div>
-</section>
-
-<section class="slide">
-  <div class="kicker">工作流 B · 多平台上架</div>
-  <h2>一份中文资料，两个平台、两种语言</h2>
-  <img class="shot" src="../img/slide-listing.png" alt="多平台上架界面截图">
-  <div class="foot"><span>Amazon 美国站（英语）· TikTok Shop 墨西哥（西语）· 各按各的平台规则检查</span><span>4 / 9</span></div>
-</section>
-
-<section class="slide">
-  <div class="kicker">工作流 C · 商品看板 + 主图检查</div>
-  <h2>所有产品的状态，一屏看清</h2>
-  <div class="two" style="grid-template-columns:1.55fr 1fr;gap:30px">
-    <img class="shot" style="max-height:640px" src="../img/slide-board.png" alt="商品看板截图">
-    <img class="shot" style="max-height:640px" src="../img/slide-image.png" alt="主图检查截图">
-  </div>
-  <div class="foot"><span>批量生成上品 · 主图按 Amazon 10 条要求检查（像素由代码测量，文字/徽章/道具/实拍由模型看图）· 导出 CSV</span><span>5 / 9</span></div>
-</section>
-
-<section class="slide">
-  <div class="kicker">对照实验 · 同一把尺子</div>
-  <h2>直接问通用 AI：8 条回复，8 条不能发</h2>
-  <div class="cmp4">
-    <div class="arm bad"><span>直接用通用 AI</span><b>8 / 8</b><em>带红色问题，共 32 条</em><small>声称有 UL / ETL / NOM 认证、承诺免费样品、按低于起订量报价</small></div>
-    <div class="arm mid"><span>通用 AI + 工厂资料</span><b>0 / 8</b><em>红色清零</em><small>20 条需人工确认<br>0 条可直接发</small></div>
-    <div class="arm"><span>TradeDesk 第 1 轮</span><b>0 / 8</b><em>&nbsp;</em><small>13 条需人工确认<br>1 条可直接发</small></div>
-    <div class="arm"><span>TradeDesk 改一轮后</span><b>0 / 8</b><em>&nbsp;</em><small>8 条需人工确认<br>3 条可直接发</small></div>
-  </div>
-  <p class="big">差距主要来自<b>工厂资料</b>。TradeDesk 让资料每次自动带上，需人工确认的从 20 条降到 8 条，每条提示都有出处。</p>
-  <div class="foot"><span>8 条示例询盘 · 同一个模型 claude-opus-5-5 · 四组用同一套代码规则 + 同一个合规审核员检查 · 每条回复在评测页可逐条查看</span><span>6 / 9</span></div>
-</section>
-
-<section class="slide">
-  <div class="kicker">为什么可信</div>
-  <h2>两层校验</h2>
-  <div class="two">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span class="on">场景</span><span>方案</span><span>技术</span><span>效果</span><span>落地</span></div></div>
+  <div class="kicker"><em>01</em>目标用户与核心场景</div>
+  <h2>用户是宁波中小外贸工厂的业务员和运营：一条询盘里常埋着好几个坑，回错一句就是做不到的承诺</h2>
+  <div class="body"><div class="users">
+    <div class="card soft"><div class="lbl">目标用户</div><dl class="kv">
+      <dt>谁用</dt><dd><b>业务员</b>回询盘，<b>运营</b>上架；协作岗位：采购、生产、美工</dd>
+      <dt>市场</dt><dd>阿里国际站 RFQ（美国、墨西哥买家）· Amazon 美国站 · TikTok Shop 墨西哥</dd>
+      <dt>语言</dt><dd>中文输入 → 英语、西班牙语输出</dd>
+      <dt>时机</dt><dd>收到询盘时 · 新品上架时 · 每天开工看商品状态时</dd>
+    </dl></div>
     <div>
-      <div class="layer"><b>① 代码规则</b><p>价格、MOQ、交期、认证、付款方式、FOB 运输方式、标题长度、禁用词 —— 用代码和资料卡比对，不让大模型算数。</p></div>
-      <div class="layer"><b>② 模型审核 + 出处守卫</b><p>模型提出的问题必须带<b>知识库规则编号</b>，并且<b>原文里真的有那句话</b>，否则代码直接丢弃。</p><p><b>红队测试：</b>注入 6 条模型提示，5 条编造的（假规则编号、回复里没有的原话…）全部拦下。</p></div>
-    </div>
-    <div>
-      <div class="num" id="n-rules" style="font-size:96px">38</div><p style="font-size:32px">条规则，每条都对照原文核实<br><span class="muted" style="font-size:26px">Amazon 文案/主图 · 阿里 · TikTok · 美国/墨西哥合规 · Incoterms · 商务礼仪</span></p>
-      <div class="num" style="margin-top:24px;font-size:96px">97% / 92%</div><p style="font-size:32px">两份盲测集首次运行的精确率<br><span class="muted" style="font-size:26px">召回率 94% / 83% · 没看过代码的人出题 · 问题已修复 · 56 项测试</span></p>
+      <div class="lbl">一条常见形态的询盘（示例，虚构）</div>
+      <div class="quote">“…Need it <u>UL listed</u> and <u>BPA free</u>… Please quote <u>FOB Ningbo by air</u>, we need goods in <u>20 days</u>. Payment: we usually pay <u>100% 60 days after delivery</u>.”</div>
+      <div class="pits">
+        <div class="pit"><b>没有 UL</b>工厂只有 CB、CE</div>
+        <div class="pit"><b>没测 BPA</b>没有检测报告</div>
+        <div class="pit"><b>FOB 不走空运</b>Incoterms 2020</div>
+        <div class="pit"><b>20 天做不出</b>标准交期 35 天</div>
+        <div class="pit"><b>货到 60 天付</b>收款风险</div>
+      </div>
     </div>
   </div>
-  <div class="foot"><span>Amazon 标题上限：网上多写 200 字符，官方页面现为 75（2026-10-26 核实）</span><span>7 / 9</span></div>
+  <div class="map">
+    <div><s>赛题第一道坎</s><b>询盘转化低</b>收件箱按公开公式排优先级；回复如实说明能做和不能做的</div>
+    <div><s>赛题第二道坎</s><b>重复人力成本高</b>一份资料批量生成多平台 Listing；主图自动按平台要求检查</div>
+    <div><s>赛题第三道坎</s><b>跨岗位协同难</b>回复时自动给采购、生产、美工派任务，每条附询盘原文</div>
+  </div></div>
+  <div class="foot"><span class="src">示例工厂“甬江小家电”及其产品、询盘均为虚构；三道坎引自赛题背景</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">03</span></div>
 </section>
 
+<!-- 4 solution -->
 <section class="slide">
-  <div class="kicker">平台配置 · 数据合规 · 落地</div>
-  <h2>6 个智能体 + 38 条规则，一台笔记本就能跑</h2>
-  <div class="two" style="gap:40px">
-    <div class="layer" style="margin:0"><b>平台配置与调用</b><p>询盘分析员 → 外贸业务员 → 合规审核员；Amazon 运营、TikTok 内容运营、主图审核员。代码按工作流编排，配置导出在 <code>app/config/agents.json</code>。</p><p>模型接口可换（OpenAI 兼容 / Claude）。一条询盘回复加改一轮共 5 次调用，约 <b style="font-size:inherit">0.24 美元</b>。</p></div>
-    <div class="layer" style="margin:0"><b>数据来源与合规</b><p>演示用的工厂、产品、询盘全部虚构。规则摘自 Amazon、FTC、ICC、墨西哥经济部等公开页面，每条附链接和抓取日期；不爬取付费数据。</p><p>真实询盘先脱敏、经对方同意才使用；API key 只存在本机。</p></div>
-  </div>
-  <p class="big" style="margin-top:44px">落地：工厂填一张资料卡 · 询盘从阿里后台粘贴 · 看板一键导出 CSV<br><span class="muted" style="font-size:36px">下一步：接询盘接口 · 扩充品类认证知识 · 宁波工厂两周试用</span></p>
-  <div class="foot"><span>费用按 Claude 官方价（输入 4 / 输出 20 美元每百万 token）和赛前实测用量计算；现场换 Tokenhub 模型后另算</span><span>8 / 9</span></div>
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>场景</span><span class="on">方案</span><span>技术</span><span>效果</span><span>落地</span></div></div>
+  <div class="kicker"><em>02</em>解决方案</div>
+  <h2>打通“数据 → 知识 → 多角色工作流”：一张工厂资料卡加 38 条公开规则，驱动三个工作流，产出给五个岗位</h2>
+  <div class="body"><div class="sol">
+    <div class="col"><div class="lbl">数据</div>
+      <div class="card"><h4>工厂资料卡</h4><p>价格阶梯、MOQ、交期、认证、材质、付款方式。工厂填一次，所有平台共用</p></div>
+      <div class="card"><h4>买家询盘</h4><p>从阿里国际站后台粘贴；英语、西班牙语</p></div>
+      <div class="card"><h4>产品主图</h4><p>上传后由代码测像素、由模型看图</p></div></div>
+    <div class="arrow">→</div>
+    <div class="col"><div class="lbl">知识</div>
+      <div class="card" style="flex:1"><h4>38 条规则 · 8 类</h4><p style="margin-bottom:16px">每条带原文、链接和抓取日期，逐条核实</p>
+        <p><b style="font-size:18px">分类</b><br>Amazon 平台 · Amazon 主图 · 阿里国际站 · TikTok Shop · 美国合规 · 墨西哥合规 · 合同条款 · 商务礼仪</p>
+        <p style="margin-top:14px"><b style="font-size:18px">来源</b><br>Amazon Seller Central · 阿里国际站规则 · TikTok Shop 墨西哥 · 墨西哥经济部 · 美国 eCFR · Cornell LII · ICC Incoterms · 商务礼仪资料</p></div></div>
+    <div class="arrow">→</div>
+    <div class="col"><div class="lbl">多角色工作流</div>
+      <div class="card wf"><span class="k">A</span><div><h4>询盘回复</h4><p>买家语言回复 + 中文内部备忘 + 跨岗位任务；多轮修改</p></div></div>
+      <div class="card wf b"><span class="k">B</span><div><h4>多平台上架</h4><p>Amazon 美国站英文 Listing + TikTok 墨西哥西语种草脚本</p></div></div>
+      <div class="card wf c"><span class="k">C</span><div><h4>商品看板</h4><p>批量上品 · 主图检查 · 状态流转 · 导出 CSV</p></div></div>
+      <div class="card wf d"><span class="k">D</span><div><h4>询盘收件箱</h4><p>代码按公开公式打优先级，每一分有依据</p></div></div>
+      <div class="roles">产出给<span>业务员</span><span>运营</span><span>采购</span><span>生产</span><span>美工</span></div></div>
+  </div></div>
+  <div class="foot"><span class="src">知识库来源按规则条数：Amazon 17 · ICC 5 · 阿里 3 · TikTok 3 · 墨西哥经济部 3 · eCFR 2 · Cornell LII 2 · 其他 3（2026-10-26 抓取）</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">04</span></div>
 </section>
 
-<section class="slide title-slide">
-  <div class="kicker">TradeDesk 出海工作台</div>
-  <h1 style="font-size:100px;margin-top:200px">让每一句对外承诺<br>都有依据。</h1>
-  <p class="muted">谢谢</p>
+<!-- 5 workflow A -->
+<section class="slide">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>场景</span><span class="on">方案</span><span>技术</span><span>效果</span><span>落地</span></div></div>
+  <div class="kicker"><em>03</em>工作流 A · 询盘回复</div>
+  <h2>先找出询盘和工厂资料对不上的地方，再用买家的语言如实回复：做不到的事，回复里写明做不到</h2>
+  <div class="body"><div class="wfl">
+    <div class="clip" style="height:650px"><img src="../img/slide-inquiry.png" alt="询盘回复：回复正文与风险批注"></div>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><div><h4>理解</h4><p>询盘分析员逐条抽取买家要求，每条带询盘原文，和资料卡比对标出硬冲突</p></div></div>
+      <div class="step"><span class="n">2</span><div><h4>生成</h4><p>外贸业务员按阿里 RFQ 风格写英 / 西语回复，同时给内部写中文备忘、派任务</p></div></div>
+      <div class="step"><span class="n">3</span><div><h4>校验</h4><p>代码比对价格、MOQ、交期、认证、付款、FOB；合规审核员按知识库审语义</p></div></div>
+      <div class="step"><span class="n">4</span><div><h4>反馈</h4><p>原文高亮批注、红黄绿等级；一句中文“按风险提示全部修改”进入第 2 轮，逐词对比</p></div></div>
+    </div>
+  </div></div>
+  <div class="foot"><span class="src">截图：示例询盘 INQ-US-01（虚构）第 1 轮结果，回放模式；右侧批注的依据是 ICC 原文与链接</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">05</span></div>
+</section>
+
+<!-- 6 workflow B + C -->
+<section class="slide">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>场景</span><span class="on">方案</span><span>技术</span><span>效果</span><span>落地</span></div></div>
+  <div class="kicker"><em>04</em>工作流 B 多平台上架 · 工作流 C 商品看板</div>
+  <h2>一份中文资料同时生成 Amazon 英文 Listing 和 TikTok 西语脚本，各按平台规则检查；看板批量上品，一屏看清卡在哪</h2>
+  <div class="body"><div class="two-shots">
+    <figure><div class="clip" style="height:500px"><img src="../img/slide-listing.png" alt="多平台上架"></div>
+      <figcaption><b>平台适配，不是直译。</b>Amazon 标题按官方 75 字符上限实时计数，禁促销用语和主观评价；TikTok 墨西哥写西语开场钩子和分镜。</figcaption></figure>
+    <figure><div class="clip" style="height:500px"><img src="../img/slide-board.png" alt="商品看板"></div>
+      <figcaption><b>批量 + 主图检查。</b>一键对全部产品生成并校验；主图的尺寸、白底、占比由代码测像素，徽章、促销字、是否实拍由模型看图。</figcaption></figure>
+  </div></div>
+  <div class="foot"><span class="src">Amazon 标题上限：网上多写 200 字符，官方页面现为 75（2026-10-26 核实）；截图为回放模式</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">06</span></div>
+</section>
+
+<!-- 7 architecture -->
+<section class="slide">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>场景</span><span>方案</span><span class="on">技术</span><span>效果</span><span>落地</span></div></div>
+  <div class="kicker"><em>05</em>技术方案</div>
+  <h2>代码负责数字和硬事实，模型负责语义判断；模型提出的问题如果没有规则编号或原文对不上，由代码直接丢弃</h2>
+  <div class="body"><div class="arch">
+    <div>
+      <div class="pipe">
+        <div class="stage"><h4>输入</h4><div class="who">用户</div><p>询盘原文、业务员意图、产品资料卡、主图</p></div>
+        <div class="stage"><h4>理解</h4><div class="who">询盘分析员</div><p>要求清单，每条带原文；没有出处的条目丢弃</p></div>
+        <div class="stage"><h4>生成</h4><div class="who">业务员 / 运营</div><p>按平台、语言、角色生成；注入规则摘要</p></div>
+        <div class="stage guard"><h4>校验</h4><div class="who">代码 + 合规审核员</div><p>代码规则 → 模型审核 → 出处守卫</p></div>
+        <div class="stage"><h4>反馈</h4><div class="who">界面</div><p>批注、红黄绿、逐词对比、任务</p></div>
+      </div>
+      <div class="kb"><b style="font-size:19px;white-space:nowrap">知识库</b><span>38 条规则的摘要注入“生成”，原文供“校验”核对；资料卡字段供代码规则比对</span></div>
+      <div class="layers">
+        <div><b>① 代码规则</b>价格、MOQ、交期、认证、付款、FOB、标题长度、禁用词：不让模型算数</div>
+        <div><b>② 模型审核</b>合规审核员只拿到相关规则，必须给出规则编号并引用原文</div>
+        <div><b>③ 出处守卫</b>编号不存在、原文里没有那句话 → 丢弃，界面显示丢了几条</div>
+      </div>
+      <p class="muted" style="font-size:18px;margin:16px 0 0">Python 标准库服务端 + 原生 JS 前端，无需安装依赖 · 模型接口可换（OpenAI 兼容 / Claude）· 56 项自动化测试</p>
+    </div>
+    <div class="card" style="padding:20px 24px"><div class="lbl">异常处理（节选）</div>
+      <table class="t"><tr><th>情况</th><th>处理</th></tr>
+        <tr><td>调用失败：网络、限流、key 无效、余额不足</td><td>中文错误提示，不显示半成品</td></tr>
+        <tr><td>返回的不是合法 JSON</td><td>报错，不展示</td></tr>
+        <tr><td>合规审核这一步失败</td><td>代码规则结果照常显示，标明未审核，<b>不显示绿色</b></td></tr>
+        <tr><td>提示没有出处或原文对不上</td><td>代码丢弃，显示条数，可展开看原始内容</td></tr>
+        <tr><td>检查为红色却要标“已上架”</td><td>代码拒绝</td></tr>
+        <tr><td>现场断网</td><td>回放模式，用录制结果演示</td></tr>
+      </table></div>
+  </div></div>
+  <div class="foot"><span class="src">完整的异常处理表和数据流见仓库 docs/配置与调用说明.md</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">07</span></div>
+</section>
+
+<!-- 8 platform config & calls -->
+<section class="slide">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>场景</span><span>方案</span><span class="on">技术</span><span>效果</span><span>落地</span></div></div>
+  <div class="kicker"><em>06</em>平台配置与能力调用</div>
+  <h2>6 个智能体按工作流编排；现场经赛事 Tokenhub 调用 gpt-5.5，一次询盘回复 3 次调用、22 秒出结果</h2>
+  <div class="body"><div class="cfg">
+    <div class="card" style="padding:20px 24px"><div class="lbl">智能体配置（导出在 app/config/agents.json）</div>
+      <table class="t"><tr><th style="width:180px">智能体</th><th>任务</th><th>输出（JSON）</th></tr>
+        <tr><td><b>询盘分析员</b></td><td>抽取买家要求，找出和资料卡的冲突</td><td>要求清单 + 询盘原文</td></tr>
+        <tr><td><b>外贸业务员</b></td><td>阿里 RFQ 回复、内部备忘、派任务</td><td>英 / 西语回复、中文备忘、任务</td></tr>
+        <tr><td><b>Amazon 运营</b></td><td>美国站 Listing</td><td>标题、五点、描述</td></tr>
+        <tr><td><b>TikTok 内容运营</b></td><td>墨西哥西语种草脚本</td><td>开场钩子、分镜、标签</td></tr>
+        <tr><td><b>主图审核员</b></td><td>看图检查主图</td><td>规则编号 + 看到了什么</td></tr>
+        <tr><td><b>合规审核员</b></td><td>按知识库审核生成结果</td><td>问题 + 规则编号 + 原文</td></tr>
+      </table>
+      <p class="muted" style="font-size:17px;margin:12px 0 0">三种模式：实时 · 录制（实时调用并存缓存）· 回放（不联网）。仓库里的回放缓存用 claude-opus-5-5 录制。</p></div>
+    <div class="card soft" style="padding:22px 28px"><div class="lbl">一次完整调用 · 2026-10-30 23:58 · 实时模式</div>
+      <dl class="trace">
+        <div class="tr"><dt>触发</dt><dd>业务员点“理解 → 生成 → 校验”</dd></div>
+        <div class="tr"><dt>输入</dt><dd>德州买家询盘原文 + 产品资料卡 KET-17S + 业务员意图 + 规则摘要</dd></div>
+        <div class="tr"><dt>调用</dt><dd><div class="calls"><span>理解询盘 8.7s</span><span>生成回复 8.8s</span><span>合规审核 4.8s</span></div><span class="muted" style="font-size:16px">gpt-5.5 · 赛事 Tokenhub（OpenAI 兼容接口）</span></dd></div>
+        <div class="tr"><dt>返回</dt><dd>结构化 JSON → 代码规则检查 → 出处守卫</dd></div>
+        <div class="tr"><dt>反馈</dt><dd><span class="pill-g">可以发</span>　0 条提示。回复写明没有 UL、没做 BPA 检测、交期 35 天、不接受货到 60 天付款</dd></div>
+      </dl></div>
+  </div></div>
+  <div class="foot"><span class="src">来源：调用日志 app/logs/calls.jsonl 中运行 acd116ca 的三条记录；智能体与工作流配置由 tools/export_config.py 导出</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">08</span></div>
+</section>
+
+<!-- 9 results -->
+<section class="slide">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>场景</span><span>方案</span><span>技术</span><span class="on">效果</span><span>落地</span></div></div>
+  <div class="kicker"><em>07</em>效果验证</div>
+  <h2>同样 8 条询盘、同一套检查：通用 AI 8 条全部不能发；附上资料后红色清零，TradeDesk 再把需确认的问题从 20 条降到 8 条</h2>
+  <div class="body"><div class="res">
+    <div class="card" style="padding:24px 30px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="lbl" style="margin:0">8 条回复的检查结果</div>
+        <div class="legend"><span><i style="background:var(--red)"></i>不能发</span><span><i style="background:var(--amber)"></i>需人工确认</span><span><i style="background:var(--green)"></i>可直接发</span></div></div>
+      <div class="arm first"><div class="nm">直接用通用 AI<small>只给询盘</small></div><div class="bar"><i class="r" style="flex:8">8</i></div><div class="iss">红色问题 <b class="red">32</b><br>黄色问题 58</div></div>
+      <div class="arm"><div class="nm">通用 AI + 工厂资料<small>手动粘贴资料</small></div><div class="bar"><i class="a" style="flex:8">8</i></div><div class="iss">红色问题 <b>0</b><br>黄色问题 20</div></div>
+      <div class="arm"><div class="nm">TradeDesk 第 1 轮<small>资料自动带上</small></div><div class="bar"><i class="a" style="flex:7">7</i><i class="g" style="flex:1">1</i></div><div class="iss">红色问题 <b>0</b><br>黄色问题 13</div></div>
+      <div class="arm"><div class="nm">TradeDesk 改一轮后<small>“按风险提示全部修改”</small></div><div class="bar"><i class="a" style="flex:5">5</i><i class="g" style="flex:3">3</i></div><div class="iss">红色问题 <b>0</b><br>黄色问题 <b class="green">8</b></div></div>
+      <p class="muted" style="font-size:17px;margin:14px 0 0">差距主要来自工厂资料本身；TradeDesk 的作用是每次自动带上资料、给每条提示挂出处，不靠业务员记得粘贴。</p>
+    </div>
+    <div class="proof">
+      <div class="card"><div class="v">38 / 38</div><p><b>规则逐条核实</b>每条对照来源页面原文，附链接和抓取日期</p></div>
+      <div class="card"><div class="v">97.1%<br><span style="font-size:32px">92.3%</span></div><p><b>两份盲测集首次精确率</b>召回率 94.4% / 82.8%；没看过代码的人出题，首次成绩在修复前冻结</p></div>
+      <div class="card"><div class="v">5 / 5</div><p><b>红队：编造的提示全部拦下</b>假规则编号、回复里没有的原话等 6 条注入，1 条真实的保留</p></div>
+    </div>
+  </div></div>
+  <div class="foot"><span class="src">方法：8 条示例询盘；四组同一模型 claude-opus-5-5、同一套代码规则和同一个合规审核员检查；每条回复可在“评测与对照”页逐条查看</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">09</span></div>
+</section>
+
+<!-- 10 demo & roll-out -->
+<section class="slide">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>场景</span><span>方案</span><span>技术</span><span>效果</span><span class="on">落地</span></div></div>
+  <div class="kicker"><em>08</em>现场效果与落地</div>
+  <h2>现场演示走完“理解 → 生成 → 校验 → 反馈”闭环；一台笔记本双击即可运行，断网也能回放</h2>
+  <div class="body"><div class="demo">
+    <div class="card" style="padding:22px 32px"><div class="lbl">演示路线（“自动演示”约 90 秒，也可手动操作）</div>
+      <div class="tl">
+        <div class="it"><span class="n">1</span><div><h4>收件箱</h4><p>8 条询盘按优先级排好，每一分都能展开看依据</p></div></div>
+        <div class="it"><span class="n">2</span><div><h4>询盘回复</h4><p>美国询盘的五个坑逐条找出；回复如实说明，批注挂 ICC 原文</p></div></div>
+        <div class="it"><span class="n">3</span><div><h4>第 2 轮</h4><p>一句中文“按风险提示全部修改”变绿；采购、生产、美工任务自动派发</p></div></div>
+        <div class="it"><span class="n">4</span><div><h4>商品看板 + 主图检查</h4><p>4 个产品 × 3 个渠道；主图被标红时不允许标记上架</p></div></div>
+        <div class="it"><span class="n">5</span><div><h4>多平台上架 → 评测</h4><p>Amazon 英文 + TikTok 西语；对照实验、红队、盲测成绩当场可查</p></div></div>
+      </div></div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="card soft" style="padding:20px 26px"><div class="lbl">怎么部署</div><ul class="tight"><li>Python 标准库，无需安装依赖</li><li>Mac / Windows 双击启动脚本</li><li>模型、地址、key 在网页里设置，key 只存本机</li></ul></div>
+      <div class="card soft" style="padding:20px 26px"><div class="lbl">数据合规</div><ul class="tight"><li>演示用的工厂、产品、询盘全部虚构</li><li>规则摘自公开页面，每条附链接和日期</li><li>不爬取付费数据</li></ul></div>
+      <div class="card soft" style="padding:20px 26px"><div class="lbl">下一步计划</div><ul class="tight"><li>接入询盘接口，扩充品类认证知识</li><li>找宁波工厂试用，用真实询盘复测</li></ul></div>
+    </div>
+  </div></div>
+  <div class="foot"><span class="src">游园会摊位另有“AI 找茬挑战”：观众用手机答题，答案由代码规则计算，不调用模型</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">10</span></div>
+</section>
+
+<!-- 11 closing -->
+<section class="slide dark grid-bg closing">
+  <div style="position:relative;padding-top:300px">
+    <div class="tagline">TradeDesk 出海工作台</div>
+    <h1 style="margin-top:28px">让每一句对外承诺，<br>都有依据。</h1>
+    <p style="font-size:30px;color:#94a3b8;margin-top:40px">谢谢 · INTERCITY HACK 宁波站 · 赛道二 AI+出海</p>
+  </div>
 </section>
 
 </div>
