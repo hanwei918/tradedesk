@@ -18,32 +18,41 @@ import re
 
 NEGATION = re.compile(
     r"(?i)(\bnot\b|\bno\b|n't\b|\bcannot\b|\bwithout\b|\bunable\b|\byet to\b|\bsin\b|"
-    r"aún no|todavía no|\bningun[ao]?\b|没有|未|不)")
+    r"aún no|todavía no|\bningun[ao]?\b|没有|未|不|"
+    r"\bnicht\b|\bkein\w*|\bohne\b|ません|ない|未取得|まだ|\bне\b|\bнет\b|отсутству\w*|\bбез\b)")
 # Talking about the process of getting a certification is an offer (amber), never a claim of having it.
 OFFER = re.compile(
     r"(?i)(can (help|assist|arrange|apply)|apply(ing)? for|look(ing)? into|evaluat\w*|consider(ing)?|explor(e|ing)|"
     r"in process|to obtain|obtain(ing)?|get(ting)? (it |the \w+ )?certified|work with you|"
     r"posibilidad|evaluando|tramit\w*|gestion\w*|obtener|colabor(ar|amos)|en proceso|"
-    r"评估|办理|可以(协助|配合))")
+    r"评估|办理|可以(协助|配合)|"
+    r"beantrag\w*|prüfen|klären|organisieren|unterstützen|in die Wege|申請|手配|検討|サポート|協力|"
+    r"оформ\w*|получени\w*|получить|подготов\w*|помо(жем|чь)|содейств\w*|рассмотр\w*)")
 # Narrower negation for material claims: "without worries" must not cancel "PTFE-free".
 NEG_CLAIM = re.compile(
-    r"(?i)(\bnot\b|\bno\b|n't\b|\bcannot\b|\bunable\b|\byet to\b|aún no|todavía no|没有|未)")
+    r"(?i)(\bnot\b|\bno\b|n't\b|\bcannot\b|\bunable\b|\byet to\b|aún no|todavía no|没有|未|"
+    r"\bnicht\b|\bkein\w*|ありません|ない|\bне\b|\bнет\b)")
 # A mention is not a claim when the sentence is a question, a condition, a request or quotes the buyer.
 NOT_A_CLAIM = re.compile(
     r"(?i)(\bif\b|\bwhether\b|\bunless\b|\?|¿|\bsi\b|confirm|mandatory|required|requirement|\bneeds?\b|"
     r"\bmust\b|necesita|requiere|indispensable|obligatori|request|\bask|pregunt|solicit|mencion|mentioned|"
     r"\btarget|objetivo|\bdebe[n]?\b|necesari|requisito|\bplan\b|proceso|tr[aá]mite|para su venta|"
-    r"in order to|如果|是否|需要|要求|计划)")
+    r"in order to|如果|是否|需要|要求|计划|"
+    r"\bfalls\b|\bob\b|erforderlich|benötig\w*|notwendig|Voraussetzung|必要|必須|場合|でしょうか|ご要望|条件|"
+    r"\bесли\b|нужн\w*|требуе\w*|необходим\w*|обязательн\w*|запрос\w*)")
 # Words that turn a certification mention into an assertion of having it.
 CLAIM_CUE = re.compile(
     r"(?i)(listed|certified|certification|certificate|approved|compliant|compl(y|ies)|\bhas\b|\bhave\b|"
     r"\bholds?\b|\bwith\b|cuenta[n]? con|contamos con|tiene[n]?\b|tenemos|certificad[oa]s?|certificaci[óo]n|"
-    r"homologad[oa]|aprobad[oa]|cumple|通过|具备|持有|有)")
+    r"homologad[oa]|aprobad[oa]|cumple|通过|具备|持有|有|"
+    r"konform|zertifiziert|Zertifikat|erfüllt|verfüg\w*|besitzt|\bhat\b|\bhaben\b|\bmit\b|"
+    r"取得済|取得して|適合|対応して|あります|付き|準拠|"
+    r"имеет\w*|имеем|\bесть\b|сертифицирован\w*|сертификат\w*|соответству\w*|\bс\b)")
 QUOTES_BUYER = re.compile(
     r"(?i)(target|your (price|budget)|objetivo|mencion|mentioned|you (asked|requested)|cannot|can't|unable|"
     r"no podemos|below our|por debajo)")
 # Only "so / but" start a new clause: commas also separate list items ("no UL, ETL ni NOM").
-CLAUSE_SPLIT = re.compile(r"\b(?:so|but|pero|así que)\b|但是|所以", re.I)
+CLAUSE_SPLIT = re.compile(r"\b(?:so|but|pero|así que|aber|deshalb|daher|но|поэтому)\b|但是|所以|ですが|しかし", re.I)
 
 
 def clause_of(sent, start):
@@ -71,6 +80,11 @@ CERT_PATTERNS = {
     "NOM": r"\bNOM\b",
     "FDA registration": r"\bFDA\b",
     "FCC SDoC test report": r"\bFCC\b",
+    # Certifications of the markets added on 2026-10-31 (only ever "not held" through a market profile).
+    "RoHS": r"\bRoHS\b",
+    "PSE": r"(?<![A-Za-z])PSE(?![A-Za-z])",
+    "EAC": r"(?<![A-Za-zА-Яа-я])(?:EAC|ЕАС)(?![A-Za-zА-Яа-я])",
+    "SONCAP": r"\bSONCAP\b",
 }
 MATERIAL_CLAIMS = [
     ("BPA", r"(?i)\bBPA[- ]?free\b|libre de BPA|\bsin BPA\b|不含\s*BPA|无\s*BPA"),

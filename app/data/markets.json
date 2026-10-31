@@ -1,0 +1,41 @@
+{
+ "note": "新增市场的资料（2026-10-31）：示例工厂在这些市场的认证状态和电源规格，全部为虚构的演示数据。只在询盘属于这些市场时并入提示词和代码校验，美国、墨西哥两个市场不受影响。",
+ "markets": {
+  "EU": {
+   "name_zh": "欧盟（德国）",
+   "power": "230V 50Hz",
+   "plug": "Type F（Schuko）",
+   "products": {
+    "KET-17S": {"certifications_not_held": ["RoHS"],
+                "notes_zh": "已有 CE（LVD/EMC），220–240V 欧规版本可做；RoHS 检测还没做，没有检测报告"}
+   }
+  },
+  "JP": {
+   "name_zh": "日本",
+   "power": "100V 50/60Hz",
+   "plug": "Type A",
+   "products": {
+    "AF-45D": {"certifications_not_held": ["PSE"],
+               "notes_zh": "目前只有 120V 美规版本，没有 100V 日本版本；没有 PSE 相关检测"}
+   }
+  },
+  "EAEU": {
+   "name_zh": "哈萨克斯坦（欧亚经济联盟）",
+   "power": "220V 50Hz",
+   "plug": "Type C / F",
+   "products": {
+    "GS-12H": {"certifications_not_held": ["EAC"],
+               "notes_zh": "资料卡只列了 120V 美规版本，220V 版本能否量产要工厂确认；没有俄语说明书"}
+   }
+  },
+  "NG": {
+   "name_zh": "尼日利亚",
+   "power": "230V 50Hz",
+   "plug": "Type D / G",
+   "products": {
+    "BL-35P": {"certifications_not_held": ["SONCAP"],
+               "notes_zh": "USB-C 充电，电池有 UN38.3 运输测试报告；从未办过 SONCAP 的产品证书和 SONCAP 证书"}
+   }
+  }
+ }
+}

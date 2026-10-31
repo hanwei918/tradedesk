@@ -53,3 +53,17 @@ All 28 excerpts were checked against the fetched page text after whitespace norm
 | https://sellercentral.amazon.com/help/hub/reference/external/G1881 ("Product image guide", "This article applies to selling in: United States") | browser (JS-rendered), excerpts checked with `innerText.includes()` | OK | IMG-01..10 |
 
 IMG-04 (85%) and IMG-05 (entire product in frame) are measured by code from the non-white bounding box; that measurement is an estimate and the UI says so.
+
+# Added 2026-10-31: EU, Japan, Eurasian Economic Union, Nigeria
+
+Seven rules for four markets, all `kind: llm` and limited to `alibaba_rfq` replies for their own market, so prompts for the US and Mexico did not change. Each excerpt was found verbatim in the fetched page text after whitespace normalisation (EUR-Lex in a browser with `innerText.indexOf()`, because it answers scripts with an empty 202; the others by curl, the EEC PDF through pdftotext).
+
+| URL | How fetched | Status | Rules |
+|---|---|---|---|
+| https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0035 | browser | OK; Directive 2014/35/EU (LVD), Art. 17(1) | EU-01 |
+| https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32011L0065 | browser | OK; Directive 2011/65/EU (RoHS), Art. 4(1) and Annex II as published (later amendments not checked) | EU-02 |
+| https://www.meti.go.jp/english/policy/economy/consumer/pse/ | curl | OK; METI page, "Last updated: 2023-04-13"; does not list air fryers by name | JP-01, JP-02 |
+| https://eec.eaeunion.org/upload/medialibrary/269/TR-TS-Downvolt.pdf | curl + pdftotext | OK; TR CU 004/2011, Art. 3(3) and Art. 4(5), linked from the EEC page on the regulation | EA-01, EA-02 |
+| https://son.gov.ng/soncap-faq/ (from https://son.gov.ng/?p=1000) | curl | OK; SON "SONCAP FAQ" page | NG-01 |
+
+The market profiles in `data/markets.json` (which certification each demo product lacks in each market, power and plug) are invented demo data, like the rest of the factory card.

@@ -819,5 +819,135 @@ class SavingsTests(unittest.TestCase):
         self.assertIn("没有实测", v["unmeasured"])
 
 
+class MarketTests(unittest.TestCase):
+    """Markets added on 2026-10-31 (EU, Japan, EAEU, Nigeria), on the real knowledge base."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.kb = KnowledgeBase()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_inquiry(self, inquiry_id, reply):
+        q = next(x for x in self.kb.inquiries if x["id"] == inquiry_id)
+        understanding = {"buyer": {"language": q["language"]}, "requests": [], "signals": [], "conflicts": [], "summary_zh": "x"}
+        transport = FakeTransport({"询盘分析员": understanding, "外贸业务员": {"reply": reply, "internal_brief_zh": "备忘"},
+                                   "合规审核员": {"findings": []}})
+        llm = LLM(api_key="k", mode="live", cache_dir=self.tmp.name, transport=transport, provider="openai")
+        runner = Runner(llm, self.kb, log_path=Path(self.tmp.name) / "calls.jsonl", board=Board(Path(self.tmp.name) / "state"))
+        r = runner.inquiry({"inquiry_text": q["text"], "intent_zh": q["intent_zh"], "product_id": q["product_id"],
+                            "inquiry_id": q["id"], "round": 1})
+        return r, transport
+
+    def test_market_comes_from_the_inquiry_not_its_language(self):
+        r, transport = self.run_inquiry("INQ-NG-01", "Hello Chinedu, the blender cups come with SONCAP certificate.")
+        self.assertEqual(r["market"], "NG")              # written in English, but the buyer is in Nigeria
+        self.assertIn("NG-01", r["rules_checked"])
+        self.assertNotIn("US-03", r["rules_checked"])    # no California rules for a Lagos importer
+        self.assertIn("SONCAP", transport.calls[0]["messages"][1]["content"])  # the analyst sees what the market needs
+        self.assertEqual([f["check"] for f in r["findings"] if f["severity"] == "red"], ["fact_cert"])
+
+    def test_us_and_mexico_requests_carry_no_market_block(self):
+        for qid in ("INQ-US-01", "INQ-MX-01"):
+            r, transport = self.run_inquiry(qid, "Hello, thank you.")
+            self.assertEqual(r["market"], {"INQ-US-01": "US", "INQ-MX-01": "MX"}[qid])
+            for call in transport.calls:
+                self.assertNotIn('"market"', call["messages"][1]["content"])
+
+    def test_certification_claims_in_four_more_languages(self):
+        cases = [("INQ-DE-01", "Der Wasserkocher ist RoHS-konform.", "Einen RoHS-Prüfbericht haben wir noch nicht."),
+                 ("INQ-JP-01", "本製品はPSEマーク付きで出荷できます。", "PSE認証は取得していません。"),
+                 ("INQ-KZ-01", "Товар имеет сертификат ЕАС.", "Сертификата ЕАС у нас пока нет."),
+                 ("INQ-NG-01", "The goods come with SONCAP certificate.", "We do not have SONCAP yet.")]
+        language = {"INQ-DE-01": "German", "INQ-JP-01": "Japanese", "INQ-KZ-01": "Russian", "INQ-NG-01": "English"}
+        for qid, claim, honest in cases:
+            r, transport = self.run_inquiry(qid, claim)
+            sales = next(c for c in transport.calls if "外贸业务员" in c["messages"][0]["content"])
+            self.assertIn(language[qid], sales["messages"][0]["content"], qid)  # replies in the buyer's language
+            red = [f for f in r["findings"] if f["check"] == "fact_cert" and f["severity"] == "red"]
+            self.assertEqual(len(red), 1, (qid, claim, r["findings"]))
+            r, _ = self.run_inquiry(qid, honest)
+            self.assertFalse([f for f in r["findings"] if f["check"] == "fact_cert"], (qid, honest, r["findings"]))
+
+    def test_every_new_market_has_verified_rules_and_a_product_profile(self):
+        new = [q for q in self.kb.inquiries if q.get("market") and q["market"] not in ("US", "MX")]
+        self.assertEqual({q["market"] for q in new}, {"EU", "JP", "EAEU", "NG"})
+        for q in new:
+            profile = self.kb.market_profile(q["market"], q["product_id"])
+            self.assertTrue(profile and profile["certifications_not_held"], q["id"])
+            rules = [r for r in self.kb.rules_for("alibaba_rfq", kinds=["llm"], market=q["market"]) if q["market"] in r["markets"]]
+            self.assertTrue(rules, q["id"])
+            for r in rules:
+                self.assertTrue(r["verified"] and r["excerpt"] and r["url"].startswith("https://") and r["fetched"] == "2026-10-31", r["id"])
+
+
+class ReplayTests(unittest.TestCase):
+    def test_replay_finds_an_answer_recorded_with_the_other_model(self):
+        with tempfile.TemporaryDirectory() as t:
+            rec = LLM(api_key="k", mode="record", cache_dir=t, provider="anthropic", model="claude-opus-5-5",
+                      transport=lambda body: '{"answer": 1}')
+            rec.chat_json("system text", "user text")
+            gpt = LLM(api_key="", mode="replay", cache_dir=t, provider="openai", model="gpt-5.5",
+                      transport=lambda body: self.fail("replay must not call the model"))
+            data, meta = gpt.chat_json("system text", "user text")
+            self.assertEqual((data, meta["source"], meta["model"]), ({"answer": 1}, "replay", "claude-opus-5-5"))
+            self.assertEqual((gpt.provider, gpt.model), ("openai", "gpt-5.5"))  # the lookup leaves the settings alone
+            with self.assertRaises(LLMError):
+                gpt.chat_json("system text", "a request nobody recorded")
+
+    def test_recorded_demo_still_replays_for_the_original_inquiries(self):
+        """Adding markets must not change a single request the demo cache was recorded with."""
+        def fail(body):
+            raise AssertionError("cache miss: a recorded request changed")
+        kb = KnowledgeBase()
+        with tempfile.TemporaryDirectory() as t:
+            llm = LLM(api_key="", mode="replay", provider="anthropic", model="claude-opus-5-5", transport=fail)
+            runner = Runner(llm, kb, log_path=Path(t) / "calls.jsonl", board=Board(Path(t) / "state"))
+            original = [q for q in kb.inquiries if "market" not in q]
+            self.assertEqual(len(original), 8)
+            runner.triage({"inquiry_ids": [q["id"] for q in original]})
+            for q in original:
+                base = {"inquiry_text": q["text"], "intent_zh": q["intent_zh"], "product_id": q["product_id"], "inquiry_id": q["id"]}
+                r1 = runner.inquiry(dict(base, round=1))
+                self.assertEqual(r1["trace"][0]["meta"]["model"], "claude-opus-5-5")
+                if r1["findings"]:  # same second round as tools/record_demo.py and the page's “按风险提示全部修改”
+                    fix = "按风险提示全部修改\n风险提示：\n" + "\n".join(
+                        f"{i + 1}. {f['problem_zh']}（原文：{f['quote']}）建议：{f['suggestion_zh']}" for i, f in enumerate(r1["findings"]))
+                    runner.inquiry(dict(base, understanding=r1["understanding"], language=r1["language"], instruction_zh=fix, round=2,
+                                        previous={"reply": r1["reply"], "internal_brief_zh": r1["internal_brief_zh"]}))
+            for pid in kb.products:
+                r1 = runner.listing({"product_id": pid, "platforms": ["amazon_us", "tiktok_mx"], "round": 1})
+                if any(d["findings"] for d in r1["platforms"].values()):
+                    fix = "按风险提示全部修改\n风险提示：\n" + "\n".join(
+                        f"[{pl}] {f['field']}：{f['problem_zh']}（原文：{f['quote']}）建议：{f['suggestion_zh']}"
+                        for pl, d in r1["platforms"].items() for f in d["findings"])
+                    prev = {pl: {"content": d["content"]} for pl, d in r1["platforms"].items()}
+                    runner.listing({"product_id": pid, "platforms": list(prev), "previous": prev, "instruction_zh": fix, "round": 2})
+            runner.check_text({"platform": "amazon_us", "product_id": "KET-17S",
+                               "text": "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping"})
+
+    def test_new_market_inquiries_replay_offline_with_either_model(self):
+        """The four 10-31 inquiries were recorded with gpt-5.5; replay must work under the Claude settings too."""
+        def fail(body):
+            raise AssertionError("cache miss")
+        kb = KnowledgeBase()
+        new = [q for q in kb.inquiries if "market" in q]
+        self.assertEqual(len(new), 4)
+        with tempfile.TemporaryDirectory() as t:
+            llm = LLM(api_key="", mode="replay", provider="anthropic", model="claude-opus-5-5", transport=fail)
+            runner = Runner(llm, kb, log_path=Path(t) / "calls.jsonl", board=Board(Path(t) / "state"))
+            runner.triage({"inquiry_ids": [q["id"] for q in new]})
+            for q in new:
+                base = {"inquiry_text": q["text"], "intent_zh": q["intent_zh"], "product_id": q["product_id"], "inquiry_id": q["id"]}
+                r1 = runner.inquiry(dict(base, round=1))
+                self.assertEqual((r1["market"], r1["trace"][1]["meta"]["model"]), (q["market"], "gpt-5.5"))
+                if r1["findings"]:
+                    fix = "按风险提示全部修改\n风险提示：\n" + "\n".join(
+                        f"{i + 1}. {f['problem_zh']}（原文：{f['quote']}）建议：{f['suggestion_zh']}" for i, f in enumerate(r1["findings"]))
+                    runner.inquiry(dict(base, understanding=r1["understanding"], language=r1["language"], instruction_zh=fix, round=2,
+                                        previous={"reply": r1["reply"], "internal_brief_zh": r1["internal_brief_zh"]}))
+
+
 if __name__ == "__main__":
     unittest.main()

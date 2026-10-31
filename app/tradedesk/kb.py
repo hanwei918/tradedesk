@@ -12,6 +12,7 @@ KB_PATH = ROOT / "kb" / "rules.json"
 PRODUCTS_PATH = ROOT / "data" / "products.json"
 INQUIRIES_PATH = ROOT / "data" / "inquiries.json"
 CHECK_MAP_PATH = ROOT / "config" / "check_map.json"
+MARKETS_PATH = ROOT / "data" / "markets.json"
 
 PLATFORM_NAMES = {
     "alibaba_rfq": "阿里巴巴国际站 · RFQ 回复",
@@ -29,7 +30,7 @@ def _load(path, default):
 
 class KnowledgeBase:
     def __init__(self, rules_path=KB_PATH, products_path=PRODUCTS_PATH,
-                 inquiries_path=INQUIRIES_PATH, check_map_path=CHECK_MAP_PATH):
+                 inquiries_path=INQUIRIES_PATH, check_map_path=CHECK_MAP_PATH, markets_path=MARKETS_PATH):
         kb = _load(rules_path, {"version": None, "rules": []})
         self.version = kb.get("version")
         self.all_rules = kb.get("rules", [])
@@ -40,11 +41,24 @@ class KnowledgeBase:
         self.products = {p["id"]: p for p in self.catalog.get("products", [])}
         self.inquiries = _load(inquiries_path, {"inquiries": []}).get("inquiries", [])
         self.check_map = _load(check_map_path, {})
+        self.markets = _load(markets_path, {"markets": {}}).get("markets", {})
 
     def product(self, product_id):
         if product_id not in self.products:
             raise KeyError(f"未知产品：{product_id}")
         return self.products[product_id]
+
+    def market_profile(self, market, product_id):
+        """What a market added after the US and Mexico needs from one product, or None.
+
+        Only those markets have a profile, so prompts and checks for the US and Mexico stay
+        exactly as they were (and their recorded answers still replay)."""
+        m = self.markets.get(market)
+        if not m:
+            return None
+        p = m.get("products", {}).get(product_id, {})
+        return {"market": market, "name_zh": m.get("name_zh"), "power": m.get("power"), "plug": m.get("plug"),
+                "certifications_not_held": p.get("certifications_not_held", []), "notes_zh": p.get("notes_zh", "")}
 
     def rule(self, rule_id):
         return self.rules.get(rule_id)

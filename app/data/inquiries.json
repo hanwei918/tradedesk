@@ -72,6 +72,50 @@
       "product_id": "AF-45D",
       "text": "Buen día, somos un distribuidor de línea blanca en Monterrey con 12 sucursales. Nos interesa la freidora de aire digital de 4.5 L, 1,500 unidades para la temporada de diciembre. Necesitamos que cumpla con la NOM y el manual en español. ¿Pueden cotizar CIF Veracruz? Pago 30% anticipo y 70% contra copia de B/L. Saludos, Jorge Treviño, Compras",
       "intent_zh": "先报 FOB 宁波 24.50（3000 以上 22.80），CIF 维拉克鲁斯确认运费后再报；没有 NOM，可以配合办理；说明书可以做西语版（需确认周期）。付款方式可以接受。"
+    },
+    {
+      "id": "INQ-DE-01",
+      "label_zh": "德国买家 · 德语 · CE + RoHS",
+      "platform": "alibaba_rfq",
+      "language": "de",
+      "market": "EU",
+      "flag": "🇩🇪",
+      "product_id": "KET-17S",
+      "text": "Guten Tag, wir sind ein Haushaltswaren-Großhändler aus Köln und beliefern rund 60 Fachgeschäfte. Wir interessieren uns für Ihren 1,7-Liter-Wasserkocher aus Edelstahl, zunächst 2.000 Stück. Bitte bestätigen Sie die CE- und RoHS-Konformität und schicken Sie uns die EU-Konformitätserklärung. Wir benötigen 230 V und Schuko-Stecker. Bitte Preis FOB Ningbo, Lieferung bis Mitte Januar. Mit freundlichen Grüßen, Katrin Weber (einkauf@example-haushalt.de)",
+      "intent_zh": "报 FOB 宁波，2000 台按阶梯价；CE（LVD/EMC）有，可以发证书；RoHS 检测报告还没有，可以安排送检，周期确认后告诉对方；欧规 230V 和 Schuko 插头可以做。"
+    },
+    {
+      "id": "INQ-JP-01",
+      "label_zh": "日本买家 · 日语 · PSE + 100V",
+      "platform": "alibaba_rfq",
+      "language": "ja",
+      "market": "JP",
+      "flag": "🇯🇵",
+      "product_id": "AF-45D",
+      "text": "お世話になっております。東京の家電輸入商社、山田商事の佐藤と申します。貴社の4.5Lデジタルエアフライヤー（AF-45D）を、初回1,000台で検討しております。日本国内で販売するため、PSEマーク付き・AC100V仕様が必須条件です。FOB寧波でのお見積りと、12月中旬までの納期可否をご教示いただけますでしょうか。よろしくお願いいたします。佐藤（info@example-yamada.jp）",
+      "intent_zh": "报 FOB 宁波 1000 台；我们没有 100V 版本，也没有 PSE 相关检测，需要评估改版和检测的周期、费用，不能答应 12 月中旬交货；可以配合进口商办理。"
+    },
+    {
+      "id": "INQ-KZ-01",
+      "label_zh": "哈萨克斯坦买家 · 俄语 · EAC",
+      "platform": "alibaba_rfq",
+      "language": "ru",
+      "market": "EAEU",
+      "flag": "🇰🇿",
+      "product_id": "GS-12H",
+      "text": "Здравствуйте! Мы дистрибьютор бытовой техники в Алматы, работаем с сетями магазинов по всему Казахстану. Нас интересует ручной отпариватель GS-12H, первая партия 800 штук. Обязательно нужен сертификат ЕАС, инструкция на русском языке и исполнение на 220 В с европейской вилкой. Просим цену FOB Нинбо и срок поставки. Оплата: 30% предоплата, 70% против копии коносамента. С уважением, Айгерим Нурланова (zakup@example-alma.kz)",
+      "intent_zh": "报 FOB 宁波 800 台，付款条件可以接受；EAC 我们没有，要和买家确认由谁办理、周期和费用；俄语说明书可以翻译制作；220V 版本要先跟工厂确认能不能做。"
+    },
+    {
+      "id": "INQ-NG-01",
+      "label_zh": "尼日利亚买家 · 英语 · SONCAP",
+      "platform": "alibaba_rfq",
+      "language": "en",
+      "market": "NG",
+      "flag": "🇳🇬",
+      "product_id": "BL-35P",
+      "text": "Hello, we are importers of small kitchen appliances based in Lagos, Nigeria. We want 1,000 pcs of your portable blender cup BL-35P for our supermarket customers. Please confirm the goods will come with SONCAP certificate, because customs in Lagos will not clear the shipment without it. Kindly quote CIF Lagos (Apapa port). Payment: 30% deposit, 70% by L/C at sight. Thanks, Chinedu Okafor (sales@example-lagos.ng)",
+      "intent_zh": "报 CIF 拉各斯 1000 台，付款方式可以接受；我们从来没办过 SONCAP，产品证书和 SONCAP 证书需要和买家确认怎么办理，不能保证清关；电池有 UN38.3。"
     }
   ]
 }

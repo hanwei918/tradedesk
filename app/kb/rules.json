@@ -1,5 +1,5 @@
 {
- "version": "2026-10-26",
+ "version": "2026-10-31",
  "note": "Rules knowledge base for the exporter-assistant demo (1.7 L stainless-steel kettle with plastic handle/lid; US + MX). Every excerpt is a verbatim quote from the page at `url`, fetched 2026-10-26; summary_zh is a paraphrase. Not legal advice. Prop 65 text comes from Cornell LII's copy of 27 CCR (official OEHHA site blocked automated access), so it is marked secondary. Culture rules are secondary sources. Regex patterns use Python `re` syntax (inline (?i) flag). See SOURCES.md.",
  "rules": [
   {
@@ -833,6 +833,153 @@
    "check": {
     "kind": "vision",
     "question_zh": "图中是否有类似 Best seller、Top seller、Amazon's Choice 的徽章或标签？"
+   }
+  },
+  {
+   "id": "EU-01",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "电器在欧盟上市须加贴 CE 标志（低电压指令）",
+   "summary_zh": "低电压指令 2014/35/EU 第 17 条要求把 CE 标志清晰、牢固地加贴在电器或其铭牌上；CE 只代表产品符合所声明的那些指令。资料卡写明的 CE 只覆盖 LVD/EMC，回复不能把它说成已经涵盖 RoHS 等其他要求。",
+   "excerpt": "The CE marking shall be affixed visibly, legibly and indelibly to the electrical equipment or to its data plate.",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0035",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否把工厂的 CE（LVD/EMC）说成已经涵盖 RoHS 或其他工厂没有做过的欧盟要求，或声称产品已满足欧盟全部上市要求？"
+   }
+  },
+  {
+   "id": "EU-02",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "RoHS：电器不得含附件 II 所列限用物质",
+   "summary_zh": "RoHS 指令 2011/65/EU 第 4 条要求投放欧盟市场的电子电气设备不含附件 II 所列物质（铅、汞、镉、六价铬、多溴联苯、多溴二苯醚等，按均质材料中的最大浓度限值）。没有检测报告时，不能声称产品“符合 RoHS”。",
+   "excerpt": "does not contain the substances listed in Annex II",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32011L0065",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否在工厂没有 RoHS 检测报告的情况下声称产品“符合 RoHS / RoHS compliant / RoHS-konform”？"
+   }
+  },
+  {
+   "id": "JP-01",
+   "category": "compliance_jp",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "JP"
+   ],
+   "title_zh": "日本：没有 PSE 标识不得销售电气用品",
+   "summary_zh": "日本经济产业省说明，《电气用品安全法》第 27 条规定，没有第 10 条所定 PSE 标识的电气用品不得在日本销售或展示；该法管制 457 类电气用品，其中特定电气用品 116 类。具体品类以政令清单为准。",
+   "excerpt": "Without the PSE Labeling specified in the article 10 of the Act, sale and/or exhibition of Electrical Appliances and Materials is prohibited in Japan.",
+   "url": "https://www.meti.go.jp/english/policy/economy/consumer/pse/",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否在工厂没有 PSE 相关资料的情况下声称产品已带 PSE 标识，或可以直接在日本销售？"
+   }
+  },
+  {
+   "id": "JP-02",
+   "category": "compliance_jp",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "JP"
+   ],
+   "title_zh": "日本：进口电器由进口商履行电气用品安全法义务",
+   "summary_zh": "经济产业省说明，进口电气用品的申报、检查和标识等义务由进口商（申报事业者）承担。工厂可以配合检测和提供资料，但不应承诺由工厂“办好 PSE”。",
+   "excerpt": "As for imported electrical appliances and materials, it is the importers who have the responsibility to fulfill these obligations under the Act.",
+   "url": "https://www.meti.go.jp/english/policy/economy/consumer/pse/",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否承诺由工厂“办好 PSE / 负责日本合规”，而没有说明在日本由进口商作为申报事业者履行义务？"
+   }
+  },
+  {
+   "id": "EA-01",
+   "category": "compliance_eaeu",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "EAEU"
+   ],
+   "title_zh": "欧亚经济联盟：没有 EAC 标志的低压设备不得投放市场",
+   "summary_zh": "关税同盟技术法规 TR CU 004/2011《低压设备安全》第 3 条：未标注联盟统一流通标志（即 EAC 标志）的低压设备不得投放市场，标志须在完成合格评定后才能加贴。适用于哈萨克斯坦等成员国。",
+   "excerpt": "Низковольтное оборудование, не маркированное единым знаком обращения на рынке государств-членов Таможенного союза, не допускается к выпуску в обращение на рынке.",
+   "url": "https://eec.eaeunion.org/upload/medialibrary/269/TR-TS-Downvolt.pdf",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否在工厂没有 EAC 证书或符合性声明的情况下声称产品已有 EAC，或可以直接在欧亚经济联盟（哈萨克斯坦等）销售？"
+   }
+  },
+  {
+   "id": "EA-02",
+   "category": "compliance_eaeu",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "EAEU"
+   ],
+   "title_zh": "欧亚经济联盟：使用说明须用俄语",
+   "summary_zh": "TR CU 004/2011 第 4 条第 5 款：使用说明等随附文件须用俄语书写，成员国法律另有要求时还须附该国官方语言。工厂没有俄语说明书时，回复要如实说明需要翻译，不能说现有说明书可以直接用。",
+   "excerpt": "Эксплуатационные документы выполняются на русском языке",
+   "url": "https://eec.eaeunion.org/upload/medialibrary/269/TR-TS-Downvolt.pdf",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否声称工厂现有的说明书可以直接用于欧亚经济联盟，而没有说明需要俄语版（及成员国官方语言版）？"
+   }
+  },
+  {
+   "id": "NG-01",
+   "category": "compliance_ng",
+   "platforms": [
+    "alibaba_rfq"
+   ],
+   "markets": [
+    "NG"
+   ],
+   "title_zh": "尼日利亚：受管制产品进口要产品证书和 SONCAP 证书",
+   "summary_zh": "尼日利亚标准组织（SON）说明：受管制产品的进口商必须取得两张证书才能办理进口和清关，即产品证书（PC）和 SONCAP 证书（SC），分别用于办理 Form M 和海关清关。工厂从未办过时，回复不能说货物已有 SONCAP 或保证能清关。",
+   "excerpt": "importers of regulated products must obtain two certificates to process the importation and clearance of the goods.",
+   "url": "https://son.gov.ng/soncap-faq/",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "回复是否声称货物已有 SONCAP、或保证能在尼日利亚直接清关，而没有说明需要产品证书（PC）和 SONCAP 证书（SC）？"
    }
   }
  ]

@@ -25,8 +25,10 @@ ROOT = Path(__file__).resolve().parent.parent
 PROMPTS = ROOT / "prompts"
 LOG_PATH = ROOT / "logs" / "calls.jsonl"
 
-MARKET_BY_LANGUAGE = {"es": "MX", "en": "US"}
-LANGUAGE_NAMES = {"en": "English", "es": "Spanish (Mexico, formal usted)", "pt": "Portuguese", "fr": "French"}
+# Only for pasted inquiries: a sample inquiry names its own market (an English inquiry may come from Nigeria).
+MARKET_BY_LANGUAGE = {"es": "MX", "en": "US", "de": "EU", "ja": "JP", "ru": "EAEU"}
+LANGUAGE_NAMES = {"en": "English", "es": "Spanish (Mexico, formal usted)", "pt": "Portuguese", "fr": "French",
+                  "de": "German (formal Sie)", "ja": "Japanese (business keigo)", "ru": "Russian (formal Вы)"}
 
 ROLES = {
     "analyst": "询盘分析员",
@@ -92,8 +94,19 @@ class Runner:
         rules = self.kb.rules_for(platform, kinds=TEXT_KINDS, market=market)
         return [{"id": r["id"], "rule_zh": r.get("summary_zh")} for r in rules]
 
+    def _facts(self, product, market=None):
+        """Factory and product card, plus what a newer market needs from this product (none for the US or Mexico)."""
+        facts = {"factory": self.kb.factory, "product": product}
+        profile = self.kb.market_profile(market, product["id"]) if market else None
+        if profile:
+            facts["market"] = profile
+        return facts
+
     def review(self, trace, run_id, workflow, platform, fields, product, trigger, market=None):
         """Rule checks + model review with the citation guard."""
+        profile = self.kb.market_profile(market, product["id"]) if market else None
+        if profile:  # certifications this market needs and the factory lacks count as "not held" for the code checks
+            product = dict(product, certifications_not_held=product.get("certifications_not_held", []) + profile["certifications_not_held"])
         findings = checks.run_rule_checks(fields, product, self.kb, platform, market)
         llm_rules = self.kb.rules_for(platform, kinds=["llm"], market=market)
         dropped, skipped = [], None
@@ -103,7 +116,7 @@ class Runner:
                                for r in llm_rules]
             user = (f"## 平台\n{PLATFORM_NAMES.get(platform, platform)}\n\n"
                     f"## 规则\n{dumps(rules_for_model)}\n\n"
-                    f"## 工厂与产品资料（只用来核对事实，不是待审文本）\n{dumps({'factory': self.kb.factory, 'product': product})}\n\n"
+                    f"## 工厂与产品资料（只用来核对事实，不是待审文本）\n{dumps(self._facts(product, market) if profile else {'factory': self.kb.factory, 'product': product})}\n\n"
                     f"## 待审文本（按字段）\n{dumps(fields)}")
             try:
                 data = self._step(trace, run_id, workflow, f"合规审核 · {platform}", "compliance",
@@ -134,14 +147,16 @@ class Runner:
         rnd = int(payload.get("round") or 1)
         trigger = "业务员修改意见" if previous else "收到新询盘"
 
-        facts = {"factory": self.kb.factory, "product": product}
+        record = next((q for q in self.kb.inquiries if q["id"] == payload.get("inquiry_id")), {})
+        market = payload.get("market") or record.get("market")
         understanding = payload.get("understanding")
         if not understanding:
-            understanding = self._understand(trace, run_id, "A 询盘回复", inquiry_text, product, trigger)
+            understanding = self._understand(trace, run_id, "A 询盘回复", inquiry_text, product, trigger, market)
 
         language = payload.get("language") or (understanding.get("buyer") or {}).get("language") or "en"
         language = language if language in LANGUAGE_NAMES else "en"
-        market = MARKET_BY_LANGUAGE.get(language, "US")
+        market = market or MARKET_BY_LANGUAGE.get(language, "US")
+        facts = self._facts(product, market)
         parts = [f"## 询盘原文\n{inquiry_text}", f"## 询盘分析\n{dumps(understanding)}",
                  f"## 工厂与产品资料\n{dumps(facts)}", f"## 业务员意图\n{intent or '（无）'}",
                  f"## 平台与沟通规则（知识库）\n{dumps(self._guidance('alibaba_rfq', market))}"]
@@ -169,9 +184,9 @@ class Runner:
             "trace": trace, **review,
         }
 
-    def _understand(self, trace, run_id, workflow, inquiry_text, product, trigger):
+    def _understand(self, trace, run_id, workflow, inquiry_text, product, trigger, market=None):
         """Shared by replies and inbox triage, so both reuse the same cached answer."""
-        facts = {"factory": self.kb.factory, "product": product}
+        facts = self._facts(product, market)
         user = f"## 询盘原文\n{inquiry_text}\n\n## 工厂与产品资料\n{dumps(facts)}"
         data = self._step(trace, run_id, workflow, "理解询盘", "analyst", prompt("understand_inquiry"), user, trigger)
         return self._guard_understanding(data, inquiry_text)
@@ -186,7 +201,7 @@ class Runner:
             run_id = uuid.uuid4().hex[:8]
             trace = []
             product = self.kb.product(q["product_id"])
-            u = self._understand(trace, run_id, "收件箱整理", q["text"].strip(), product, "整理收件箱")
+            u = self._understand(trace, run_id, "收件箱整理", q["text"].strip(), product, "整理收件箱", q.get("market"))
             prio = priority(u, product)
             self.inbox.set_triage(q["id"], u, prio)
             out.append({"inquiry_id": q["id"], "priority": prio, "trace": trace})

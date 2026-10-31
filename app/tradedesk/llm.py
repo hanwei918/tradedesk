@@ -149,6 +149,23 @@ class LLM:
             "reasoning_effort": "low",
         }
 
+    # The demo cache holds answers recorded with these models. In replay mode a request missing for the
+    # current model is looked up as it was recorded with the others, so switching models never breaks replay.
+    REPLAY_MODELS = (("anthropic", ANTHROPIC_DEFAULT_MODEL), ("openai", DEFAULT_MODEL))
+
+    def _recorded(self, system, user, image):
+        """(path, model) of the recorded answer to this request, trying the current model first."""
+        current = (self.provider, self.model)
+        for provider, model in (current,) + tuple(m for m in self.REPLAY_MODELS if m != current):
+            self.provider, self.model = provider, model
+            try:
+                path = self.cache_dir / f"{self.key_for(self.body(system, user, image))}.json"
+            finally:
+                self.provider, self.model = current
+            if path.exists():
+                return path, model
+        return None, None
+
     @staticmethod
     def key_for(body):
         raw = json.dumps(body, ensure_ascii=False, sort_keys=True).encode("utf-8")
@@ -161,9 +178,12 @@ class LLM:
         path = self.cache_dir / f"{key}.json"
         started = time.time()
         usage = None
-        if self.mode == "replay" or (self.mode == "record" and path.exists()):
-            if not path.exists():
+        model = self.model
+        if self.mode == "replay":
+            path, model = self._recorded(system, user, image)
+            if not path:
                 raise LLMError("回放模式下没有这条请求的缓存，请切换到 live 或 record 模式")
+        if self.mode == "replay" or (self.mode == "record" and path.exists()):
             cached = json.loads(path.read_text(encoding="utf-8"))
             content, usage = cached["content"], cached.get("usage")
             source = "replay"
@@ -180,7 +200,7 @@ class LLM:
             data = json.loads(content)
         except json.JSONDecodeError as exc:
             raise LLMError(f"模型没有返回合法 JSON：{exc}") from exc
-        meta = {"source": source, "cache_key": key[:12], "model": self.model,
+        meta = {"source": source, "cache_key": path.stem[:12], "model": model,
                 "seconds": round(time.time() - started, 2), "usage": usage}
         return data, meta
 
