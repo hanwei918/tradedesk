@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="style.css?v=23">
 <script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -73,7 +73,7 @@
         <div class="grid g3" style="margin-top:16px">
           <button class="entry" data-go="board"><span class="ei"><svg class="ic"><use href="#i-package"/></svg></span><span class="tx"><small>工作流 C · 运营每天从这里开始</small><b>商品看板</b><span class="p">所有产品 × 主图 / Amazon / TikTok 的最新状态；批量生成上品，主图按 Amazon 要求逐条检查，导出 CSV。</span></span><svg class="ic go"><use href="#i-arrow-right"/></svg></button>
           <button class="entry" data-go="inquiry"><span class="ei"><svg class="ic"><use href="#i-mail-question"/></svg></span><span class="tx"><small>工作流 A</small><b>询盘回复</b><span class="p">找出询盘和工厂资料对不上的地方，用买家语言写 RFQ 回复，同时给采购 / 生产写中文备忘。</span></span><svg class="ic go"><use href="#i-arrow-right"/></svg></button>
-          <button class="entry" data-go="listing"><span class="ei"><svg class="ic"><use href="#i-store"/></svg></span><span class="tx"><small>工作流 B</small><b>多平台上架</b><span class="p">一份中文产品资料，生成 Amazon 美国站英文 Listing 和 TikTok 墨西哥西语脚本，按各自平台规则检查。</span></span><svg class="ic go"><use href="#i-arrow-right"/></svg></button>
+          <button class="entry" data-go="listing"><span class="ei"><svg class="ic"><use href="#i-store"/></svg></span><span class="tx"><small>工作流 B</small><b>多平台上架</b><span class="p">选择上架平台并分别设置输出语言，按可用的平台规则与产品事实检查文案。</span></span><svg class="ic go"><use href="#i-arrow-right"/></svg></button>
         </div>
       </section>
 
@@ -124,14 +124,15 @@
 
       <!-- ================= listing ================= -->
       <section class="page" id="page-listing">
-        <div class="page-head"><div><h1>多平台上架</h1><p>工作流 B · 一份中文产品资料 → 两个平台、两种语言</p></div><div class="rounds" id="lst-rounds"></div></div>
+        <div class="page-head"><div><h1>多平台上架</h1><p>工作流 B · 一份中文产品资料 → 多个平台，可分别选择输出语言</p></div><div class="rounds" id="lst-rounds"></div></div>
         <div class="bench" id="lst-bench">
           <div class="left card">
             <div class="card-h"><div><h3><svg class="ic"><use href="#i-package"/></svg>产品资料卡</h3><p>工厂填写一次，所有平台共用</p></div></div>
             <div class="card-b">
               <div class="products" id="lst-products"></div>
-              <label class="toggle"><span class="plat"><span class="pl amz">a</span><span><b>Amazon 美国站</b><br><span class="small muted">英语 · Listing</span></span></span><input type="checkbox" id="lst-amz" checked><span class="switch"></span></label>
-              <label class="toggle"><span class="plat"><span class="pl tt">♪</span><span><b>TikTok Shop 墨西哥</b><br><span class="small muted">西班牙语 · 种草短视频</span></span></span><input type="checkbox" id="lst-tt" checked><span class="switch"></span></label>
+              <div class="field listing-platform-label">上架平台与输出语言</div>
+              <div id="lst-platform-options" class="listing-platforms"></div>
+              <div id="lst-mode-note" class="listing-mode-note" hidden></div>
               <details style="margin:10px 0 14px"><summary class="small muted" style="cursor:pointer">查看资料卡 JSON</summary><pre class="json" id="lst-card"></pre></details>
               <button class="btn primary" id="lst-run" style="width:100%"><svg class="ic"><use href="#i-play"/></svg>生成 → 校验<span class="kbd">⌘↵</span></button>
             </div>
@@ -194,6 +195,6 @@
 <aside class="sheet" id="sheet" aria-hidden="true"><div class="sheet-h" id="sheet-h"></div><div class="sheet-b" id="sheet-b"></div><div class="sheet-f" id="sheet-f"></div></aside>
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
-<script src="app.js?v=23"></script>
+<script src="app.js?v=25"></script>
 </body>
 </html>

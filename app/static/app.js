@@ -41,7 +41,7 @@ const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { ret
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return u; } };
 const fmtS = (s) => (s == null ? "" : s < 1 ? `${Math.round(s * 1000)}ms` : `${s.toFixed(1)}s`);
 const worst = (risks) => (risks.includes("red") ? "red" : risks.includes("amber") ? "amber" : "green");
-const catNames = () => ({ platform_amazon: "Amazon 平台", platform_amazon_image: "Amazon 主图", platform_alibaba: "阿里国际站", platform_tiktok: "TikTok Shop", compliance_us: "美国合规", compliance_mx: "墨西哥合规", compliance_eu: "欧盟合规", compliance_jp: "日本合规", compliance_eaeu: "欧亚经济联盟合规", compliance_ng: "尼日利亚合规", contract: "合同条款", culture: "商务礼仪" });
+const catNames = () => ({ platform_amazon: "Amazon 平台", platform_amazon_image: "Amazon 主图", platform_alibaba: "阿里国际站", platform_tiktok: "TikTok Shop", platform_ebay: "eBay 平台", platform_shopify: "Shopify 平台", platform_etsy: "Etsy 平台", platform_walmart: "Walmart 平台", platform_mercadolibre: "Mercado Libre 平台", platform_aliexpress: "AliExpress 平台", compliance_us: "美国合规", compliance_mx: "墨西哥合规", compliance_eu: "欧盟合规", compliance_jp: "日本合规", compliance_eaeu: "欧亚经济联盟合规", compliance_ng: "尼日利亚合规", contract: "合同条款", culture: "商务礼仪" });
 
 // ------------------------------------------------------------------ shared renderers
 function highlight(text, findings, field) {
@@ -483,19 +483,46 @@ function renderProducts() {
   $$("#lst-products .product").forEach((b) => b.addEventListener("click", () => pickProduct(b.dataset.id)));
   pickProduct(META.products[0].id);
 }
+function renderListingOptions() {
+  const { platforms, languages } = META.listing_catalog;
+  let saved = {};
+  try { saved = JSON.parse(store.get("td-listing-targets") || "{}"); } catch (e) { saved = {}; }
+  if (!saved || typeof saved !== "object" || Array.isArray(saved)) saved = {};
+  $("#lst-amz")?.closest(".toggle")?.remove();
+  $("#lst-tt")?.closest(".toggle")?.remove();
+  $("#page-listing .page-head p").textContent = "工作流 B · 一份中文产品资料 → 多个平台，可分别选择输出语言";
+  $("#lst-platform-options").innerHTML = Object.entries(platforms).map(([id, p]) => {
+    const checked = typeof saved[id]?.selected === "boolean" ? saved[id].selected : !!p.default_selected;
+    const language = languages[saved[id]?.language] ? saved[id].language : p.default_language;
+    return `<div class="listing-platform" data-platform="${id}">
+      <label class="listing-platform-check"><input type="checkbox" data-platform-select ${checked ? "checked" : ""}><span>${esc(p.name)}</span></label>
+      <select data-platform-language aria-label="${esc(p.name)}输出语言">${Object.entries(languages).map(([code, lang]) =>
+        `<option value="${code}" ${code === language ? "selected" : ""}>${esc(lang.name)}</option>`).join("")}</select></div>`;
+  }).join("");
+  const save = () => store.set("td-listing-targets", JSON.stringify(Object.fromEntries(
+    $$("#lst-platform-options [data-platform]").map((row) => [row.dataset.platform, {
+      selected: $("[data-platform-select]", row).checked,
+      language: $("[data-platform-language]", row).value,
+    }]),
+  )));
+  $$("#lst-platform-options [data-platform-select], #lst-platform-options [data-platform-language]").forEach((el) => el.addEventListener("change", save));
+  const note = $("#lst-mode-note");
+  note.hidden = META.llm.mode !== "replay";
+  note.textContent = "离线回放仅适用于已录制的完全相同请求。目前已有缓存覆盖部分 Amazon 美国站英语和 TikTok 墨西哥西语示例；其他平台、语言、产品或修改轮次需要先联网录制。";
+}
 function pickProduct(id) {
   state.lstProduct = id;
   $$("#lst-products .product").forEach((b) => b.classList.toggle("on", b.dataset.id === id));
   $("#lst-card").textContent = JSON.stringify(META.products.find((p) => p.id === id), null, 1);
 }
 
-function amazonPreview(d) {
+function amazonPreview(d, showUsTitleLimit = false) {
   const f = d.findings, c = d.content || {};
   const bullets = (c.bullets || []).map((b, i) => `<li>${highlight(b, f, `bullets[${i + 1}]`)}</li>`).join("");
   const len = (c.title || "").length;
-  return `<div class="amz-preview"><div class="fieldlab">标题 <span class="badge ${len > 75 ? "red" : "green"}">${len} / 75 字符</span></div>
-    <div class="t">${highlight(c.title, f, "title")}</div><div class="meta">Visit the [Brand] Store（预览占位）</div>
-    <div class="fieldlab">About this item</div><ul>${bullets}</ul>
+  return `<div class="amz-preview"><div class="fieldlab">标题 ${showUsTitleLimit ? `<span class="badge ${len > 75 ? "red" : "green"}">${len} / 75 字符</span>` : ""}</div>
+    <div class="t">${highlight(c.title, f, "title")}</div>
+    <div class="fieldlab">五点描述</div><ul>${bullets}</ul>
     <div class="fieldlab">描述</div><div class="desc">${highlight(c.description, f, "description")}</div>
     <div class="fieldlab">后台搜索词</div><div class="st mono">${highlight(c.search_terms, f, "search_terms")}</div></div>`;
 }
@@ -514,34 +541,47 @@ function tiktokPreview(d) {
       <div class="fieldlab">话题</div><div class="shot mono">${highlight((c.hashtags || []).join(" "), f, "hashtags")}</div></div></div>`;
 }
 
+function genericListingPreview(d) {
+  const f = d.findings, c = d.content || {};
+  const bullets = (c.bullets || []).map((b, i) => `<li>${highlight(b, f, `bullets[${i + 1}]`)}</li>`).join("");
+  const keywords = Array.isArray(c.keywords)
+    ? c.keywords.map((word, i) => highlight(word, f, `keywords[${i + 1}]`)).join(", ")
+    : highlight(c.keywords || "", f, "keywords");
+  return `<div class="generic-listing-preview"><div class="fieldlab">标题</div><h3>${highlight(c.title, f, "title")}</h3>
+    <div class="fieldlab">简短描述</div><div>${highlight(c.short_description, f, "short_description")}</div>
+    <div class="fieldlab">卖点</div><ul>${bullets}</ul><div class="fieldlab">商品描述</div><div class="desc">${highlight(c.description, f, "description")}</div>
+    <div class="fieldlab">关键词</div><div class="mono">${highlight(keywords, f, "keywords")}</div></div>`;
+}
+
 function renderListing() {
   const st = state.lst;
   $("#lst-rounds").innerHTML = roundsHtml(st, "lst");
   $$("#lst-rounds [data-round]").forEach((b) => b.addEventListener("click", () => { st.view = +b.dataset.round.split(":")[1]; renderListing(); }));
   if (!st.history.length) {
-    $("#lst-out").innerHTML = emptyCard("store", "选择产品和平台，点“生成 → 校验”", ["Amazon 按 Seller Central 规则检查：标题 ≤75 字符、禁用字符、促销用语…", "TikTok 墨西哥按平台内容政策和 NOM 规则检查。"]);
+    $("#lst-out").innerHTML = emptyCard("store", "选择产品与上架渠道", ["可为每个渠道分别选择文案输出语言。", "生成的文案会按已有规则和产品资料逐项校验。"]);
     return;
   }
   const r = st.history[st.view];
   const latest = st.view === st.history.length - 1;
   const names = r.trace.map((t) => `${t.role}`);
   const cards = Object.entries(r.platforms).map(([p, d]) => {
-    const P = PLAT[p];
+    const P = META.listing_catalog.platforms[p];
+    const format = P.kind === "tiktok" ? "短视频脚本" : "商品 Listing";
     const hasDiff = d.diff && Object.values(d.diff).some((ops) => ops.some((o) => o.op !== "equal"));
-    return `<div class="card" data-scope data-plat="${p}">
-      <div class="card-h"><div class="plat"><span class="pl ${P.cls}">${P.mark}</span><div><h3>${esc(P.name)}</h3><p>${esc(P.lang)} · ${p === "amazon_us" ? "Listing" : "种草短视频"}</p></div></div>
+    return `<div class="card" data-scope data-plat="${p}" dir="${d.language === "ar" ? "rtl" : "auto"}">
+      <div class="card-h"><div class="plat"><span class="pl ${P.kind === "amazon" ? "amz" : P.kind === "tiktok" ? "tt" : "other"}">${P.kind === "amazon" ? "a" : P.kind === "tiktok" ? "♪" : "店"}</span><div><h3>${esc(d.platform_name || P.name)}</h3><p>${esc(d.language_name || META.listing_catalog.languages[d.language]?.name || "")} · ${format}</p></div></div>
         <div class="row"><div class="seg"><button class="on" data-v="pre">预览</button><button data-v="diff" ${hasDiff ? "" : "disabled"}>对比</button></div><span class="badge ${d.risk}">${RISK[d.risk]}</span></div></div>
-      <div data-view="pre">${p === "amazon_us" ? amazonPreview(d) : tiktokPreview(d)}</div>
+      <div data-view="pre">${P.kind === "amazon" ? amazonPreview(d, true) : P.kind === "tiktok" ? tiktokPreview(d) : genericListingPreview(d)}</div>
       <div data-view="diff" hidden class="card-b">${d.diff ? Object.entries(d.diff).filter(([, ops]) => ops.some((o) => o.op !== "equal")).map(([k, ops]) => `<div class="fieldlab">${esc(k)}</div><div class="doc compact diff">${diffHtml(ops)}</div>`).join("") : ""}</div>
       <div class="sep" style="margin:0"></div>${riskPanel(d)}</div>`;
   }).join("");
   $("#lst-out").innerHTML = `<div class="card"><div class="steps-wrap">${stepsBar(names, r.trace, false)}${editBtn("lst-bench")}</div>
       ${!latest ? `<div class="callout" style="margin:12px 16px">${ic("info")}<div>正在查看第 ${st.view + 1} 轮（历史）。</div></div>` : ""}</div>
     <div class="grid ${Object.keys(r.platforms).length > 1 ? "g2" : ""}" style="margin-top:16px;align-items:start">${cards}</div>
-    ${latest ? `<div class="card journey"><div class="card-b"><span class="ji">${ic("package")}</span>
-      <div class="jt"><b>结果已写进商品看板</b><span>看板上这个产品的 Amazon 和 TikTok 格子已经更新，主图检查也在那里</span></div>
+    ${latest && r.board_channels?.length ? `<div class="card journey"><div class="card-b"><span class="ji">${ic("package")}</span>
+      <div class="jt"><b>支持的渠道已写入商品看板</b><span>Amazon 美国站与 TikTok 墨西哥的最新检查结果会显示在看板中</span></div>
       <button class="btn sm primary" data-go-board>${ic("package", "sm")}去商品看板</button></div></div>` : ""}
-    ${latest ? composer("lst", ["按风险提示全部修改", "标题再短一点，突出 304 不锈钢", "TikTok 开头更抓人一点"], st.history.length + 1) : ""}`;
+    ${latest ? composer("lst", ["按风险提示全部修改", "标题更简洁，突出核心卖点", ...(Object.keys(r.platforms).includes("tiktok_mx") ? ["TikTok 开头更抓人一点"] : [])], st.history.length + 1) : ""}`;
   $$("#lst-out [data-plat]").forEach((card) => $$(".seg button", card).forEach((b) => b.addEventListener("click", () => {
     $$(".seg button", card).forEach((x) => x.classList.toggle("on", x === b));
     $$("[data-view]", card).forEach((v) => (v.hidden = v.dataset.view !== b.dataset.v));
@@ -551,17 +591,19 @@ function renderListing() {
   if (latest) wireComposer("lst", reviseListing);
 }
 
-const selectedPlatforms = () => [["#lst-amz", "amazon_us"], ["#lst-tt", "tiktok_mx"]].filter(([s]) => $(s).checked).map(([, p]) => p);
+const selectedPlatforms = () => $$("#lst-platform-options [data-platform]").filter((row) => $("[data-platform-select]", row).checked).map((row) => row.dataset.platform);
+const selectedLanguages = (platforms) => Object.fromEntries(platforms.map((id) => [id, $("[data-platform-language]", $(`#lst-platform-options [data-platform='${id}']`)).value]));
 
 async function runListing() {
   if (state.lst.busy) return;
   const plats = selectedPlatforms();
   if (!plats.length) return toast("至少选一个平台");
+  const languages = selectedLanguages(plats);
   const btn = $("#lst-run");
   state.lst.busy = true; busy(btn, true, "生成中…");
-  $("#lst-out").innerHTML = loadingCard(plats.flatMap((p) => [`${PLAT[p].name} · 生成`, "合规审核"]));
+  $("#lst-out").innerHTML = loadingCard(plats.flatMap((p) => [`${META.listing_catalog.platforms[p].name} · 生成`, "合规审核"]));
   try {
-    const r = await api("/api/listing", { product_id: state.lstProduct, platforms: plats, round: 1 });
+    const r = await api("/api/listing", { product_id: state.lstProduct, platforms: plats, languages, round: 1 });
     state.lst.history = [r]; state.lst.view = 0; $("#lst-bench").classList.add("collapsed");
   } catch (e) { toast(e.message); }
   state.lst.busy = false; busy(btn, false); renderListing();
@@ -577,7 +619,9 @@ async function reviseListing() {
     const p = st.history[st.history.length - 1];
     const instruction = fixInstruction(ins, Object.entries(p.platforms).flatMap(([pl, d]) => d.findings.map((f) => `[${pl}] ${f.field}：${f.problem_zh}（原文：${f.quote}）建议：${f.suggestion_zh}`)));
     const previous = Object.fromEntries(Object.entries(p.platforms).map(([pl, d]) => [pl, { content: d.content }]));
-    const r = await api("/api/listing", { product_id: state.lstProduct, platforms: Object.keys(p.platforms), previous, instruction_zh: instruction, round: p.round + 1 });
+    const platforms = Object.keys(p.platforms);
+    const languages = Object.fromEntries(platforms.map((id) => [id, p.platforms[id].language]));
+    const r = await api("/api/listing", { product_id: state.lstProduct, platforms, languages, previous, instruction_zh: instruction, round: p.round + 1 });
     st.history.push(r); st.view = st.history.length - 1;
     toast(`第 ${r.round} 轮完成`, "ok");
   } catch (e) { toast(e.message); }
@@ -586,7 +630,7 @@ async function reviseListing() {
 
 // ------------------------------------------------------------------ check
 function renderCheckControls() {
-  const SHORT = { alibaba_rfq: "阿里国际站", amazon_us: "Amazon US", tiktok_mx: "TikTok MX" };
+  const SHORT = { alibaba_rfq: "阿里国际站", amazon_us: "Amazon US", tiktok_mx: "TikTok MX", amazon_uk: "Amazon UK", amazon_de: "Amazon DE", amazon_jp: "Amazon JP", ebay: "eBay", shopify: "Shopify", etsy: "Etsy", walmart_us: "Walmart US", mercadolibre_mx: "Mercado Libre", aliexpress: "AliExpress" };
   $("#chk-platform").innerHTML = Object.keys(META.platforms).map((k) => `<button data-p="${k}" class="${k === state.chkPlatform ? "on" : ""}">${esc(SHORT[k] || k)}</button>`).join("");
   $$("#chk-platform button").forEach((b) => b.addEventListener("click", (e) => { e.preventDefault(); state.chkPlatform = b.dataset.p; renderCheckControls(); }));
 }
@@ -1229,12 +1273,14 @@ async function boot() {
   document.body.insertAdjacentHTML("afterbegin", sprite);
   META = await api("/api/meta");
   renderModelCard();
+  const listingEntry = $('[data-go="listing"] .p');
+  if (listingEntry) listingEntry.textContent = "一份中文资料生成多平台商品文案，并为每个平台单独选择输出语言。";
   $$(".product-select").forEach((s) => { s.innerHTML = META.products.map((p) => `<option value="${p.id}">${esc(p.name_zh)}</option>`).join(""); });
   $("#inq-text").insertAdjacentHTML("afterend", micBar("inq-text", true));
   $("#inq-intent").insertAdjacentHTML("afterend", micBar("inq-intent", false));
   wireMics($("#inq-bench .left"));
   renderSamples(); pickSample(0); renderInquiry();
-  renderProducts(); renderListing();
+  renderProducts(); renderListingOptions(); renderListing();
   renderCheckControls();
   $("#chk-text").value = "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping";
   $("#chk-out").innerHTML = emptyCard("scan-search", "贴入文案后点“检查”", ["示例里埋了 6 个问题：长度、感叹号、促销用语、主观评价、未持有的认证、没检测过的材料宣称。"]);

@@ -18,8 +18,22 @@ PLATFORM_NAMES = {
     "alibaba_rfq": "阿里巴巴国际站 · RFQ 回复",
     "amazon_us": "Amazon 美国站 · Listing",
     "tiktok_mx": "TikTok Shop 墨西哥 · 种草短视频",
+    "amazon_uk": "Amazon 英国站 · Listing",
+    "amazon_de": "Amazon 德国站 · Listing",
+    "amazon_jp": "Amazon 日本站 · Listing",
+    "ebay": "eBay · Listing",
+    "shopify": "Shopify 独立站 · Listing",
+    "etsy": "Etsy · Listing",
+    "walmart_us": "Walmart 美国站 · Listing",
+    "mercadolibre_mx": "Mercado Libre 墨西哥 · Listing",
+    "aliexpress": "AliExpress · Listing",
 }
-PLATFORM_MARKET = {"alibaba_rfq": None, "amazon_us": "US", "tiktok_mx": "MX"}
+PLATFORM_MARKET = {
+    "alibaba_rfq": None,
+    "amazon_us": "US", "amazon_uk": "UK", "amazon_de": "EU", "amazon_jp": "JP",
+    "tiktok_mx": "MX", "walmart_us": "US", "mercadolibre_mx": "MX",
+    "ebay": None, "shopify": None, "etsy": None, "aliexpress": None,
+}
 
 
 def _load(path, default):

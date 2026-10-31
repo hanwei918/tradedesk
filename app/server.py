@@ -24,6 +24,7 @@ from tradedesk import checks, settings, savings
 from tradedesk.board import Board, CHANNELS
 from tradedesk.evaluate import evaluate, LABEL_ZH
 from tradedesk.inbox import TASK_STATUS
+from tradedesk.listing_catalog import public_catalog
 from tradedesk.workflows import Runner, LOG_PATH, ROLES
 
 ROOT = Path(__file__).resolve().parent
@@ -53,6 +54,7 @@ class App:
             "products": list(self.kb.products.values()),
             "inquiries": self.kb.inquiries,
             "platforms": PLATFORM_NAMES,
+            "listing_catalog": public_catalog(),
             "roles": ROLES,
         }
 

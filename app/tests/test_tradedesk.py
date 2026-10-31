@@ -13,6 +13,18 @@ from tradedesk.llm import LLM, LLMError  # noqa: E402
 from tradedesk.workflows import Runner, word_diff  # noqa: E402
 from tradedesk.board import Board  # noqa: E402
 from tradedesk import images  # noqa: E402
+from tradedesk.listing_catalog import LANGUAGES, LISTING_PLATFORMS  # noqa: E402
+
+
+class ListingCatalogTests(unittest.TestCase):
+    def test_listing_catalog_has_eleven_platforms_and_six_supported_languages(self):
+        self.assertEqual(len(LISTING_PLATFORMS), 11)
+        self.assertEqual(set(LANGUAGES), {"en", "es", "zh", "de", "ja", "ru"})
+        self.assertTrue(all(p["default_language"] in LANGUAGES for p in LISTING_PLATFORMS.values()))
+        for platform in LISTING_PLATFORMS.values():
+            self.assertTrue((ROOT / "prompts" / f"{platform['prompt']}.md").is_file())
+            self.assertTrue(platform["role"])
+
 
 RULES = {
     "version": "test",
@@ -287,12 +299,50 @@ class WorkflowTests(unittest.TestCase):
                   "bullets": ["A", "B", "C", "D", "E"], "description": "d", "search_terms": "s"}
         tiktok = {"hook": "¡Mira esto!", "script": [{"shot_zh": "镜头", "line": "Hierve rápido"}],
                   "caption": "c", "hashtags": ["#cocina"]}
-        runner, _ = self.runner({"Amazon US": amazon, "TikTok Shop": tiktok, "合规审核员": {"findings": []}})
+        runner, transport = self.runner({"Amazon US": amazon, "TikTok Shop": tiktok, "合规审核员": {"findings": []}})
         r = runner.listing({"product_id": "KET-17S", "round": 1})
         self.assertEqual(set(r["platforms"]), {"amazon_us", "tiktok_mx"})
         amz = r["platforms"]["amazon_us"]
         self.assertEqual(sorted(f["source"]["rule_id"] for f in amz["findings"]), ["AMZ-01", "AMZ-02"])
         self.assertEqual(r["platforms"]["tiktok_mx"]["risk"], "green")
+        amazon_call = next(c for c in transport.calls if c["messages"][0]["content"] ==
+                           (ROOT / "prompts" / "listing_amazon.md").read_text(encoding="utf-8"))
+        tiktok_call = next(c for c in transport.calls if c["messages"][0]["content"] ==
+                           (ROOT / "prompts" / "listing_tiktok.md").read_text(encoding="utf-8"))
+        for call in (amazon_call, tiktok_call):
+            for message in call["messages"]:
+                self.assertNotIn("Output language:", message["content"])
+
+    def test_listing_accepts_platform_specific_language(self):
+        generic = {"title": "商品标题", "short_description": "简短描述", "bullets": ["卖点一", "卖点二"],
+                   "description": "商品描述", "keywords": ["关键词一"], "notes_zh": "说明"}
+        runner, transport = self.runner({
+            "You are an experienced eBay marketplace": generic,
+            "You are an experienced Shopify": generic,
+        })
+        result = runner.listing({"product_id": "KET-17S", "platforms": ["ebay", "shopify"],
+                                 "languages": {"ebay": "ru", "shopify": "zh"}})
+        listing = result["platforms"]["ebay"]
+        self.assertEqual((listing["language"], listing["language_name"]), ("ru", "俄语"))
+        self.assertEqual((result["platforms"]["shopify"]["language"],
+                          result["platforms"]["shopify"]["language_name"]), ("zh", "中文"))
+        self.assertTrue(transport.calls[0]["messages"][0]["content"].endswith("Output language: Russian."))
+        self.assertTrue(transport.calls[1]["messages"][0]["content"].endswith("Output language: Simplified Chinese."))
+        for call in transport.calls:
+            self.assertNotIn("Output language:", call["messages"][1]["content"])
+        self.assertEqual(listing["fields"]["bullets[1]"], "卖点一")
+        self.assertEqual(listing["fields"]["keywords[1]"], "关键词一")
+        self.assertEqual(result["board_channels"], [])
+
+    def test_listing_rejects_unknown_platform_and_language(self):
+        runner, _ = self.runner({})
+        base = {"product_id": "KET-17S"}
+        with self.assertRaises(ValueError):
+            runner.listing(dict(base, platforms=["unknown_marketplace"]))
+        with self.assertRaises(ValueError):
+            runner.listing(dict(base, platforms=["ebay"], languages={"ebay": "fr"}))
+        with self.assertRaises(ValueError):
+            runner.listing(dict(base, platforms=[]))
 
 
 class ReviewFallbackTests(unittest.TestCase):
@@ -880,6 +930,85 @@ class MarketTests(unittest.TestCase):
             self.assertTrue(rules, q["id"])
             for r in rules:
                 self.assertTrue(r["verified"] and r["excerpt"] and r["url"].startswith("https://") and r["fetched"] == "2026-10-31", r["id"])
+
+
+class ListingMarketRuleTests(unittest.TestCase):
+    """The 11-platform listing (10-31): a new platform gets the verified rules of its market, the old ones nothing new."""
+
+    # Rule ids each original platform saw before the new platforms were added. Recorded replays depend on them.
+    ORIGINAL = {
+        "amazon_us": ["AMZ-01", "AMZ-02", "AMZ-03", "AMZ-04", "AMZ-05", "AMZ-06", "AMZ-07", "IMG-01", "IMG-02",
+                      "IMG-03", "IMG-04", "IMG-05", "IMG-06", "IMG-07", "IMG-08", "IMG-09", "IMG-10",
+                      "US-01", "US-02", "US-03", "US-04"],
+        "tiktok_mx": ["MX-01", "MX-02", "MX-03", "TT-01", "TT-02", "TT-03"],
+        "alibaba_rfq": ["ALI-01", "ALI-02", "ALI-03", "CUL-01", "CUL-02", "CUL-03", "EA-01", "EA-02", "EU-01",
+                        "EU-02", "INC-01", "INC-02", "INC-03", "INC-04", "INC-05", "JP-01", "JP-02",
+                        "MX-01", "MX-02", "MX-03", "NG-01"],
+    }
+
+    def setUp(self):
+        self.kb = KnowledgeBase()
+
+    def ids(self, platform):
+        return [r["id"] for r in self.kb.rules_for(platform)]
+
+    def test_new_platforms_get_the_rules_of_their_market(self):
+        self.assertLessEqual({"US-01", "US-02", "US-03", "US-04"}, set(self.ids("walmart_us")))
+        self.assertLessEqual({"MX-01", "MX-02", "MX-03"}, set(self.ids("mercadolibre_mx")))
+        self.assertLessEqual({"EU-01", "EU-02"}, set(self.ids("amazon_de")))
+        self.assertIn("JP-01", self.ids("amazon_jp"))
+        national = ("US-", "MX-", "EU-", "JP-", "EA-", "NG-")
+        for platform in ("ebay", "shopify", "etsy", "aliexpress", "amazon_uk"):  # no single market, or none verified
+            self.assertEqual([i for i in self.ids(platform) if i.startswith(national)], [], platform)
+
+    def test_original_platforms_see_exactly_the_same_rules(self):
+        for platform, ids in self.ORIGINAL.items():
+            self.assertEqual(self.ids(platform), ids, platform)
+
+    def test_amazon_title_rules_cover_the_uk_german_and_japanese_stores(self):
+        # The title page says the requirements apply in all stores except Saudi Arabia, Egypt, Türkiye and the UAE.
+        for platform in ("amazon_uk", "amazon_de", "amazon_jp"):
+            self.assertLessEqual({"AMZ-01", "AMZ-02", "AMZ-03", "AMZ-04"}, set(self.ids(platform)), platform)
+        cases = [("amazon_de", "EU", "Wasserkocher 1,7 L, kostenloser Versand", "AMZ-DE-01"),
+                 ("amazon_jp", "JP", "電気ケトル 1.7L ベストセラー", "AMZ-JP-01")]
+        for platform, market, title, rule_id in cases:
+            findings = checks.run_rule_checks({"title": title}, self.kb.product("KET-17S"), self.kb, platform, market)
+            self.assertIn(rule_id, [f["source"]["rule_id"] for f in findings if f["check"] == "kb_regex"], platform)
+            clean = checks.run_rule_checks({"title": "Wasserkocher 1,7 L Edelstahl"}, self.kb.product("KET-17S"), self.kb, platform, market)
+            self.assertNotIn(rule_id, [f["source"]["rule_id"] for f in clean if f["check"] == "kb_regex"], platform)
+
+    def rule_hits(self, platform, fields, market=None):
+        found = checks.run_rule_checks(fields, self.kb.product("KET-17S"), self.kb, platform, market)
+        return sorted({f["source"]["rule_id"] for f in found if f["check"] in ("kb_regex", "kb_length")})
+
+    def test_marketplace_rules_on_ebay_and_etsy(self):
+        long_title = "1.7L Stainless Steel Electric Kettle with Auto Shut-Off and Boil-Dry Protection for Home Kitchen Use"
+        self.assertEqual(self.rule_hits("ebay", {"title": long_title + " ?"}), ["EBAY-01", "EBAY-02"])
+        self.assertEqual(self.rule_hits("ebay", {"title": "1.7L Kettle", "description": "Email sales@factory.com for a quote"}), ["EBAY-03"])
+        self.assertEqual(self.rule_hits("ebay", {"title": "1.7L Kettle", "description": "IEC 60335-2-15, 120V 60Hz, 1500W"}), [])
+        self.assertEqual(self.rule_hits("etsy", {"title": long_title + " " + long_title}), ["ETSY-01"])
+        self.assertEqual(self.rule_hits("etsy", {"title": long_title}), [])
+
+    def test_marketplace_rules_on_walmart_mercado_libre_and_aliexpress(self):
+        self.assertEqual(self.rule_hits("walmart_us", {"title": "1.7L Kettle - Hot Sale!"}, "US"), ["WMT-02", "WMT-03"])
+        self.assertEqual(self.rule_hits("walmart_us", {"title": "K" * 151}, "US"), ["WMT-01"])
+        self.assertEqual(self.rule_hits("mercadolibre_mx", {"title": "Tetera eléctrica 1.7 L acero inoxidable con envío gratis"}, "MX"), ["ML-02"])
+        self.assertEqual(self.rule_hits("mercadolibre_mx", {"title": "Tetera eléctrica 1.7 L acero inoxidable apagado automático 1500W"}, "MX"), ["ML-01"])
+        self.assertEqual(self.rule_hits("mercadolibre_mx", {"title": "Tetera 1.7 L", "description": "Escríbenos a ventas@fabrica.mx"}, "MX"), ["ML-03"])
+        self.assertEqual(self.rule_hits("aliexpress", {"title": "Kettle WhatsApp +86 138 1234 5678", "description": "See www.factory.cn"}), ["AE-01", "AE-02"])
+        self.assertEqual(self.rule_hits("aliexpress", {"title": "1.7L Stainless Steel Electric Kettle"}), [])
+
+    def test_rules_added_for_the_new_platforms_are_verified(self):
+        added = [r for r in self.kb.rules.values() if r["id"].split("-")[0] in ("EBAY", "ETSY", "WMT", "ML", "AE")
+                 or r["id"] in ("AMZ-DE-01", "AMZ-JP-01")]
+        self.assertEqual(len(added), 16)
+        for r in added:
+            self.assertTrue(r["verified"] and r["excerpt"] and r["url"].startswith("https://") and r["fetched"] == "2026-10-31", r["id"])
+
+    def test_walmart_listing_is_checked_against_us_rules_by_code(self):
+        fields = {"title": "Eco-friendly 1.7L Kettle, Made in USA"}
+        findings = checks.run_rule_checks(fields, self.kb.product("KET-17S"), self.kb, "walmart_us", "US")
+        self.assertEqual(sorted(f["source"]["rule_id"] for f in findings if f["check"] == "kb_regex"), ["US-01", "US-02"])
 
 
 class ReplayTests(unittest.TestCase):

@@ -17,7 +17,7 @@
 - **自动演示**：右上角一键播放 12 步带字幕的走查，`#tour=loop` 可在摊位循环播放。
 - **游园会找茬**：`python3 server.py --lan` 后手机扫码答题，答案由代码规则计算；局域网访问只开放找茬页面，其余接口一律 403。
 - **工作流 C · 商品看板**：所有产品 × 主图 / Amazon / TikTok 的最新状态一屏看清；一键批量生成上品，导出 CSV。主图按 Amazon 美国站的 10 条要求检查：尺寸、白底、产品占比、是否贴边由代码测量，文字、徽章、道具、是否实拍由模型看图判断。
-- **工作流 B · 多平台上架**：一份中文产品资料，同时生成 Amazon 美国站英文 Listing 和 TikTok Shop 墨西哥站西语种草脚本。
+- **工作流 B · 多平台上架**：一份中文产品资料，可选 Amazon 美国 / 英国 / 德国 / 日本站、TikTok Shop 墨西哥、eBay、Shopify、Etsy、Walmart 美国站、Mercado Libre 墨西哥和 AliExpress；每个平台可单独选择英语、西班牙语、中文、德语、日语或俄语。Amazon 美国站与 TikTok 墨西哥保留原有请求、专属文案格式和已核实规则；其他平台使用各自提示词与岗位、通用 Listing 格式及产品事实校验，未核实的平台政策不会被冒充为已核实。
 - **校验**：分两层。第一层是代码规则：产品事实、合同条款、平台格式。第二层是模型审核：模型提出的问题必须带上**知识库规则编号**和**原文片段**，带不上就由代码丢弃，不显示。
 - **反馈**：原文高亮批注，加上红、黄、绿三档风险等级，再加上与上一轮的逐词对比。业务员可以用中文多轮提修改意见。
 
@@ -68,12 +68,22 @@ LLM_MODEL=claude-opus-5-5
 cd app
 TRADEDESK_MODE=record python3 tools/record_demo.py   # 把固定演示输入跑一遍并缓存
 TRADEDESK_MODE=replay python3 server.py              # 断网也能演示
-python3 -m unittest discover -s tests -v             # 测试（67 项）
+python3 -m unittest discover -s tests -v             # 测试
 python3 tools/cost_report.py                         # 每条询盘的调用成本（先跑 record_demo 生成日志）
 TRADEDESK_MODE=replay python3 tools/run_baseline.py  # 对照实验（缓存齐全时不联网）
 TRADEDESK_MODE=replay python3 server.py --lan        # 游园会：手机扫码访问 /play，大屏打开 /play#screen
 python3 tools/export_config.py                       # 导出平台配置 → app/config/agents.json
 ```
+
+要准备多平台 Listing 的离线回放缓存，先在应用「模型设置」配置可用模型与 key，再从 `app/` 目录按产品、平台、语言小批量预览/录制：
+
+```bash
+python3 tools/warm_listing_cache.py                                      # 只预览全量规模，不调用模型
+python3 tools/warm_listing_cache.py --product KET-17S --platform ebay --language zh  # 单组合预览
+python3 tools/warm_listing_cache.py --product KET-17S --platform ebay --language zh --execute
+```
+
+`--execute` 会真实调用模型并可能产生费用；每个组合会录制生成结果及适用的模型审核。全部 4 个示例产品覆盖 11 个平台和 6 种语言，最多约 312 次请求（264 次生成与至多 48 次审核，已有缓存命中会减少调用）。缓存只适用于完全相同的产品资料、平台、语言、提示词和首轮请求；修改资料或提交新一轮修改不会自动命中。录制完成后使用 `TRADEDESK_MODE=replay` 离线回放。
 
 ## 目录
 
@@ -92,7 +102,7 @@ app/
   tradedesk/cost.py      从调用日志统计每条询盘的 token 与费用
   data/redteam.json      红队测试的注入样例
   prompts/*.md           各角色提示词（含主图审核员、对照组的通用助手）
-  kb/rules.json          规则知识库（45 条，每条带原文摘录与来源 URL）
+  kb/rules.json          规则知识库（61 条，每条带原文摘录与来源 URL）
   config/check_map.json  内置检查 → 依据的知识库规则
   config/agents.json     平台配置导出
   data/                  示例工厂、4 个产品、12 条询盘、各市场认证状态、3 道找茬题（虚构）

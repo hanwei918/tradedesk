@@ -67,3 +67,36 @@ Seven rules for four markets, all `kind: llm` and limited to `alibaba_rfq` repli
 | https://son.gov.ng/soncap-faq/ (from https://son.gov.ng/?p=1000) | curl | OK; SON "SONCAP FAQ" page | NG-01 |
 
 The market profiles in `data/markets.json` (which certification each demo product lacks in each market, power and plug) are invented demo data, like the rest of the factory card.
+
+# Added 2026-10-31 (evening): rules for the 11-platform listing
+
+The listing page now offers 11 platforms. Rules for the new ones, checked the same way: the excerpt was searched for in the fetched page text after whitespace normalisation, and an altered control string was not found. curl pages through an HTML-to-text script (Mercado Libre's policy page is cp1252); JS-rendered pages (Amazon Seller Central, AliExpress) and eBay (which shows scripts a captcha, not bypassed) in a browser with `innerText.includes()`.
+
+**Existing rules extended to new platforms (no new excerpt):**
+- AMZ-01..04 now also cover amazon_uk, amazon_de, amazon_jp. The same Seller Central page says: "Title requirements apply to all product types, except media product types, listed in all stores, except for Saudi Arabia, Egypt, Türkiye, and the United Arab Emirates." The UK, DE and JP versions of the page were also opened and show the 75-character sentence.
+- US-01..04 also cover walmart_us; MX-01..03 cover mercadolibre_mx; EU-01/02 cover amazon_de; JP-01 covers amazon_jp. These are national rules for the market the platform sells into. The rule sets of amazon_us, tiktok_mx and alibaba_rfq are unchanged (a test pins them), so recorded replays still match.
+
+| URL | How fetched | Status | Rules |
+|---|---|---|---|
+| https://sellercentral.amazon.de/help/hub/reference/external/GYTR6SYGFA5E3EQC | browser | OK; German promotional examples | AMZ-DE-01 |
+| https://sellercentral.amazon.co.jp/help/hub/reference/external/GYTR6SYGFA5E3EQC | browser | OK; Japanese promotional examples | AMZ-JP-01 |
+| https://www.ebay.com/help/selling/listings/listing-tips/optimising-listings-best-match?id=4166 | browser | OK; the 80-character line is in the Best Match tips | EBAY-01 |
+| https://www.ebay.com/help/policies/listing-policies/search-manipulation-policy?id=4243 | browser | OK | EBAY-02 |
+| https://www.ebay.com/help/policies/payment-policies/offering-buy-sell-outside-ebay-policy?id=4272 | browser | OK | EBAY-03 |
+| https://help.etsy.com/hc/en-us/articles/115015628707-How-to-Create-a-Listing | curl | OK | ETSY-01 |
+| https://help.etsy.com/hc/en-us/articles/23948763872151-Does-Etsy-Allow-Drop-Shipping-or-Reselling | curl | OK | ETSY-02 |
+| https://marketplacelearn.walmart.com/guides/Item%20setup/Item%20content,%20imagery,%20and%20media/Product-Detail-Page:-overview | curl | OK; "Product details policy", "Last updated on Oct 6, 2026" | WMT-01..03 |
+| https://developers.mercadolibre.com.mx/es_ar/publica-productos | curl | OK; developer docs, given as recommendations; /es_ar/ locale | ML-01, ML-02 |
+| https://api.mercadolibre.com/categories/MLM120037 | curl | OK; "Teteras Eléctricas", `max_title_length` 60 (air fryer, ironing and juicer categories also 60) | ML-01 (the limit) |
+| https://www.mercadolibre.com.mx/seguro_publicacion.html | curl (cp1252) | OK; "Políticas de Publicación", undated | ML-03 |
+| https://rule.aliexpress.com/rule-channels/36963666/122523152 | browser | OK; 《全球速卖通商品发布规范》, 修订日期 北京时间2026/04/29 | AE-01..03 |
+
+Research for eBay, Etsy, Shopify, Walmart, Mercado Libre and AliExpress was done by two helper agents; every excerpt above was then re-fetched and checked here before it went in.
+
+**Not used:**
+- Shopify: the Acceptable Use Policy (https://www.shopify.com/legal/aup) has no rule about listing content. shop.com content policies cover only the Shop app channel. So Shopify listings get the factory-card checks only.
+- eBay "add a title" help page (id=4648): captcha, not bypassed.
+- Etsy Creativity Standards (etsy.com/legal/creativity): HTTP 403 without JavaScript; not checked.
+- Mercado Libre "60 caracteres" as prose: found only on the Chile site, so ML-01 cites the category API instead.
+- AliExpress 128-character title maximum: often cited, not found on an official page. The quality-score rule (titles of 15 characters or fewer lose points) was found but not added, because it is a score penalty, not a publishing rule.
+- Amazon UK: no UK-specific compliance rule (UKCA) was added.

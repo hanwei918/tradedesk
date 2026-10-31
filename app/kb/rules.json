@@ -6,10 +6,16 @@
    "id": "AMZ-01",
    "category": "platform_amazon",
    "platforms": [
-    "amazon_us"
+    "amazon_us",
+    "amazon_uk",
+    "amazon_de",
+    "amazon_jp"
    ],
    "markets": [
-    "US"
+    "US",
+    "UK",
+    "EU",
+    "JP"
    ],
    "title_zh": "标题不超过 75 个字符",
    "summary_zh": "亚马逊美国站现行规则：商品标题（Item name）含空格最多 75 个字符，适用于除媒体类以外的所有品类；放不下的卖点可写进 125 字符的 Item highlights。注意：网上很多文章还写着旧的 200 字符上限，2026-10-26 抓取的官方页面已是 75。",
@@ -28,10 +34,16 @@
    "id": "AMZ-02",
    "category": "platform_amazon",
    "platforms": [
-    "amazon_us"
+    "amazon_us",
+    "amazon_uk",
+    "amazon_de",
+    "amazon_jp"
    ],
    "markets": [
-    "US"
+    "US",
+    "UK",
+    "EU",
+    "JP"
    ],
    "title_zh": "标题禁用特殊字符",
    "summary_zh": "标题不得出现 ! $ ? _ { } ^ ¬ ¦ 这些字符（品牌名本身含有的除外，应填到 Brand 字段）；~ # < > * 只能用于型号或尺寸等特定场景，不能做装饰。",
@@ -51,10 +63,16 @@
    "id": "AMZ-03",
    "category": "platform_amazon",
    "platforms": [
-    "amazon_us"
+    "amazon_us",
+    "amazon_uk",
+    "amazon_de",
+    "amazon_jp"
    ],
    "markets": [
-    "US"
+    "US",
+    "UK",
+    "EU",
+    "JP"
    ],
    "title_zh": "标题不得含促销用语",
    "summary_zh": "标题里不能写促销话术，官方举例是“free shipping”和“100% quality guaranteed”。",
@@ -74,10 +92,16 @@
    "id": "AMZ-04",
    "category": "platform_amazon",
    "platforms": [
-    "amazon_us"
+    "amazon_us",
+    "amazon_uk",
+    "amazon_de",
+    "amazon_jp"
    ],
    "markets": [
-    "US"
+    "US",
+    "UK",
+    "EU",
+    "JP"
    ],
    "title_zh": "标题不得含主观评价（Hot Item / Best seller）",
    "summary_zh": "官方最佳实践把“Hot Item”“Best seller”列为主观评价，标题里不应使用；不合规示例里也出现了全大写和 ★ 装饰。",
@@ -160,6 +184,52 @@
     "field": "any",
     "pattern": "(?i)(\\$\\s?\\d|\\bUSD\\s?\\d|\\b(in|out of) stock\\b)",
     "message_zh": "文案含价格或库存信息，亚马逊详情页不允许，请删除。"
+   }
+  },
+  {
+   "id": "AMZ-DE-01",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_de"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "德国站标题不得含德语促销用语",
+   "summary_zh": "亚马逊德国站的标题规则页面把德语促销用语列为示例：标题不得包含“kostenloser Versand”（免运费）、“100%ige Qualitätsgarantie”（百分百质量保证）这类说法。",
+   "excerpt": "Titles must not contain promotional phrases, such as \"kostenloser Versand\" or \"100%ige Qualitätsgarantie.\"",
+   "url": "https://sellercentral.amazon.de/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "(?i)(kostenlose[rn]?\\s+versand|100\\s?%\\s?ige\\s+qualit(ä|ae)tsgarantie)",
+    "message_zh": "标题含德语促销用语（如 kostenloser Versand），亚马逊德国站不允许，请删除。"
+   }
+  },
+  {
+   "id": "AMZ-JP-01",
+   "category": "platform_amazon",
+   "platforms": [
+    "amazon_jp"
+   ],
+   "markets": [
+    "JP"
+   ],
+   "title_zh": "日本站标题不得含日语促销用语",
+   "summary_zh": "亚马逊日本站的标题规则页面把日语促销用语列为示例：标题不得包含“無料配送”（免费配送）、“100% 品質保証”（百分百质量保证）、“人気商品”（人气商品）、“ベストセラー”（畅销）这类说法。",
+   "excerpt": "Titles must not contain promotional phrases, such as \"無料配送\" or \"100% 品質保証、人気商品、ベストセラー.\"",
+   "url": "https://sellercentral.amazon.co.jp/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "(無料配送|100\\s?%\\s?品質保証|人気商品|ベストセラー)",
+    "message_zh": "标题含日语促销用语（如 無料配送、ベストセラー），亚马逊日本站不允许，请删除。"
    }
   },
   {
@@ -298,7 +368,8 @@
    "id": "US-01",
    "category": "compliance_us",
    "platforms": [
-    "amazon_us"
+    "amazon_us",
+    "walmart_us"
    ],
    "markets": [
     "US"
@@ -321,7 +392,8 @@
    "id": "US-02",
    "category": "compliance_us",
    "platforms": [
-    "amazon_us"
+    "amazon_us",
+    "walmart_us"
    ],
    "markets": [
     "US"
@@ -344,7 +416,8 @@
    "id": "US-03",
    "category": "compliance_us",
    "platforms": [
-    "amazon_us"
+    "amazon_us",
+    "walmart_us"
    ],
    "markets": [
     "US"
@@ -365,7 +438,8 @@
    "id": "US-04",
    "category": "compliance_us",
    "platforms": [
-    "amazon_us"
+    "amazon_us",
+    "walmart_us"
    ],
    "markets": [
     "US"
@@ -387,7 +461,8 @@
    "category": "compliance_mx",
    "platforms": [
     "tiktok_mx",
-    "alibaba_rfq"
+    "alibaba_rfq",
+    "mercadolibre_mx"
    ],
    "markets": [
     "MX"
@@ -409,7 +484,8 @@
    "category": "compliance_mx",
    "platforms": [
     "tiktok_mx",
-    "alibaba_rfq"
+    "alibaba_rfq",
+    "mercadolibre_mx"
    ],
    "markets": [
     "MX"
@@ -431,7 +507,8 @@
    "category": "compliance_mx",
    "platforms": [
     "tiktok_mx",
-    "alibaba_rfq"
+    "alibaba_rfq",
+    "mercadolibre_mx"
    ],
    "markets": [
     "MX"
@@ -839,7 +916,8 @@
    "id": "EU-01",
    "category": "compliance_eu",
    "platforms": [
-    "alibaba_rfq"
+    "alibaba_rfq",
+    "amazon_de"
    ],
    "markets": [
     "EU"
@@ -860,7 +938,8 @@
    "id": "EU-02",
    "category": "compliance_eu",
    "platforms": [
-    "alibaba_rfq"
+    "alibaba_rfq",
+    "amazon_de"
    ],
    "markets": [
     "EU"
@@ -881,7 +960,8 @@
    "id": "JP-01",
    "category": "compliance_jp",
    "platforms": [
-    "alibaba_rfq"
+    "alibaba_rfq",
+    "amazon_jp"
    ],
    "markets": [
     "JP"
@@ -980,6 +1060,320 @@
    "check": {
     "kind": "llm",
     "question_zh": "回复是否声称货物已有 SONCAP、或保证能在尼日利亚直接清关，而没有说明需要产品证书（PC）和 SONCAP 证书（SC）？"
+   }
+  },
+  {
+   "id": "EBAY-01",
+   "category": "platform_ebay",
+   "platforms": [
+    "ebay"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "eBay 标题不超过 80 个字符",
+   "summary_zh": "eBay 帮助中心《Optimize listings for Best Match》要求标题清楚简洁、拼写正确、不超过 80 个字符。原文写在“优化 Best Match 排名”的建议里。",
+   "excerpt": "Write a clear and concise title with correct spelling and no more than 80 characters",
+   "url": "https://www.ebay.com/help/selling/listings/listing-tips/optimising-listings-best-match?id=4166",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "length",
+    "field": "title",
+    "max": 80
+   }
+  },
+  {
+   "id": "EBAY-02",
+   "category": "platform_ebay",
+   "platforms": [
+    "ebay"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "eBay 标题不得用问号关键词",
+   "summary_zh": "eBay《Search manipulation policy》：listing 不能包含带问号的关键词，因为会误导买家；不清楚的商品信息应留空。",
+   "excerpt": "Listings can't include keywords with question marks, as this can be misleading for buyers.",
+   "url": "https://www.ebay.com/help/policies/listing-policies/search-manipulation-policy?id=4243",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "\\?",
+    "message_zh": "标题含问号，eBay 搜索操纵政策不允许带问号的关键词，请删除。"
+   }
+  },
+  {
+   "id": "EBAY-03",
+   "category": "platform_ebay",
+   "platforms": [
+    "ebay"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "eBay listing 不得留联系方式或站外链接",
+   "summary_zh": "eBay《Offering to buy or sell outside of eBay policy》：不允许引导站外交易，完成交易前买卖双方不能分享邮箱、电话等联系方式；同页列出的禁止项还包括社交账号和站外网址。",
+   "excerpt": "Buyers and sellers also can't share contact information, including email addresses and phone numbers, prior to completing a transaction on eBay.",
+   "url": "https://www.ebay.com/help/policies/payment-policies/offering-buy-sell-outside-ebay-policy?id=4272",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)([\\w.+-]+@[\\w-]+\\.[a-z]{2,}|https?://|\\bwww\\.|\\+\\d{1,3}[\\s-]?\\d[\\d\\s-]{6,}\\d)",
+    "message_zh": "含邮箱、网址或电话，eBay 不允许在 listing 里留联系方式或站外链接，请删除。"
+   }
+  },
+  {
+   "id": "ETSY-01",
+   "category": "platform_etsy",
+   "platforms": [
+    "etsy"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "Etsy 标题不超过 140 个字符",
+   "summary_zh": "Etsy 帮助中心《How to Create a Listing》：listing 标题最多 140 个字符，并建议少于 15 个词。",
+   "excerpt": "A listing’s title can be up to 140 characters long.",
+   "url": "https://help.etsy.com/hc/en-us/articles/115015628707-How-to-Create-a-Listing",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "length",
+    "field": "title",
+    "max": 140
+   }
+  },
+  {
+   "id": "ETSY-02",
+   "category": "platform_etsy",
+   "platforms": [
+    "etsy"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "Etsy 不允许转售市面上可买到的商品",
+   "summary_zh": "Etsy 帮助中心说明：转售是指卖家出售不是自己制作或设计、市面上可以买到的商品，Etsy 不允许。工厂批量生产的通用小家电要先确认是否符合 Etsy 的创作标准，再决定上不上 Etsy。",
+   "excerpt": "Reselling is the practice of selling a commercially available item that the seller did not make or design.",
+   "url": "https://help.etsy.com/hc/en-us/articles/23948763872151-Does-Etsy-Allow-Drop-Shipping-or-Reselling",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "这件商品是否由卖家自己制作或设计？如果资料显示是工厂批量生产、市面上可买到的通用商品，应提示人工确认是否符合 Etsy 规则，不得写成手工制作。"
+   }
+  },
+  {
+   "id": "WMT-01",
+   "category": "platform_walmart",
+   "platforms": [
+    "walmart_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "Walmart 标题不超过 150 个字符",
+   "summary_zh": "Walmart Marketplace《Product details policy》（2026-10-06 更新）：商品标题应简短，不超过 150 个字符。",
+   "excerpt": "Writing brief titles not exceeding 150 characters.",
+   "url": "https://marketplacelearn.walmart.com/guides/Item%20setup/Item%20content,%20imagery,%20and%20media/Product-Detail-Page:-overview",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "length",
+    "field": "title",
+    "max": 150
+   }
+  },
+  {
+   "id": "WMT-02",
+   "category": "platform_walmart",
+   "platforms": [
+    "walmart_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "Walmart 文案不得含促销用语",
+   "summary_zh": "Walmart《Product details policy》禁止在标题和描述里写促销宣称，官方示例包括 free shipping、hot sale、top rated、premium quality、best-selling、clearance、Black Friday、low price 等（示例不是完整清单）。",
+   "excerpt": "Making any promotional claims (e.g., free shipping, Walmart fulfilled, hot sale, top rated, premium quality, best-selling, clearance, Black Friday, savings, low price).",
+   "url": "https://marketplacelearn.walmart.com/guides/Item%20setup/Item%20content,%20imagery,%20and%20media/Product-Detail-Page:-overview",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)\\b(free shipping|walmart fulfilled|hot sale|top rated|premium quality|best[- ]?selling|clearance|black friday|low price)\\b",
+    "message_zh": "含 Walmart 禁止的促销用语（如 free shipping、best-selling），请删除。"
+   }
+  },
+  {
+   "id": "WMT-03",
+   "category": "platform_walmart",
+   "platforms": [
+    "walmart_us"
+   ],
+   "markets": [
+    "US"
+   ],
+   "title_zh": "Walmart 标题不得用特殊字符",
+   "summary_zh": "Walmart《Product details policy》：标题不得全大写，也不得使用特殊字符，官方示例为 ~ ! * $。",
+   "excerpt": "Writing in all caps or using special characters (e.g., ~, !, *, $).",
+   "url": "https://marketplacelearn.walmart.com/guides/Item%20setup/Item%20content,%20imagery,%20and%20media/Product-Detail-Page:-overview",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "[~!*$]",
+    "message_zh": "标题含 Walmart 不允许的特殊字符（~ ! * $），请删除。"
+   }
+  },
+  {
+   "id": "ML-01",
+   "category": "platform_mercadolibre",
+   "platforms": [
+    "mercadolibre_mx"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "Mercado Libre 墨西哥：电热水壶类目标题不超过 60 个字符",
+   "summary_zh": "Mercado Libre 开发者文档说明，标题长度上限由商品所在类目决定（max_title_length）。2026-10-31 查询官方类目接口：墨西哥站“Teteras Eléctricas”（MLM120037）的 max_title_length 是 60；空气炸锅、熨烫、榨汁类目查到的也是 60。",
+   "excerpt": "El límite del título de la publicación está establecido por la categoría a la que pertenece el mismo (\"max_title_length\").",
+   "url": "https://developers.mercadolibre.com.mx/es_ar/publica-productos",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "length",
+    "field": "title",
+    "max": 60
+   }
+  },
+  {
+   "id": "ML-02",
+   "category": "platform_mercadolibre",
+   "platforms": [
+    "mercadolibre_mx"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "Mercado Libre 标题不写免运费、退货、分期",
+   "summary_zh": "Mercado Libre 开发者文档的标题建议：不要在标题里写其他优惠信息，例如退货、免运费（envío gratis）或分期付款（pagos en cuotas）。原文列在“避免违规”的建议里。",
+   "excerpt": "Evita dar información de otros beneficios, como devoluciones, envío gratis o pagos en cuotas.",
+   "url": "https://developers.mercadolibre.com.mx/es_ar/publica-productos",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "(?i)(env[ií]o\\s+gratis|devoluci[oó]n(es)?|pagos?\\s+en\\s+cuotas)",
+    "message_zh": "标题含免运费、退货或分期等优惠信息，Mercado Libre 建议不要写进标题，请删除。"
+   }
+  },
+  {
+   "id": "ML-03",
+   "category": "platform_mercadolibre",
+   "platforms": [
+    "mercadolibre_mx"
+   ],
+   "markets": [
+    "MX"
+   ],
+   "title_zh": "Mercado Libre 不得留联系方式或站外链接",
+   "summary_zh": "Mercado Libre 墨西哥《Políticas de Publicación》禁止在描述、图片、问答和昵称里放联系方式，并定义联系方式包括邮箱、地址、邮编、电话或传真、银行信息以及网址。",
+   "excerpt": "dirección de e-mail, dirección geográfica, código postal, número(s) de teléfono y/o fax, datos bancarios, así como URL o sitios web.",
+   "url": "https://www.mercadolibre.com.mx/seguro_publicacion.html",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)([\\w.+-]+@[\\w-]+\\.[a-z]{2,}|https?://|\\bwww\\.|\\+\\d{1,3}[\\s-]?\\d[\\d\\s-]{6,}\\d)",
+    "message_zh": "含邮箱、网址或电话，Mercado Libre 不允许在 listing 里留联系方式，请删除。"
+   }
+  },
+  {
+   "id": "AE-01",
+   "category": "platform_aliexpress",
+   "platforms": [
+    "aliexpress"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "AliExpress 标题不得带联系方式",
+   "summary_zh": "《全球速卖通商品发布规范》（北京时间 2026-04-29 修订）列出标题禁止情形，其中包括标题带有联系方式。",
+   "excerpt": "禁止出现包括但不限于以下几类情况：标题无明确商品名称、标题带有联系方式",
+   "url": "https://rule.aliexpress.com/rule-channels/36963666/122523152",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "title",
+    "pattern": "(?i)([\\w.+-]+@[\\w-]+\\.[a-z]{2,}|https?://|\\bwww\\.|\\+\\d{1,3}[\\s-]?\\d[\\d\\s-]{6,}\\d)",
+    "message_zh": "标题含联系方式，速卖通商品发布规范禁止，请删除。"
+   }
+  },
+  {
+   "id": "AE-02",
+   "category": "platform_aliexpress",
+   "platforms": [
+    "aliexpress"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "AliExpress 描述不得引导到站外链接",
+   "summary_zh": "《全球速卖通商品发布规范》：不得以任何明示或暗示的方式，在商品描述等页面引导买家跳转或访问平台以外的链接。",
+   "excerpt": "3、不得以任何明示或暗示的方法，在商品描述等页面，引导买家跳转或访问至非平台的其他链接。",
+   "url": "https://rule.aliexpress.com/rule-channels/36963666/122523152",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "regex",
+    "field": "any",
+    "pattern": "(?i)(https?://|\\bwww\\.)",
+    "message_zh": "含站外网址，速卖通不允许在商品描述等页面引导买家访问站外链接，请删除。"
+   }
+  },
+  {
+   "id": "AE-03",
+   "category": "platform_aliexpress",
+   "platforms": [
+    "aliexpress"
+   ],
+   "markets": [
+    "ALL"
+   ],
+   "title_zh": "AliExpress 标题不得堆砌或写无关字眼",
+   "summary_zh": "《全球速卖通商品发布规范》禁止标题没有明确商品名、堆砌商品名或修饰词、出现与商品无关的字眼、与图片或详细描述不符等情况，需要人工或模型判断。",
+   "excerpt": "标题商品名堆砌、标题描述堆砌（包括不限于商品名、品牌、型号、修饰词堆砌）",
+   "url": "https://rule.aliexpress.com/rule-channels/36963666/122523152",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-10-31",
+   "check": {
+    "kind": "llm",
+    "question_zh": "标题是否有明确的商品名称？是否堆砌商品名、品牌、型号或修饰词，或出现与商品无关的字眼？"
    }
   }
  ]

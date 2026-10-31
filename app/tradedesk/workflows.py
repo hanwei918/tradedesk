@@ -16,7 +16,8 @@ import hashlib
 from . import checks, images
 from .board import Board
 from .inbox import Inbox, guard_tasks, priority
-from .kb import PLATFORM_NAMES
+from .kb import PLATFORM_MARKET, PLATFORM_NAMES
+from .listing_catalog import LANGUAGES, LISTING_PLATFORMS
 from .llm import LLMError
 
 TEXT_KINDS = ["regex", "length", "llm"]
@@ -35,6 +36,13 @@ ROLES = {
     "sales": "外贸业务员",
     "ops_amazon": "Amazon 运营",
     "ops_tiktok": "TikTok 内容运营",
+    "ops_listing": "平台运营",
+    "ops_ebay": "eBay 运营",
+    "ops_shopify": "Shopify 运营",
+    "ops_etsy": "Etsy 运营",
+    "ops_walmart": "Walmart 运营",
+    "ops_mercadolibre": "Mercado Libre 运营",
+    "ops_aliexpress": "AliExpress 运营",
     "compliance": "合规审核员",
     "image_reviewer": "主图审核员",
     "generic": "通用 AI 助手（对照组）",
@@ -254,30 +262,56 @@ class Runner:
         run_id = uuid.uuid4().hex[:8]
         trace = []
         product = self.kb.product(payload["product_id"])
-        platforms = payload.get("platforms") or ["amazon_us", "tiktok_mx"]
+        platforms = payload.get("platforms", ["amazon_us", "tiktok_mx"])
+        if not isinstance(platforms, list) or not platforms:
+            raise ValueError("至少选择一个上架平台")
+        if any(not isinstance(p, str) for p in platforms):
+            raise ValueError("上架平台格式不正确")
+        platforms = list(dict.fromkeys(platforms))
+        unknown = [p for p in platforms if p not in LISTING_PLATFORMS]
+        if unknown:
+            raise ValueError(f"不支持的上架平台：{unknown[0]}")
+        languages = payload.get("languages") or {}
+        if not isinstance(languages, dict):
+            raise ValueError("平台语言配置格式不正确")
         previous = payload.get("previous") or {}
         instruction = (payload.get("instruction_zh") or "").strip()
         rnd = int(payload.get("round") or 1)
         trigger = "运营修改意见" if previous else "新品上架"
-        out = {"run_id": run_id, "round": rnd, "platforms": {}, "trace": trace}
+        out = {"run_id": run_id, "round": rnd, "platforms": {}, "trace": trace,
+               "board_channels": []}
         for platform in platforms:
-            name = {"amazon_us": "listing_amazon", "tiktok_mx": "listing_tiktok"}[platform]
-            role = {"amazon_us": "ops_amazon", "tiktok_mx": "ops_tiktok"}[platform]
+            config = LISTING_PLATFORMS[platform]
+            language = languages.get(platform) or config["default_language"]
+            if not isinstance(language, str) or language not in LANGUAGES:
+                raise ValueError(f"{config['name']}：不支持的输出语言")
+            language_name = LANGUAGES[language]["prompt"]
+            name, role = config["prompt"], config["role"]
             parts = [f"## 产品资料（中文）\n{dumps(product)}",
                      f"## 平台规则（知识库）\n{dumps(self._guidance(platform))}"]
             prev = previous.get(platform)
             if prev:
                 parts += [f"## 上一版\n{dumps(prev.get('content'))}", f"## 修改意见\n{instruction}"]
-            content = self._step(trace, run_id, "B 多平台上架", f"生成 {PLATFORM_NAMES[platform]} · 第 {rnd} 轮",
-                                 role, prompt(name), "\n\n".join(parts), trigger)
+            platform_name = config["name"]
+            system = prompt(name, platform=platform_name)
+            if language != config["default_language"]:
+                system += f"\nOutput language: {language_name}."
+            content = self._step(trace, run_id, "B 多平台上架", f"生成 {platform_name} · 第 {rnd} 轮",
+                                 role, system,
+                                 "\n\n".join(parts), trigger)
             fields = flatten(platform, content)
-            review = self.review(trace, run_id, "B 多平台上架", platform, fields, product, trigger)
+            review = self.review(trace, run_id, "B 多平台上架", platform, fields, product, trigger,
+                                 PLATFORM_MARKET.get(platform))
             diff = None
             if prev:
                 old = flatten(platform, prev.get("content") or {})
                 diff = {k: word_diff(old.get(k, ""), v) for k, v in fields.items()}
-            out["platforms"][platform] = {"content": content, "fields": fields, "diff": diff, **review}
-            self.board.record(product["id"], platform, dict(out["platforms"][platform], round=rnd), run_id)
+            out["platforms"][platform] = {"content": content, "fields": fields, "diff": diff,
+                                          "language": language, "language_name": LANGUAGES[language]["name"],
+                                          "platform_name": platform_name, **review}
+            if platform in ("amazon_us", "tiktok_mx"):
+                self.board.record(product["id"], platform, dict(out["platforms"][platform], round=rnd), run_id)
+                out["board_channels"].append(platform)
         return out
 
     # ------------------------------------------------------------ main image
@@ -337,18 +371,33 @@ class Runner:
 
 def flatten(platform, content):
     content = content or {}
-    if platform == "amazon_us":
+    kind = LISTING_PLATFORMS.get(platform, {}).get("kind")
+    if kind == "amazon":
         fields = {"title": content.get("title", "")}
         for i, b in enumerate(content.get("bullets") or []):
             fields[f"bullets[{i + 1}]"] = b
         fields["description"] = content.get("description", "")
         fields["search_terms"] = content.get("search_terms", "")
         return fields
-    if platform == "tiktok_mx":
+    if kind == "tiktok":
         fields = {"hook": content.get("hook", "")}
         for i, s in enumerate(content.get("script") or []):
             fields[f"script[{i + 1}]"] = s.get("line", "") if isinstance(s, dict) else str(s)
         fields["caption"] = content.get("caption", "")
         fields["hashtags"] = " ".join(content.get("hashtags") or [])
         return fields
-    return {k: v for k, v in content.items() if isinstance(v, str)}
+    fields = {}
+
+    def collect(value, path):
+        if isinstance(value, str):
+            fields[path] = value
+        elif isinstance(value, list):
+            for i, item in enumerate(value, 1):
+                collect(item, f"{path}[{i}]")
+        elif isinstance(value, dict):
+            for key, item in value.items():
+                if key != "notes_zh":
+                    collect(item, f"{path}.{key}" if path else key)
+
+    collect(content, "")
+    return fields
