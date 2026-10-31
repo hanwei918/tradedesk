@@ -288,12 +288,12 @@ async function renderOverview() {
     kpi("red", "shield-alert", "拦下的风险", all.length,
       sbar([{ n: reds, cls: "s-red", label: "红色 · 不能发" }, { n: all.length - reds, cls: "s-amber", label: "黄色 · 需人工确认" }]),
       swatch("s-red", "红色", reds) + swatch("s-amber", "黄色", all.length - reds)) +
-    kpi("green", "ban", "丢弃的无出处提示", dropped, `<div class="pills"><span>出处守卫 · 代码执行</span></div>`, "模型说不出依据，没有展示给用户");
+    kpi("green", "ban", "丢弃的无出处提示", dropped, `<div class="pills"><span>出处守卫 · 代码执行</span></div>`, dropped ? "模型说不出依据，没有展示给用户" : "0 表示模型这几次都给出了出处；编造的提示见评测页红队测试（5 条全部拦下）");
 
   // channel health, from the product board
   if (board) {
     const rows = board.rows;
-    $("#ov-chan-note").textContent = `商品看板 · ${rows.length} 个产品 × ${board.channels.length} 个渠道的最新检查结果`;
+    $("#ov-chan-note").textContent = `商品看板 · ${rows.length} 个产品 × ${board.channels.length} 个渠道的最新检查结果（看板跟踪主图、Amazon 美国站和 TikTok 墨西哥；另外 9 个平台在“多平台上架”里生成）`;
     $("#ov-chan-legend").innerHTML = CELL_STATES.map(([k, label]) => swatch(`s-${k}`, label)).join("");
     $("#ov-chan").innerHTML = board.channels.map((ch) => {
       const cells = rows.map((r) => r.cells[ch]);
@@ -827,7 +827,7 @@ async function openImageCell(p, row, cell) {
 
 
 // ------------------------------------------------------------------ inbox & tasks
-let inboxTab = "list", taskRole = "全部";
+let inboxTab = "list", taskRole = "全部", taskInquiry = null;
 function showInboxTab(v) {
   inboxTab = v;
   $$("#inbox-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
@@ -857,17 +857,18 @@ async function renderInbox() {
     go("inquiry"); pickSample(i); runInquiry();
   }));
   const roles = ["全部", ...new Set(data.tasks.map((t) => t.role_zh))];
-  const tasks = data.tasks.filter((t) => taskRole === "全部" || t.role_zh === taskRole);
+  const tasks = data.tasks.filter((t) => (taskRole === "全部" || t.role_zh === taskRole) && (!taskInquiry || t.inquiry_id === taskInquiry));
   const col = (st) => `<div class="col"><h4><span>${st}</span><span class="muted">${tasks.filter((t) => t.status === st).length}</span></h4>${tasks.filter((t) => t.status === st).map((t) => {
     const i = data.task_status.indexOf(st);
     return `<div class="task"><div class="row"><span class="badge brand">${esc(t.role_zh)}</span>${t.priority === "high" ? '<span class="badge red">急</span>' : ""}<span class="small muted" style="margin-left:auto">${esc(t.inquiry_id)}</span></div>
       <div style="margin-top:6px">${esc(t.task_zh)}</div><div class="q">“${esc(t.quote)}”</div>
       <div class="acts"><button class="btn sm ghost" data-mv="${t.id}:${i - 1}" ${i === 0 ? "disabled" : ""}>←</button><span class="small muted">${esc(t.inquiry_label_zh)}</span><button class="btn sm ghost" data-mv="${t.id}:${i + 1}" ${i === 2 ? "disabled" : ""}>→</button></div></div>`;
   }).join("") || '<div class="small muted" style="padding:6px">空</div>'}</div>`;
-  $("#inbox-tasks").innerHTML = data.tasks.length ? `<div class="chips" style="margin-bottom:12px">${roles.map((r) => `<button class="chip ${r === taskRole ? "on" : ""}" data-role="${esc(r)}">${esc(r)}</button>`).join("")}</div>
+  $("#inbox-tasks").innerHTML = data.tasks.length ? `<div class="chips" style="margin-bottom:12px">${roles.map((r) => `<button class="chip ${r === taskRole ? "on" : ""}" data-role="${esc(r)}">${esc(r)}</button>`).join("")}${taskInquiry ? `<span class="chip on">只看 ${esc(taskInquiry)} 的任务</span><button class="chip" id="task-all">显示全部询盘</button>` : ""}</div>
     <div class="kanban">${data.task_status.map(col).join("")}</div>`
     : emptyCard("building-2", "还没有任务", ["处理询盘时，系统会把需要采购、生产、美工跟进的事拆成任务，每条都挂着询盘原文。"]);
   $$("#inbox-tasks [data-role]").forEach((b) => b.addEventListener("click", () => { taskRole = b.dataset.role; renderInbox(); }));
+  $("#task-all")?.addEventListener("click", () => { taskInquiry = null; renderInbox(); });
   $$("#inbox-tasks [data-mv]").forEach((b) => b.addEventListener("click", async () => {
     const [id, i] = b.dataset.mv.split(":");
     try { await api("/api/tasks/status", { id, status: data.task_status[+i] }); renderInbox(); } catch (e) { toast(e.message); }
@@ -1209,7 +1210,7 @@ async function tourSteps() {
       run: async () => { go("board"); await renderBoard(); spot($(".board")); } },
     { d: 8500, cap: "主图检查：白底、占比、尺寸由代码测像素；徽章、促销字、道具由模型看图，必须写出看到了什么。", sub: "这张图被标了 5 条红；红色时“标记已上架”按钮是灰的",
       run: async () => { await openCell("KET-17S", "image"); } },
-    { d: 6500, cap: "同一份中文资料，同时生成 Amazon 美国站英文 Listing 和 TikTok 墨西哥西语脚本，各按平台规则检查。", sub: "Amazon 标题现在最多 75 个字符，这里实时计数",
+    { d: 6500, cap: "同一份中文资料，同时生成 Amazon 美国站英文 Listing 和 TikTok 墨西哥西语脚本，各按平台规则检查。", sub: "Amazon 标题现在最多 75 个字符，这里实时计数；上架可选 11 个平台、6 种语言，这里演示默认的两个",
       run: async () => { closeSheet(); go("listing"); await runListing(); await sleep(200); spot($("#lst-out .grid")); } },
     { d: 9500, cap: cmp, sub: cmpSub || "同样 8 条询盘，同一套代码规则 + 同一个合规审核员来测",
       run: async () => { go("eval"); await showEvalTab("compare"); spot($("#eval-compare .grid")); } },
@@ -1254,13 +1255,26 @@ async function startTour(loop = false) {
 // Booth mode: a visitor picks a role and sees only that lane, its pages in the sidebar and a fixed path of real
 // actions one step at a time. Every step uses requests that are recorded, so the whole path replays offline.
 const CHECK_SAMPLE = "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping";
+const ROLE_INQUIRY = "INQ-US-01";
+
+function cardTitled(root, text) {
+  return [...$$(".card-h h3", root)].find((h) => h.textContent.includes(text))?.closest(".card");
+}
 
 async function roleInquiryRound(n) {
   go("inquiry");
-  if (!state.inq.history.length || state.inqId !== "INQ-US-01") { pickSample(0); await runInquiry(); }
+  if (!state.inq.history.length || state.inqId !== ROLE_INQUIRY) { pickSample(META.inquiries.findIndex((q) => q.id === ROLE_INQUIRY)); await runInquiry(); }
   if (n > 1 && state.inq.history.length < 2) { $("#inq-ins").value = "按风险提示全部修改"; await reviseInquiry(); }
-  if (n > 1) $('#inq-tabs [data-t="diff"]')?.click();
-  spot("#inq-out .risk-hero");
+  if (n > 1) { $('#inq-tabs [data-t="diff"]')?.click(); spot("#inq-out .risk-hero"); }
+  else spot(cardTitled($("#inq-out"), "询盘分析") || "#inq-out .risk-hero");
+}
+
+// What the factory card says it does not have: the claims a buyer will never see on these pages.
+function buyerNote() {
+  const p = META.products[0];
+  const untested = Object.entries(p.material_tests || {}).filter(([, v]) => /未/.test(v)).map(([k]) => k);
+  return `<div class="callout buyer-note">${ic("shield-check")}<div><b>这页没写的话</b>工厂没有 ${esc(p.certifications_not_held.join("、"))}，
+    没做过 ${esc(untested.join("、"))} 检测，所以你在这些页面上看不到这类说法。页面只写资料卡里有的认证：${esc(p.certifications_held.join("、"))}。<span class="small muted">依据：工厂资料卡</span></div></div>`;
 }
 
 async function roleListing(ids) {
@@ -1271,6 +1285,7 @@ async function roleListing(ids) {
     $("[data-platform-language]", row).value = META.listing_catalog.platforms[row.dataset.platform].default_language;
   });
   await runListing();
+  if (role === "consumer" && state.lst.history.length) $("#lst-out").insertAdjacentHTML("afterbegin", buyerNote());
 }
 
 async function roleCheck() {
@@ -1283,55 +1298,63 @@ async function roleCheck() {
 
 const ROLE_LANES = {
   merchant: {
-    name: "商户", mark: "商", sub: "工厂的业务员和运营 · B2B 询盘", pages: ["inbox", "inquiry"],
+    name: "商户", mark: "商", sub: "工厂的业务员和运营 · B2B 询盘", fit: "行业、投资评委", pages: ["inbox", "inquiry"],
     out: "能直接发给进口商的回复、中文内部备忘、派给采购 / 生产 / 美工的任务",
     steps: [
-      { t: "收件箱排好优先级", d: "今天进来的询盘，按公开公式打好了分：分数越高越值得先回。每个分数都能点开看是怎么算的。",
-        run: async () => { go("inbox"); const d = await api("/api/inbox"); if (!d.items.some((x) => x.priority)) await runTriage(); } },
-      { t: "理解并回复美国询盘", d: "这条询盘要 UL、BPA free、FOB 空运、20 天交货、货到 60 天付款。系统先找出和工厂资料对不上的地方，再用英语如实回复，每句承诺都过合规检查。",
+      { t: "收件箱排好优先级", d: "询盘按公开公式打好了分。高亮这条只有 50 分：和工厂资料有 3 处硬冲突、2 处待确认。分低不是不回，是提醒要小心回。",
+        run: async () => {
+          go("inbox");
+          const d = await api("/api/inbox");
+          if (!d.items.some((x) => x.priority)) await runTriage();
+          spot($(`#inbox-list [data-open="${ROLE_INQUIRY}"]`)?.closest(".mail"));
+        } },
+      { t: "理解并回复这条询盘", d: "先看“询盘分析”：UL、BPA、FOB 空运、20 天交货、货到 60 天付款，五个坑逐条带原文；英文回复如实写明做不到。",
         run: () => roleInquiryRound(1) },
-      { t: "一句中文改第 2 轮", d: "业务员只说一句“按风险提示全部修改”，系统在上一版基础上改：红黄提示变少，改动逐词标出来。",
+      { t: "一句中文改第 2 轮", d: "只说一句“按风险提示全部修改”，系统在上一版基础上改：风险变成“可以发”，改动逐词标出来。",
         run: () => roleInquiryRound(2) },
-      { t: "看派出去的任务", d: "回复里需要采购、生产、美工跟进的事，已经自动拆成任务，每条都挂着询盘原文。",
-        run: async () => { go("inbox"); await renderInbox(); showInboxTab("tasks"); } },
+      { t: "看派出去的任务", d: "这条询盘里要采购、生产、美工跟进的事，已自动拆成任务，每条都挂着询盘原文。",
+        run: async () => { taskInquiry = ROLE_INQUIRY; go("inbox"); await renderInbox(); showInboxTab("tasks"); } },
     ],
   },
   reviewer: {
-    name: "合规审查员", mark: "审", sub: "发出前的最后一道关", pages: ["check", "kb", "eval"],
+    name: "合规审查员", mark: "审", sub: "发出前的最后一道关", fit: "技术评委", pages: ["check", "kb", "eval"],
     out: "红黄绿结论，每条问题都附规则原文和链接",
     steps: [
-      { t: "检查一段待发文案", d: "这段 Amazon 标题里埋了 6 个问题：促销用语、主观评价、感叹号、工厂没有的 UL、没测过的 BPA、免运费。",
+      { t: "检查一段待发文案", d: "这段标题埋了 6 个问题：促销语、主观评价、感叹号、没有的 UL、没测的 BPA、免运费；系统还多查出一条：78 字符，超过 75。",
         run: roleCheck },
-      { t: "每条问题都有出处", d: "每条提示都挂着规则原文和链接，或工厂资料卡上的那个字段。模型说不出出处的提示，代码直接丢掉。",
+      { t: "每条问题都有出处", d: "每条提示都挂着规则原文和链接，或资料卡上的字段；模型说不出出处的提示，代码直接丢掉。",
         run: async () => { if (!$("#chk-out .finding")) await roleCheck(); spot("#chk-out .finding"); } },
-      { t: "61 条规则逐条核实", d: "规则覆盖 11 个平台、6 个市场，每条都对照官方原文核实过，附链接和抓取日期。可以按平台或市场筛选。",
+      { t: "61 条规则逐条核实", d: "覆盖 11 个平台、6 个市场，每条对照官方原文核实，附链接和抓取日期，可以按平台筛选。",
         run: async () => { go("kb"); } },
-      { t: "编造的提示拦得住吗", d: "红队测试：往审核结果里塞 5 条编造的提示（假规则编号、原文对不上），看代码怎么全部拦下。",
+      { t: "编造的提示拦得住吗", d: "往审核结果里塞 5 条编造的提示（假编号、原文对不上），看代码怎么全部拦下。",
         run: async () => { go("eval"); await showEvalTab("redteam"); await runRedteam(); } },
     ],
   },
   consumer: {
-    name: "消费者", mark: "买", sub: "海外买家看到的商品页 · B2C 上架", pages: ["listing", "check"],
+    name: "消费者", mark: "买", sub: "海外买家看到的商品页 · B2C 上架", fit: "关心本地化和 B2C 的评委", pages: ["listing", "check"],
     out: "按平台和语言生成、只写工厂真有的认证和参数的商品页",
     steps: [
-      { t: "美国和墨西哥的商品页", d: "同一份中文资料：美国买家在 Amazon 看到英文 Listing，墨西哥买家在 TikTok 看到西语短视频脚本。",
+      { t: "美国和墨西哥的商品页", d: "美国买家在 Amazon 看到英文 Listing，墨西哥买家在 TikTok 看到西语短视频。这里只显示买家看得到的部分。",
         run: () => roleListing(["amazon_us", "tiktok_mx"]) },
-      { t: "换到德国和墨西哥电商", d: "换成 Amazon 德国站（德语）和 Mercado Libre 墨西哥（西语）：格式和语言跟着平台走，各按当地平台规则和法规检查。",
+      { t: "换到德国和墨西哥电商", d: "换成 Amazon 德国站（德语）和 Mercado Libre 墨西哥（西语）：格式和语言跟着平台走，都按当地规则检查过。",
         run: () => roleListing(["amazon_de", "mercadolibre_mx"]) },
-      { t: "页面上不会出现的话", d: "工厂没有 UL、没测过 BPA，所以你看到的商品页里不会有 “UL Listed”“BPA Free”。把这种文案贴进来，系统直接判红。",
+      { t: "页面上不会出现的话", d: "工厂没有 UL、没测过 BPA，所以商品页不会有 “UL Listed”“BPA Free”；有人把这种文案贴进来，系统直接判红。",
         run: roleCheck },
     ],
   },
 };
+const ROLE_ORDER = Object.keys(ROLE_LANES);
 let role = null, roleStep = 0, roleBusy = false;
 
 function showRolePicker() {
   let el = $("#rolepick");
   if (!el) { el = document.createElement("div"); el.id = "rolepick"; el.className = "rolepick"; document.body.appendChild(el); }
-  el.innerHTML = `<div class="rp-inner"><span class="rp-kick">从合规切入的外贸 AI 工作台</span><h1>你是哪一类用户？</h1>
+  el.innerHTML = `<div class="rp-inner"><span class="rp-kick">TradeDesk 出海工作台 · 从合规切入</span><h1>你是哪一类用户？</h1>
+    <div class="rp-proof"><b class="r">8 / 8</b><span>直接用通用 AI 回 8 条外贸询盘，全都不能发</span><i>→</i><b class="g">0 / 8</b><span>TradeDesk 带上工厂资料卡和规则，红色清零</span></div>
     <p>选一个角色，按你的路径走一遍。每一步都是工作台里的真实操作，左边只留这条路径用得到的页面。</p>
     <div class="rp-cards">${Object.entries(ROLE_LANES).map(([k, r]) => `<button class="rp-card ${k}" data-role="${k}">
       <span class="rp-ic">${r.mark}</span><b>${r.name}</b><small>${esc(r.sub)}</small>
+      <span class="rp-meta">约 1 分钟 · ${r.steps.length} 步 · 适合${esc(r.fit)}</span>
       <span class="rp-path">${r.steps.map((s, i) => `<span><i>${i + 1}</i>${esc(s.t)}</span>`).join("")}</span>
       <span class="rp-out">产出：${esc(r.out)}</span></button>`).join("")}</div>
     <button class="rp-all" data-role="">进入完整工作台（全部功能）</button></div>`;
@@ -1341,9 +1364,10 @@ function showRolePicker() {
 
 function setRole(key) {
   role = ROLE_LANES[key] ? key : null;
-  roleStep = 0;
+  roleStep = 0; taskInquiry = null;
   $("#rolepick")?.setAttribute("hidden", "");
   document.body.classList.toggle("role-mode", !!role);
+  document.body.classList.toggle("buyer-view", role === "consumer");
   document.body.dataset.role = role || "";
   const lane = role && ROLE_LANES[role];
   $$(".nav button").forEach((b) => { b.hidden = !!lane && !lane.pages.includes(b.dataset.page); });
@@ -1357,14 +1381,17 @@ function renderRoleGuide() {
   const g = $("#roleguide"), lane = role && ROLE_LANES[role];
   if (!lane) { g.hidden = true; return; }
   const st = lane.steps[roleStep], last = roleStep === lane.steps.length - 1;
+  const next = ROLE_ORDER[(ROLE_ORDER.indexOf(role) + 1) % ROLE_ORDER.length];
   g.hidden = false;
   g.innerHTML = `<div class="rg-who ${role}"><span class="rg-ic">${lane.mark}</span><div><b>${lane.name}</b><small>${esc(lane.sub)}</small></div></div>
     <ol class="rg-steps">${lane.steps.map((s, i) => `<li class="${i < roleStep ? "done" : i === roleStep ? "now" : ""}"><button data-step="${i}"><i>${i < roleStep ? "✓" : i + 1}</i>${esc(s.t)}</button></li>`).join("")}</ol>
-    <div class="rg-now"><p><b>第 ${roleStep + 1} 步 · ${esc(st.t)}</b>${esc(st.d)}</p>
-      <div class="row">${last ? `<span class="rg-done">走完了 · 产出：${esc(lane.out)}</span>` : `<button class="btn sm primary" id="rg-next">下一步：${esc(lane.steps[roleStep + 1].t)}${ic("arrow-right", "sm")}</button>`}
-      <button class="btn sm ghost" id="rg-switch">换个角色</button></div></div>`;
+    <div class="rg-acts">${last ? `<button class="btn sm primary" id="rg-nextlane">下一条线：${esc(ROLE_LANES[next].name)}${ic("arrow-right", "sm")}</button>`
+        : `<button class="btn sm primary" id="rg-next">下一步：${esc(lane.steps[roleStep + 1].t)}${ic("arrow-right", "sm")}</button>`}
+      <button class="btn sm ghost" id="rg-switch">换个角色</button></div>
+    <p class="rg-desc"><b>第 ${roleStep + 1} 步 · ${esc(st.t)}</b>${esc(st.d)}${last ? `<span class="rg-done">走完了 · 产出：${esc(lane.out)}</span>` : ""}</p>`;
   $$("#roleguide [data-step]").forEach((b) => b.addEventListener("click", () => runRoleStep(+b.dataset.step)));
   $("#rg-next")?.addEventListener("click", () => runRoleStep(roleStep + 1));
+  $("#rg-nextlane")?.addEventListener("click", () => setRole(next));
   $("#rg-switch").addEventListener("click", showRolePicker);
 }
 
@@ -1442,7 +1469,7 @@ async function boot() {
     if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && !(document.activeElement.id || "").endsWith("-ins")) {
       e.preventDefault();
       ({ inquiry: runInquiry, listing: runListing, check: runCheck })[page]?.();
-    } else if (!typing && !e.metaKey && !e.ctrlKey && /^[1-9]$/.test(e.key) && !$("#sheet").classList.contains("on")) go(Object.keys(PAGES)[+e.key - 1]);
+    } else if (!typing && !role && !e.metaKey && !e.ctrlKey && /^[1-9]$/.test(e.key) && !$("#sheet").classList.contains("on")) go(Object.keys(PAGES)[+e.key - 1]);
   });
   renderOverview();
   if (/^#roles?\b/.test(location.hash)) { const m = location.hash.match(/^#role=(\w+)/); return m ? setRole(m[1]) : showRolePicker(); }

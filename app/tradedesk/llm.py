@@ -182,7 +182,7 @@ class LLM:
         if self.mode == "replay":
             path, model = self._recorded(system, user, image)
             if not path:
-                raise LLMError("回放模式下没有这条请求的缓存，请切换到 live 或 record 模式")
+                raise LLMError("这一步没有录好的结果：回放模式不联网，只能用录好的结果。换回默认选项再试，或在左下角模型卡片切到实时模式（需要联网和 key）")
         if self.mode == "replay" or (self.mode == "record" and path.exists()):
             cached = json.loads(path.read_text(encoding="utf-8"))
             content, usage = cached["content"], cached.get("usage")

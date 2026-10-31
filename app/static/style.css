@@ -663,3 +663,28 @@ input.bad{border-color:hsl(var(--red));box-shadow:0 0 0 3px hsl(var(--red) / .15
 body.role-mode #tour-btn{display:none}
 @media (max-width:1100px){.roleguide{grid-template-columns:minmax(0,1fr);gap:10px;padding:10px 16px}}
 .nav button[hidden],.nav-label[hidden]{display:none}
+/* role picker: what this is, and how long a lane takes */
+.rp-proof{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 14px;padding:10px 14px;border:1px solid rgba(148,163,255,.22);border-radius:12px;background:rgba(255,255,255,.04);font-size:14px;color:#cbd5e1;width:fit-content;max-width:100%}
+.rp-proof b{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}.rp-proof b.r{color:#f87171}.rp-proof b.g{color:#4ade80}.rp-proof i{font-style:normal;color:#22d3ee;font-size:18px}
+.rp-meta{font-size:12.5px;font-weight:600;color:#a5b4fc;letter-spacing:.02em}
+/* guide bar: keep it to two lines of text at laptop width */
+.roleguide{padding:8px 32px;gap:14px;grid-template-columns:auto minmax(0,1.15fr) minmax(0,1fr)}
+.rg-steps button{padding:4px 9px;font-size:12.5px}
+.rg-now p{margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rg-now p b{display:inline;margin:0 6px 0 0}
+/* consumer lane: show only what a buyer sees on the marketplace page */
+body.buyer-view #lst-out .card:has(> .steps-wrap),body.buyer-view #lst-out .composer,body.buyer-view #lst-out .journey,
+body.buyer-view #lst-out [data-plat] > :not(.card-h):not([data-view="pre"]),body.buyer-view #lst-out [data-plat] .card-h .row,
+body.buyer-view #lst-out .fieldlab .badge,body.buyer-view #lst-out sup.fn,body.buyer-view #lst-rounds{display:none}
+body.buyer-view #lst-out mark{background:none;color:inherit;border:0;box-shadow:none;text-decoration:none;padding:0}
+.buyer-note{margin:0 0 16px}.buyer-note b{display:block;margin-bottom:2px}.buyer-note .small{display:block;margin-top:4px}
+/* guide bar, final layout: one row of steps and buttons, the explanation on its own full-width row */
+.roleguide{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"who steps acts" "who desc desc";row-gap:6px;align-items:center}
+.rg-who{grid-area:who;align-self:center}.rg-steps{grid-area:steps}.rg-acts{grid-area:acts;display:flex;gap:8px;align-items:center}
+.rg-desc{grid-area:desc;margin:0;font-size:13px;line-height:1.5;color:hsl(var(--muted-foreground))}
+.rg-desc b{color:hsl(var(--foreground));margin-right:8px}
+.rg-desc .rg-done{display:inline;margin-left:10px}
+.roleguide.busy .rg-desc::after{content:"  · 运行中…";color:hsl(var(--brand))}
+@media (max-width:1100px){.roleguide{grid-template-columns:minmax(0,1fr);grid-template-areas:"who" "steps" "desc" "acts"}}
+.roleguide{grid-template-areas:"who steps steps" "who desc acts"}
+.rg-acts{align-self:end}
