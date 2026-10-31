@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=29">
+<link rel="stylesheet" href="style.css?v=30">
 <script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -52,9 +52,21 @@
     <div class="content">
       <!-- ================= overview ================= -->
       <section class="page on" id="page-overview">
-        <div class="page-head">
-          <div><div class="eyebrow" id="ov-eyebrow"></div><h1>出海工作台</h1><p>询盘 → 回复 → 上架。每一条风险提示都有出处：公开规则的原文与链接，或工厂资料卡上的那个字段。</p></div>
-          <div class="row"><button class="btn" data-go="board"><svg class="ic"><use href="#i-package"/></svg>商品看板</button><button class="btn primary" data-go="inquiry"><svg class="ic"><use href="#i-mail-question"/></svg>处理一条询盘</button></div>
+        <div class="ov-hero">
+          <div class="ov-hero-copy">
+            <div class="ov-kick"><span id="ov-eyebrow"></span><span>TradeDesk 出海工作台 · 从合规切入</span></div>
+            <h1>不帮工厂写文案，<br><span>帮工厂在发出前查。</span></h1>
+            <p>AI 写的每一句对外承诺，对不上工厂资料或平台规则就拦下，并给出依据：规则原文和链接，或资料卡上的那个字段。</p>
+            <div class="row"><button class="btn primary" data-go="check"><svg class="ic"><use href="#i-scan-search"/></svg>贴一段文案试试</button>
+              <button class="btn ov-ghost" id="ov-roles"><svg class="ic"><use href="#i-building-2"/></svg>按角色体验</button>
+              <button class="btn ov-ghost" data-go="inquiry"><svg class="ic"><use href="#i-mail-question"/></svg>处理一条询盘</button></div>
+          </div>
+          <div class="ov-proof">
+            <div class="opf r"><b>8 / 8</b><span>通用 AI 只看询盘</span><small>8 条回复都带红色问题</small></div>
+            <div class="opf a"><b>0 红</b><span>贴上工厂资料</span><small>仍有 20 处待人工确认</small></div>
+            <div class="opf g"><b>3 / 8</b><span>TradeDesk 改一轮</span><small>可直接发，待确认 8 处</small></div>
+            <button class="ov-link" data-go="eval">同样 8 条询盘、同一套检查 · 看对照实验<svg class="ic sm"><use href="#i-chevron-right"/></svg></button>
+          </div>
         </div>
         <div class="grid g4" id="ov-stats"></div>
         <div class="dash">
@@ -149,12 +161,13 @@
 
       <!-- ================= check ================= -->
       <section class="page" id="page-check">
-        <div class="page-head"><div><h1>文案体检</h1><p>把店里正在用的标题、要点或回复贴进来，按同一套规则检查</p></div></div>
+        <div class="page-head"><div><h1>文案体检</h1><p>贴一段文案：自己写的、ChatGPT 写的、别的工具写的都行，按同一套规则和工厂资料卡检查，每条问题给出依据</p></div></div>
         <div class="bench" id="chk-bench">
           <div class="left card"><div class="card-b">
             <label class="field">平台<div class="seg" id="chk-platform"></div></label>
             <label class="field">产品<select id="chk-product" class="product-select"></select></label>
             <label class="field">待检查的文案<textarea id="chk-text" rows="8"></textarea></label>
+            <div class="chk-samples" id="chk-samples"></div>
             <button class="btn primary" id="chk-run" style="width:100%"><svg class="ic"><use href="#i-scan-search"/></svg>检查<span class="kbd">⌘↵</span></button>
           </div></div>
           <div id="chk-out"></div>
@@ -219,6 +232,6 @@
 <aside class="sheet" id="sheet" aria-hidden="true"><div class="sheet-h" id="sheet-h"></div><div class="sheet-b" id="sheet-b"></div><div class="sheet-f" id="sheet-f"></div></aside>
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
-<script src="app.js?v=31"></script>
+<script src="app.js?v=32"></script>
 </body>
 </html>

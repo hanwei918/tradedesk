@@ -269,7 +269,7 @@ const WF_ICON = { "收件箱整理": "history", "已有文案检查": "scan-sear
 async function renderOverview() {
   const [{ entries }, kb, board] = await Promise.all([api("/api/logs"), KB ? KB : api("/api/kb"), api("/api/board").catch(() => null)]);
   KB = kb;
-  if (META) $("#ov-eyebrow").innerHTML = `${ic("building-2", "sm")}${esc(META.factory.name_zh)}`;
+  if (META) $("#ov-eyebrow").innerHTML = `${ic("building-2", "sm")}${esc(META.factory.name_zh)} ·`;
   const runs = groupRuns(entries);
   const reviews = entries.filter((e) => e.findings);
   const all = reviews.flatMap((e) => e.findings);
@@ -1744,6 +1744,15 @@ async function boot() {
   $("#log-refresh").addEventListener("click", renderLogs);
   $("#board-batch").addEventListener("click", runBatch);
   $("#board-add").addEventListener("click", () => openProductForm());
+  $("#ov-roles").addEventListener("click", showRolePicker);
+  // One-click samples on the check page (the texts the demo cache was recorded with).
+  const SAMPLE_NAMES = { "KET-17S": "水壶标题：埋了 6 个问题", "TMB-50V": "保温杯标题（另一家工厂）" };
+  $("#chk-samples").innerHTML = `<span class="small muted">试试示例：</span>` + Object.keys(META.check_samples || {}).map((pid) =>
+    `<button class="chip" data-sample="${esc(pid)}">${esc(SAMPLE_NAMES[pid] || pid)}</button>`).join("");
+  $$("#chk-samples [data-sample]").forEach((b) => b.addEventListener("click", (e) => {
+    e.preventDefault(); state.chkPlatform = "amazon_us"; renderCheckControls();
+    $("#chk-product").value = b.dataset.sample; $("#chk-text").value = sampleFor(b.dataset.sample); runCheck();
+  }));
   $("#tour-btn").addEventListener("click", () => startTour(false));
   $("#role-btn").addEventListener("click", showRolePicker);
   addEventListener("keydown", (e) => { if (e.key === "Escape" && tourState.on) tourState.on = false; });

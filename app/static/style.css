@@ -737,3 +737,37 @@ body.buyer-view #lst-out mark{background:none;color:inherit;border:0;box-shadow:
 .sv-t span{font-size:12.5px;color:hsl(var(--muted-foreground))}.sv-t b{font-size:22px}.sv-t small{font-size:12px;color:hsl(var(--muted-foreground))}
 .sv-tform{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.sv-tform select{width:auto}.sv-tform input[type=number]{width:140px}.sv-tform input[type=text]{flex:1;min-width:200px}
 .sv-trec{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:12.5px}.sv-trec span{border:1px solid hsl(var(--border));border-radius:999px;padding:2px 4px 2px 10px;display:inline-flex;align-items:center;gap:4px}
+
+/* ---- 10-31 night: UI polish (overview hero, poster palette in dark mode, check page) */
+#chk-platform{display:flex;flex-wrap:wrap;gap:4px}
+#chk-platform button{white-space:nowrap;padding:5px 10px}
+.chk-samples{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-2px 0 12px}
+.ov-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;align-items:center;
+  padding:30px 32px;margin-bottom:16px;border-radius:16px;color:#cbd5e1;border:1px solid rgba(148,163,255,.18);
+  background:radial-gradient(60% 90% at 88% 0%,rgba(37,99,235,.42),transparent 60%),radial-gradient(50% 80% at 0% 100%,rgba(8,145,178,.30),transparent 60%),radial-gradient(40% 60% at 55% 120%,rgba(139,92,246,.22),transparent 60%),#070e25}
+.ov-hero::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:linear-gradient(90deg,#000,transparent 70%);mask-image:linear-gradient(90deg,#000,transparent 70%)}
+.ov-hero>*{position:relative}
+.ov-kick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;font-weight:600;letter-spacing:.04em;color:#93c5fd}
+.ov-kick .ic{width:14px;height:14px}
+.ov-hero h1{margin:12px 0 0;font-size:34px;line-height:1.18;letter-spacing:-.02em;color:#fff;font-weight:750}
+.ov-hero h1 span{background:linear-gradient(90deg,#48e2db,#74a0ff 55%,#b795ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ov-hero p{margin:12px 0 18px;font-size:14px;line-height:1.65;color:#b8c5dc;max-width:560px}
+.ov-hero .row{gap:8px;flex-wrap:wrap}
+.ov-hero .btn.ov-ghost{background:rgba(255,255,255,.06);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+.ov-hero .btn.ov-ghost:hover{background:rgba(255,255,255,.12)}
+.ov-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.opf{display:flex;flex-direction:column;gap:2px;padding:14px 14px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-top:3px solid var(--c)}
+.opf.r{--c:#f87171}.opf.a{--c:#fbbf24}.opf.g{--c:#4ade80}
+.opf b{font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--c);font-variant-numeric:tabular-nums;line-height:1.15}
+.opf span{font-size:12.5px;font-weight:600;color:#e2e8f0}.opf small{font-size:11.5px;color:#94a3b8;line-height:1.4}
+.ov-link{all:unset;grid-column:1/-1;cursor:pointer;font-size:12px;color:#93c5fd;display:inline-flex;align-items:center;gap:4px}
+.ov-link:hover{color:#bfdbfe}
+@media (max-width:1180px){.ov-hero{grid-template-columns:1fr}}
+/* dark mode in the poster palette: deep navy, cyan / blue / violet accents */
+:root[data-theme="dark"]{--background:228 62% 7%;--card:226 46% 11%;--muted:226 36% 15%;--border:226 34% 20%;--accent:226 36% 15%;
+  --brand:222 100% 74%;--brand-soft:224 60% 18%;--primary:221 92% 62%;--sidebar:229 66% 5%;--sidebar-border:226 40% 13%;--sidebar-hover:226 40% 11%}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--background:228 62% 7%;--card:226 46% 11%;--muted:226 36% 15%;--border:226 34% 20%;--accent:226 36% 15%;
+  --brand:222 100% 74%;--brand-soft:224 60% 18%;--primary:221 92% 62%;--sidebar:229 66% 5%;--sidebar-border:226 40% 13%;--sidebar-hover:226 40% 11%}}
+:root[data-theme="dark"] body{background:radial-gradient(1100px 520px at 95% -8%,rgba(37,99,235,.16),transparent 60%),radial-gradient(900px 480px at -5% 105%,rgba(8,145,178,.10),transparent 60%),hsl(var(--background)) fixed}
+:root[data-theme="dark"] .card{box-shadow:0 0 0 1px rgba(148,163,255,.04),0 14px 34px -24px rgba(37,99,235,.55)}
+:root[data-theme="dark"] .ov-hero{border-color:rgba(148,163,255,.24)}
