@@ -1318,5 +1318,86 @@ class CustomProductTests(unittest.TestCase):
         self.assertFalse(any(card["name_zh"] in n for n in names))
 
 
+class LiveCheckTests(unittest.TestCase):
+    """实时验证: a fresh inquiry goes through understand -> reply -> review with real calls, never the cache."""
+
+    def fake(self):
+        return FakeTransport({"询盘分析员": {"buyer": {"language": "en"}, "requests": [], "signals": [], "conflicts": []},
+                              "外贸业务员": {"reply": "Hello, our MOQ is 500 pcs.", "tasks": []},
+                              "合规审核员": {"findings": []}})
+
+    def test_new_inquiry_runs_live_and_is_recorded(self):
+        from tradedesk.live_check import LiveChecks, sample_inquiry
+        kb = KnowledgeBase()
+        with tempfile.TemporaryDirectory() as t:
+            fake = self.fake()
+            live = LLM(api_key="k", mode="live", transport=fake, cache_dir=Path(t) / "cache")
+            store = LiveChecks(Path(t) / "live.json")
+            text = sample_inquiry(kb.product("KET-17S"))
+            r = store.run(kb, live, "KET-17S", text, Path(t) / "calls.jsonl", Board(Path(t) / "s"))
+            self.assertTrue(r["ok"], r)
+            self.assertEqual([s["source"] for s in r["steps"]], ["live", "live", "live"])
+            self.assertEqual(len(fake.calls), 3)
+            self.assertFalse((Path(t) / "cache").exists())  # live mode never writes the cache
+            self.assertEqual(store.load()[-1]["text"], text)
+
+    def test_refuses_without_key_or_outside_live_mode_and_records_failures(self):
+        from tradedesk.live_check import LiveChecks
+        kb = KnowledgeBase()
+        text = "Hi, please quote 800 pcs of your kettle, FOB Ningbo, delivery in 20 days."
+        with tempfile.TemporaryDirectory() as t:
+            store = LiveChecks(Path(t) / "live.json")
+            args = ("KET-17S", text, Path(t) / "c.jsonl", Board(Path(t) / "s"))
+            with self.assertRaisesRegex(ValueError, "key"):
+                store.run(kb, LLM(api_key="", mode="live"), *args)
+            with self.assertRaisesRegex(ValueError, "实时模式"):
+                store.run(kb, LLM(api_key="k", mode="replay"), *args)
+            def down(body):
+                raise LLMError("模型调用失败：timeout")
+            r = store.run(kb, LLM(api_key="k", mode="live", transport=down), *args)
+            self.assertEqual((r["ok"], "timeout" in r["error"]), (False, True))
+            self.assertEqual(len(store.load()), 1)
+
+    def test_sample_inquiries_differ(self):
+        from tradedesk.live_check import sample_inquiry
+        import random as _r
+        p = KnowledgeBase().product("KET-17S")
+        self.assertNotEqual(sample_inquiry(p, _r.Random(1)), sample_inquiry(p, _r.Random(2)))
+
+
+class TimingTests(unittest.TestCase):
+    def test_on_site_timings_are_kept_apart_and_summarised(self):
+        from tradedesk import savings
+        with tempfile.TemporaryDirectory() as t:
+            log = savings.TimingLog(Path(t) / "t.json")
+            for task, m in [("manual", 18), ("manual", 22), ("manual", 25), ("tradedesk", 4.5)]:
+                log.add({"task": task, "minutes": m, "note": "x"})
+            s = log.summary()["tasks"]
+            self.assertEqual((s["manual"]["n"], s["manual"]["median"], s["tradedesk"]["median"]), (3, 22, 4.5))
+            for bad in [{"task": "x", "minutes": 3}, {"task": "manual", "minutes": "abc"}, {"task": "manual", "minutes": 0}]:
+                with self.assertRaises(ValueError):
+                    log.add(bad)
+            log.delete(0)
+            self.assertEqual(log.summary()["tasks"]["manual"]["n"], 2)
+            v = savings.view(None, log)
+            self.assertEqual(v["assumptions"][2]["value"], 20)  # timings never change the assumptions by themselves
+
+
+class ProductEditBoardTests(unittest.TestCase):
+    def test_editing_a_card_clears_its_old_checks(self):
+        import server
+        from tradedesk.catalog_edit import CustomProducts
+        with tempfile.TemporaryDirectory() as t:
+            app = server.App.__new__(server.App)
+            app.kb, app.board, app.custom = KnowledgeBase(), Board(Path(t) / "s"), CustomProducts(Path(t) / "c.json")
+            form = dict(CustomProductTests.FORM)
+            pid = app.product_save({"product": form})["product"]["id"]
+            app.board.record(pid, "amazon_us", {"risk": "green", "findings": []}, "r1")
+            app.product_save({"product": dict(form, certifications_not_held=["UL"]), "id": pid})
+            self.assertIsNone(app.board.snapshot([pid])[0]["cells"]["amazon_us"]["risk"])
+            with self.assertRaisesRegex(ValueError, "示例商品不能改"):
+                app.product_save({"product": form, "id": "KET-17S"})
+
+
 if __name__ == "__main__":
     unittest.main()

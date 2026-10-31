@@ -1052,9 +1052,42 @@ async function renderSavings() {
       <div class="card"><div class="card-h"><div><h3>${ic("cpu")}假设（可改）</h3><p>示例值，按你的工厂填</p></div><span class="badge">假设</span></div>
         <div class="card-b sv-in">${SV.assumptions.map((a) => `<label><span>${esc(a.label)}</span><span class="f"><input type="number" min="0" step="any" data-k="${a.key}" value="${a.value}">${a.unit ? `<em>${esc(a.unit)}</em>` : ""}</span></label>`).join("")}</div></div>
     </div>
+    <div class="card" id="sv-time" style="margin-top:16px"></div>
     <div class="card" id="sv-out" style="margin-top:16px"></div>`;
+  timingCard();
   $$("#eval-savings [data-k]").forEach((i) => i.addEventListener("input", () => { clearTimeout(svTimer); svTimer = setTimeout(updateSavings, 250); }));
   savingsResult(SV);
+}
+let swStart = null, swTimer = null;
+function timingCard() {
+  const T = SV.timings || { tasks: {}, records: [] }, t = T.tasks || {};
+  const col = (k) => { const x = t[k] || {}; return `<div class="sv-t"><span>${esc(x.label || "")}</span><b>${x.median != null ? `${x.median} 分钟` : "还没测"}</b><small>${x.n ? `中位数 · n=${x.n}` : "点“开始计时”现场测一次"}</small></div>`; };
+  const both = t.manual?.n && t.tradedesk?.n;
+  $("#sv-time").innerHTML = `<div class="card-h"><div><h3>${ic("history")}现场实测：人工 vs 用 TradeDesk</h3><p>请人当场计时：手写一条回复，再用 TradeDesk 生成 + 复核一条。只记真实测到的数，样本少就照实写 n</p></div><span class="badge brand">实测</span></div>
+    <div class="card-b"><div class="sv-tcols">${col("manual")}${col("tradedesk")}</div>
+      <div class="sv-tform"><select id="tm-task"><option value="manual">人工回一条询盘</option><option value="tradedesk">用 TradeDesk 生成 + 复核一条</option></select>
+        <button class="btn sm" id="tm-sw">${ic("play", "sm")}<span id="tm-sw-l">开始计时</span></button>
+        <input type="number" id="tm-min" min="0.1" step="0.1" placeholder="或直接填分钟">
+        <input type="text" id="tm-note" placeholder="备注：谁测的、哪条询盘（可选）">
+        <button class="btn sm primary" id="tm-add">记下这次</button></div>
+      ${T.records.length ? `<div class="sv-trec">${T.records.map((e, i) => `<span>${esc(e.ts.slice(5))} · ${e.task === "manual" ? "人工" : "TradeDesk"} ${e.minutes} 分钟${e.note ? ` · ${esc(e.note)}` : ""} <button class="btn sm ghost" data-tdel="${i}" title="删除这条">×</button></span>`).join("")}</div>` : ""}
+      ${both ? `<button class="btn sm" id="tm-use" style="margin-top:10px">${ic("circle-check-big", "sm")}用实测中位数替换下面两项假设（人工 ${t.manual.median} 分钟、复核 ${t.tradedesk.median} 分钟）</button>` : ""}
+      <p class="small muted" style="margin:8px 0 0">样本只有几次时，不能当平均值讲；没测过的就不写。</p></div>`;
+  $("#tm-sw").addEventListener("click", () => {
+    if (!swStart) { swStart = Date.now(); swTimer = setInterval(() => ($("#tm-sw-l").textContent = `停止（${((Date.now() - swStart) / 60000).toFixed(1)} 分钟）`), 1000); $("#tm-sw-l").textContent = "停止（0.0 分钟）"; return; }
+    clearInterval(swTimer); $("#tm-min").value = Math.max(0.1, (Date.now() - swStart) / 60000).toFixed(1); swStart = null; $("#tm-sw-l").textContent = "开始计时";
+  });
+  $("#tm-add").addEventListener("click", async () => {
+    try { SV = await api("/api/savings/timing", { task: $("#tm-task").value, minutes: $("#tm-min").value, note: $("#tm-note").value }); timingCard(); toast("已记下", "ok"); } catch (e) { toast(e.message); }
+  });
+  $$("#sv-time [data-tdel]").forEach((b) => b.addEventListener("click", async () => {
+    try { SV = await api("/api/savings/timing/delete", { index: +b.dataset.tdel }); timingCard(); } catch (e) { toast(e.message); }
+  }));
+  $("#tm-use")?.addEventListener("click", () => {
+    $('#eval-savings [data-k="manual_minutes_per_reply"]').value = t.manual.median;
+    $('#eval-savings [data-k="review_minutes_per_reply"]').value = t.tradedesk.median;
+    updateSavings(); toast(`已用实测替换：人工 ${t.manual.median} 分钟（n=${t.manual.n}）、复核 ${t.tradedesk.median} 分钟（n=${t.tradedesk.n}）`, "ok");
+  });
 }
 async function updateSavings() {
   const values = Object.fromEntries($$("#eval-savings [data-k]").map((i) => [i.dataset.k, i.value]));
@@ -1063,6 +1096,8 @@ async function updateSavings() {
 }
 function savingsResult(v) {
   const a = Object.fromEntries(v.assumptions.map((x) => [x.key, x.value])), e = v.estimate, m = v.measured;
+  const T = (v.timings || {}).tasks || {};
+  const src = (key, task) => (T[task]?.n && T[task].median === a[key] ? `（实测 n=${T[task].n}）` : "（假设）");
   const tile = (k, val, d, cls = "") => `<div class="sv-k ${cls}"><span>${esc(k)}</span><b>${val}</b><small>${d}</small></div>`;
   $("#sv-out").innerHTML = `<div class="card-h"><div><h3>${ic("scan-search")}每月测算</h3><p>用上面的实测单价和你填的假设算出来；每一行都写出了算式</p></div></div>
     <div class="card-b"><div class="sv-tiles">
@@ -1072,7 +1107,7 @@ function savingsResult(v) {
       ${tile("模型费用", "−" + cny(e.model_cny), "实测单价")}
       ${tile("每月净节省", cny(e.net_cny), "人工 + 外包 − 模型", e.net_cny >= 0 ? "pos" : "neg")}</div>
       <div class="sv-f">
-        <div><span>人工</span><code>${a.inquiries_per_day} 条/天 × ${a.workdays_per_month} 天 × (${a.manual_minutes_per_reply} − ${a.review_minutes_per_reply}) 分钟 ÷ 60 = ${e.hours_saved} 小时；× ${a.hourly_wage_cny} 元 = ${cny(e.labor_cny)}</code></div>
+        <div><span>人工</span><code>${a.inquiries_per_day} 条/天 × ${a.workdays_per_month} 天 × (${a.manual_minutes_per_reply}${src("manual_minutes_per_reply", "manual")} − ${a.review_minutes_per_reply}${src("review_minutes_per_reply", "tradedesk")}) 分钟 ÷ 60 = ${e.hours_saved} 小时；× ${a.hourly_wage_cny} 元 = ${cny(e.labor_cny)}</code></div>
         <div><span>外包</span><code>${a.listings_per_month} 个 × ${a.outsourcing_cny_per_listing} 元 = ${cny(e.outsourcing_cny)}</code></div>
         <div><span>模型</span><code>(${e.replies_per_month} 条 × $${m.usd_per_inquiry.value} + ${a.listings_per_month} 个 × $${m.usd_per_listing.value}) × ${a.usd_to_cny} = ${cny(e.model_cny)}</code></div>
         <div><span>净节省</span><code>${cny(e.labor_cny)} + ${cny(e.outsourcing_cny)} − ${cny(e.model_cny)} = ${cny(e.net_cny)}</code></div>
@@ -1224,8 +1259,39 @@ async function renderSelfcheck() {
       <span>${esc(r.checked_at)} · ${r.steps.filter((x) => x.ok).length} / ${r.steps.length} 步演示路径在回放模式下离线可走 · 当前 ${esc(MODE_ZH[r.mode] || r.mode)} · ${esc(r.model)}</span></div></div></div>
     <div class="grid g2" style="margin-top:16px;align-items:start">
       <div class="card"><div class="card-h"><h3>${ic("cpu")}环境</h3></div><table class="tbl sc-tbl"><tbody>${env.map((e) => `<tr><td>${mark(e)}</td><td><b>${esc(e.item)}</b></td><td class="small">${esc(e.detail_zh)}</td></tr>`).join("")}</tbody></table></div>
-      <div class="card"><div class="card-h"><div><h3>${ic("play")}演示路径回放</h3><p>在临时目录里把每一步回放一遍，不联网、不改看板</p></div></div><table class="tbl sc-tbl"><tbody>${r.steps.map((x) => `<tr><td>${mark(x)}</td><td><span class="badge">${esc(x.path)}</span></td><td><b>${esc(x.step)}</b>${x.ok ? `<div class="small muted">${x.model_steps} 次模型步骤，全部有录好的结果</div>` : `<div class="small" style="color:hsl(var(--red))">${esc(x.reason_zh)}：切到“实时 + 录制”联网走一遍这一步</div>`}</td></tr>`).join("")}</tbody></table></div></div>`;
+      <div class="card"><div class="card-h"><div><h3>${ic("play")}演示路径回放</h3><p>在临时目录里把每一步回放一遍，不联网、不改看板</p></div></div><table class="tbl sc-tbl"><tbody>${r.steps.map((x) => `<tr><td>${mark(x)}</td><td><span class="badge">${esc(x.path)}</span></td><td><b>${esc(x.step)}</b>${x.ok ? `<div class="small muted">${x.model_steps} 次模型步骤，全部有录好的结果</div>` : `<div class="small" style="color:hsl(var(--red))">${esc(x.reason_zh)}：切到“实时 + 录制”联网走一遍这一步</div>`}</td></tr>`).join("")}</tbody></table></div></div>
+    ${liveCard(r.live_checks || [])}`;
+  $("#lv-text").value = liveSample($("#lv-product").value);
+  $("#lv-new").addEventListener("click", () => ($("#lv-text").value = liveSample($("#lv-product").value)));
+  $("#lv-product").addEventListener("change", () => ($("#lv-text").value = liveSample($("#lv-product").value)));
+  $("#lv-run").addEventListener("click", runLiveCheck);
 }
+function liveSample(pid) {
+  const pick = (a) => a[Math.floor(Math.random() * a.length)];
+  const p = META.products.find((x) => x.id === pid) || META.products[0];
+  return `Hi, we are a ${pick(["home goods importer", "kitchenware wholesaler", "small appliance distributor", "online retailer"])} in ${pick(["Houston", "Monterrey", "Chicago", "Guadalajara", "Miami", "Phoenix"])}. Please quote ${(300 + 50 * Math.floor(Math.random() * 94)).toLocaleString("en-US")} pcs of your ${p.name_en}, FOB Ningbo. We need it ${pick(["UL listed", "ETL certified", "FDA approved", "BPA free"])} and delivered within ${15 + Math.floor(Math.random() * 31)} days. Payment: ${pick(["100% 60 days after delivery", "30% deposit, 70% before shipment", "L/C at sight", "net 30"])}. Thanks, ${pick(["Alex", "Maria", "Daniel", "Sofia", "Chris", "Lucia"])}`;
+}
+function liveRunHtml(r) {
+  if (!r.ok) return `<div class="live-run bad"><b>${esc(r.ts)} · 没跑通</b><span>${esc(r.error || "")}</span></div>`;
+  return `<div class="live-run"><b>${esc(r.ts)} · ${esc(r.model)} · ${r.steps.length} 次实时调用 · ${r.seconds} 秒 · <span class="badge ${r.risk}">${esc(RISK[r.risk])}</span> ${r.findings} 条提示</b>
+    <span>${r.steps.map((x) => `${esc(x.role)} ${x.seconds}s`).join(" → ")}</span><details><summary class="small muted">询盘与回复开头</summary><div class="small">${esc(r.text)}</div><div class="small muted" style="margin-top:4px">${esc(r.reply_head)}…</div></details></div>`;
+}
+function liveCard(runs) {
+  return `<div class="card" style="margin-top:16px"><div class="card-h"><div><h3>${ic("zap")}实时验证：用一条没录过的新询盘跑一遍</h3><p>不读缓存，真调用模型：理解 → 回复 → 合规审核，3 次调用，约 20 秒，会花 Tokenhub 额度。每次的结果都留记录，也写进调用日志</p></div></div>
+    <div class="card-b"><div class="live-form"><select id="lv-product" class="product-select">${META.products.map((p) => `<option value="${p.id}">${esc(prodLabel(p))}</option>`).join("")}</select>
+      <textarea id="lv-text" rows="3"></textarea>
+      <div class="row"><button class="btn sm ghost" id="lv-new">${ic("history", "sm")}换一条随机询盘</button><div style="flex:1"></div><button class="btn primary" id="lv-run">${ic("zap", "sm")}实时跑一遍</button></div></div>
+      <div id="lv-out">${runs.length ? runs.map(liveRunHtml).join("") : '<div class="small muted">还没做过实时验证。</div>'}</div></div></div>`;
+}
+async function runLiveCheck() {
+  const btn = $("#lv-run"); busy(btn, true, "实时调用中，约 20 秒…");
+  try {
+    const r = await api("/api/selfcheck/live", { product_id: $("#lv-product").value, text: $("#lv-text").value });
+    toast(r.ok ? `实时跑通：${r.steps.length} 次调用，${r.seconds} 秒` : `没跑通：${r.error}`, r.ok ? "ok" : "err");
+    await renderSelfcheck();
+  } catch (e) { toast(e.message); busy(btn, false); }
+}
+
 async function warmBooth() {
   const btn = $("#sc-warm"); busy(btn, true, "回放中…");
   try { const r = await api("/api/selfcheck/warm", {}); KB = null; toast(`已回放 ${r.warmed} / ${r.total} 步：概览、看板、收件箱现在有数据了`, "ok"); }
@@ -1517,6 +1583,22 @@ async function roleCheck() {
 }
 
 const ROLE_LANES = {
+  reviewer: {
+    name: "合规审查员", mark: "审", sub: "发出前的最后一道关 · 建议先看这条", fit: "所有评委", pages: ["eval", "check", "kb", "agents"],
+    out: "红黄绿结论，每条问题都附规则原文和链接；别的工具写的文案也能查",
+    steps: [
+      { t: "通用 AI 写的 8 条回复", d: "同样 8 条询盘：通用 AI 只看询盘，8 条都带红（编 UL 认证、按低于起订量报价）；贴上工厂资料红色清零，仍有 20 处待确认；TradeDesk 改一轮后 3 条可直接发。点格子看原文。",
+        run: async () => { go("eval"); await showEvalTab("compare"); spot("#eval-compare .grid"); } },
+      { t: "贴一段文案就查", d: "不管是 ChatGPT 还是别的工具写的，贴进来就查。这段标题埋了 6 个问题，系统还多查出一条：78 字符，超过 75。",
+        run: roleCheck },
+      { t: "每条问题都有出处", d: "每条提示都挂着规则原文和链接，或资料卡上的字段；模型说不出出处的提示，代码直接丢掉。",
+        run: async () => { if (!$("#chk-out .finding")) await roleCheck(); spot("#chk-out .finding"); } },
+      { t: "编造的提示拦得住吗", d: "往审核结果里塞 5 条编造的提示（假编号、原文对不上），看代码怎么全部拦下。",
+        run: async () => { go("eval"); await showEvalTab("redteam"); await runRedteam(); } },
+      { t: "6 个智能体怎么分工", d: "每个智能体的职责、输入、输出、护栏和提示词全文都在这页；哪一步是代码、哪一步是模型，按工作流列清楚，可以导出成 JSON。",
+        run: async () => { go("agents"); await renderAgents(); spot("#agents-out .ag-wfs"); } },
+    ],
+  },
   merchant: {
     name: "商户", mark: "商", sub: "工厂的业务员和运营 · B2B 询盘", fit: "行业、投资评委", pages: ["inbox", "inquiry", "listing"],
     out: "能直接发给进口商的回复、中文内部备忘、派给采购 / 生产 / 美工的任务、附给买家的 Amazon 文案",
@@ -1543,22 +1625,6 @@ const ROLE_LANES = {
         } },
     ],
   },
-  reviewer: {
-    name: "合规审查员", mark: "审", sub: "发出前的最后一道关", fit: "技术评委", pages: ["check", "kb", "eval", "agents"],
-    out: "红黄绿结论，每条问题都附规则原文和链接",
-    steps: [
-      { t: "检查一段待发文案", d: "这段标题埋了 6 个问题：促销语、主观评价、感叹号、没有的 UL、没测的 BPA、免运费；系统还多查出一条：78 字符，超过 75。",
-        run: roleCheck },
-      { t: "每条问题都有出处", d: "每条提示都挂着规则原文和链接，或资料卡上的字段；模型说不出出处的提示，代码直接丢掉。",
-        run: async () => { if (!$("#chk-out .finding")) await roleCheck(); spot("#chk-out .finding"); } },
-      { t: "61 条规则逐条核实", d: "覆盖 11 个平台、6 个市场，每条对照官方原文核实，附链接和抓取日期，可以按平台筛选。",
-        run: async () => { go("kb"); } },
-      { t: "编造的提示拦得住吗", d: "往审核结果里塞 5 条编造的提示（假编号、原文对不上），看代码怎么全部拦下。",
-        run: async () => { go("eval"); await showEvalTab("redteam"); await runRedteam(); } },
-      { t: "6 个智能体怎么分工", d: "每个智能体的职责、输入、输出、护栏和提示词全文都在这页；哪一步是代码、哪一步是模型，按工作流列清楚，可以导出成 JSON。",
-        run: async () => { go("agents"); await renderAgents(); spot("#agents-out .ag-wfs"); } },
-    ],
-  },
   consumer: {
     name: "消费者", mark: "买", sub: "海外买家看到的商品页 · B2C 上架", fit: "关心本地化和 B2C 的评委", pages: ["listing", "check"],
     out: "按平台和语言生成、只写工厂真有的认证和参数的商品页",
@@ -1578,8 +1644,8 @@ let role = null, roleStep = 0, roleBusy = false;
 function showRolePicker() {
   let el = $("#rolepick");
   if (!el) { el = document.createElement("div"); el.id = "rolepick"; el.className = "rolepick"; document.body.appendChild(el); }
-  el.innerHTML = `<div class="rp-inner"><span class="rp-kick">TradeDesk 出海工作台 · 从合规切入</span><h1>你是哪一类用户？</h1>
-    <div class="rp-proof"><b class="r">8 / 8</b><span>通用 AI 直接回 8 条外贸询盘，条条带红色问题</span><i>→</i><b class="g">3 / 8</b><span>TradeDesk 自动带上工厂资料、改一轮：0 红，3 条可直接发</span></div>
+  el.innerHTML = `<div class="rp-inner"><span class="rp-kick">TradeDesk 出海工作台 · 不帮你写，帮你在发出前查</span><h1>你是哪一类用户？</h1>
+    <div class="rp-proof"><b class="r">8 / 8</b><span>通用 AI 只看询盘：条条带红</span><i>→</i><b class="a">0 红</b><span>贴上工厂资料：仍有 20 处待确认</span><i>→</i><b class="g">3 / 8</b><span>TradeDesk 改一轮：可直接发，待确认 8 处</span></div>
     <p>选一个角色，按你的路径走一遍。每一步都是工作台里的真实操作，左边只留这条路径用得到的页面。</p>
     <div class="rp-cards">${Object.entries(ROLE_LANES).map(([k, r]) => `<button class="rp-card ${k}" data-role="${k}">
       <span class="rp-ic">${r.mark}</span><b>${r.name}</b><small>${esc(r.sub)}</small>

@@ -728,3 +728,12 @@ body.buyer-view #lst-out mark{background:none;color:inherit;border:0;box-shadow:
 @keyframes deltaFade{0%,70%{opacity:1}100%{opacity:0}}
 .board tr.flash td{animation:rowFlash 2.6s ease}
 @keyframes rowFlash{0%,35%{background:hsl(var(--brand-soft))}100%{background:transparent}}
+.rp-proof b.a{color:#fbbf24}
+.live-form{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.live-run{display:flex;flex-direction:column;gap:3px;padding:8px 10px;border:1px solid hsl(var(--border));border-radius:10px;margin-top:8px;font-size:13px}
+.live-run span{font-size:12px;color:hsl(var(--muted-foreground))}.live-run.bad{border-color:hsl(var(--red) / .4)}.live-run.bad b{color:hsl(var(--red))}
+.sv-tcols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.sv-t{border:1px solid hsl(var(--border));border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.sv-t span{font-size:12.5px;color:hsl(var(--muted-foreground))}.sv-t b{font-size:22px}.sv-t small{font-size:12px;color:hsl(var(--muted-foreground))}
+.sv-tform{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.sv-tform select{width:auto}.sv-tform input[type=number]{width:140px}.sv-tform input[type=text]{flex:1;min-width:200px}
+.sv-trec{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;font-size:12.5px}.sv-trec span{border:1px solid hsl(var(--border));border-radius:999px;padding:2px 4px 2px 10px;display:inline-flex;align-items:center;gap:4px}

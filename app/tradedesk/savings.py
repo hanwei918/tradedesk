@@ -10,6 +10,7 @@ Two kinds of numbers are kept apart, and the page labels them differently:
 """
 
 import json
+import time
 from pathlib import Path
 from statistics import median
 
@@ -101,9 +102,57 @@ def estimate(a, m):
             "outsourcing_cny": round(outsourcing), "model_cny": round(model), "net_cny": round(labor + outsourcing - model)}
 
 
-def view(values=None):
+# On-site timing (现场实测): a person times one reply by hand and one with TradeDesk. Kept apart from the
+# assumptions; the page only uses them when someone presses "用实测替换假设", and always shows n.
+TIMING_TASKS = {"manual": "人工回一条询盘（查资料、核对、写回复）", "tradedesk": "用 TradeDesk 生成 + 人工复核一条"}
+
+
+class TimingLog:
+    def __init__(self, path):
+        self.path = Path(path)
+
+    def load(self):
+        return json.loads(self.path.read_text(encoding="utf-8")) if self.path.exists() else []
+
+    def _write(self, items):
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.write_text(json.dumps(items, ensure_ascii=False, indent=1), encoding="utf-8")
+
+    def add(self, payload):
+        task = payload.get("task")
+        if task not in TIMING_TASKS:
+            raise ValueError("计时项目只能是“人工回一条”或“用 TradeDesk 生成 + 复核”")
+        try:
+            minutes = float(payload.get("minutes"))
+        except (TypeError, ValueError):
+            raise ValueError("用时要填数字（分钟）") from None
+        if not 0.1 <= minutes <= 600:
+            raise ValueError("用时要在 0.1 到 600 分钟之间")
+        entry = {"ts": time.strftime("%Y-%m-%d %H:%M"), "task": task, "minutes": round(minutes, 1),
+                 "inquiry_id": str(payload.get("inquiry_id") or "")[:20], "note": str(payload.get("note") or "")[:80]}
+        self._write(self.load() + [entry])
+        return entry
+
+    def delete(self, index):
+        items = self.load()
+        if not isinstance(index, int) or not 0 <= index < len(items):
+            raise ValueError("没有这条计时记录")
+        del items[index]
+        self._write(items)
+
+    def summary(self):
+        items = self.load()
+        out = {}
+        for task, label in TIMING_TASKS.items():
+            values = [e["minutes"] for e in items if e["task"] == task]
+            out[task] = {"label": label, "n": len(values), "median": round(median(values), 1) if values else None}
+        return {"tasks": out, "records": items}
+
+
+def view(values=None, timings=None):
     m = measured()
     a = validate(values)
     return {"measured": m,
             "assumptions": [{"key": k, "label": s[0], "unit": s[1], "value": a[k], "example": s[2]} for k, s in ASSUMPTIONS.items()],
-            "estimate": estimate(a, m), "replaces": REPLACES, "not_replaced": NOT_REPLACED, "unmeasured": UNMEASURED}
+            "estimate": estimate(a, m), "replaces": REPLACES, "not_replaced": NOT_REPLACED, "unmeasured": UNMEASURED,
+            "timings": timings.summary() if timings else {"tasks": {}, "records": []}}

@@ -186,16 +186,16 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
 <section class="slide">
   <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span class="on">摘要</span><span>切入点</span><span>合规内核</span><span>合规之上</span><span>配置</span><span>价值</span><span>落地</span></div></div>
   <div class="kicker">执行摘要</div>
-  <h2>我们从合规切入：直接用通用 AI，8 条外贸回复全部不能发；TradeDesk 把工厂资料和平台规则带进每次生成，红色问题清零，再把这套合规底座延展到上架、看板和协同</h2>
+  <h2>TradeDesk 不帮工厂写文案，帮工厂在发出前查：AI 写的每一句承诺，对不上工厂资料或平台规则就拦下，并给出依据</h2>
   <div class="body"><div class="sum">
     <div class="card r"><div class="lbl">问题</div><div class="big red">8 / 8</div><div class="unit">条回复带红色问题，共 32 条</div>
       <p>外贸业务员每天回询盘、上架、对接采购和生产。通用 AI 不知道工厂的认证、交期和价格，会替工厂乱承诺：<b>声称有 UL / ETL / NOM 认证、承诺免费样品、按低于起订量报价</b>。</p></div>
-    <div class="card"><div class="lbl">方案</div><div class="big brand">61</div><div class="unit">条公开规则，覆盖 6 个市场，逐条核实</div>
-      <p>先做合规：代码管数字和硬事实，模型管语义，说不出出处的提示由代码丢弃。再在这层底座上做询盘回复、多平台上架、商品看板和收件箱，6 个智能体按 <b>理解 → 生成 → 校验 → 反馈</b> 编排。</p></div>
-    <div class="card g"><div class="lbl">证据</div><div class="big green">0 / 8</div><div class="unit">条回复带红色问题（TradeDesk）</div>
-      <p>改一轮后 <b>3 条可直接发</b>；盲测首次精确率 <b>97.1% / 92.3%</b>；红队注入 5 条编造提示，<b>全部拦下</b>；赛事 Tokenhub 上用 gpt-5.5 实测跑通。</p></div>
+    <div class="card" style="border-top-color:var(--amber)"><div class="lbl">对照：贴上工厂资料</div><div class="big amber">0 红</div><div class="unit">但仍有 20 处待人工确认</div>
+      <p>公平地说，差距主要来自工厂资料：通用 AI 贴上资料后不再编认证，但仍有 20 处要人工确认，而且<b>每次都要业务员自己找资料、贴资料</b>。</p></div>
+    <div class="card g"><div class="lbl">TradeDesk</div><div class="big green">3 / 8</div><div class="unit">条改一轮后可直接发，待确认降到 8 处</div>
+      <p>资料卡自动带进每一次生成和检查；每条提示挂规则原文或资料卡字段，<b>没出处的被代码丢掉</b>（红队 5 / 5）；第一份盲测集首次精确率 <b>97.1%</b>（第二份 92.3%）。</p></div>
   </div></div>
-  <div class="foot"><span class="src">来源：对照实验 8 条示例询盘，四组用同一模型和同一套检查；盲测与红队见第 05 页，实测调用见第 09 页</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">02</span></div>
+  <div class="foot"><span class="src">来源：对照实验 8 条示例询盘，四组用同一模型和同一套检查；盲测与红队见第 05 页，实测调用见第 10 页</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">02</span></div>
 </section>
 
 <!-- 3 users & scene -->
@@ -252,7 +252,7 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
         <div><b>③ 出处守卫</b>编号不存在、原文里没有那句话 → 丢弃，界面显示丢了几条</div>
       </div>
       <div class="cov"><span class="lbl" style="margin:0">四类规则 + 资料核对</span><span>目标国合规<small>FTC · 加州 65 · NOM · CE / RoHS · PSE · EAC · SONCAP</small></span><span>平台规则<small>Amazon · 阿里 · TikTok</small></span><span>合同条款<small>Incoterms</small></span><span>商务礼仪<small>墨西哥</small></span><span>资料卡核对<small>认证 · 价格 · 交期 · 付款</small></span></div>
-      <p class="muted" style="font-size:18px;margin:16px 0 0">Python 标准库服务端 + 原生 JS 前端，无需安装依赖 · 模型接口可换（OpenAI 兼容 / Claude）· 99 项自动化测试</p>
+      <p class="muted" style="font-size:18px;margin:16px 0 0">Python 标准库服务端 + 原生 JS 前端，无需安装依赖 · 模型接口可换（OpenAI 兼容 / Claude）· 104 项自动化测试</p>
     </div>
     <div class="card" style="padding:20px 24px"><div class="lbl">异常处理（节选）</div>
       <table class="t"><tr><th>情况</th><th>处理</th></tr>
@@ -291,11 +291,27 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
   <div class="foot"><span class="src">方法：8 条示例询盘；四组同一模型 claude-opus-5-5、同一套代码规则和同一个合规审核员检查；每条回复可在“评测与对照”页逐条查看</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">05</span></div>
 </section>
 
+<!-- 10b positioning -->
+<section class="slide">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span class="on">合规内核</span><span>合规之上</span><span>配置</span><span>价值</span><span>落地</span></div></div>
+  <div class="kicker"><em>04</em>定位：和现有做法比</div>
+  <h2>我们不替代写作工具，做发出前的合规校验层：自动带上工厂资料，每条提示挂出处，回复和上架文案交叉核对</h2>
+  <div class="body"><div class="card pos" style="padding:10px 26px 14px">
+    <table class="t pos-t"><tr><th style="width:250px"></th><th style="width:440px">直接用通用 AI<br><small>ChatGPT 等，业务员现在的常见做法</small></th><th style="width:250px">平台自带的 AI 写作工具</th><th style="width:250px">外包翻译 / 代运营</th><th class="us">TradeDesk</th></tr>
+      <tr><td><b>用不用工厂自己的资料</b><br><small>认证、MOQ、交期、付款</small></td><td>要业务员每次自己贴。<b class="red">不贴时 8 条回复 8 条带红色问题</b>；贴上后红色清零，仍有 20 处待确认（实测）</td><td class="muted">各家不同，没逐个测</td><td>靠人工沟通，资料给多少写多少</td><td class="us">资料卡自动带进每一次生成和检查；改一轮后 <b class="green">3 / 8 条可直接发</b>，待确认 8 处（实测）</td></tr>
+      <tr><td><b>提示有没有出处</b></td><td>没有</td><td class="muted">没测，不下结论</td><td>没有</td><td class="us">挂规则原文和链接，或资料卡字段；没出处的提示被代码丢掉（红队 5 / 5）</td></tr>
+      <tr><td><b>覆盖范围</b></td><td>什么都能写，但不知道平台规则</td><td>只管自己这个平台</td><td>看服务商</td><td class="us">询盘回复 + 11 个上架平台，同一张资料卡</td></tr>
+      <tr><td><b>发出前核对</b></td><td>没有</td><td class="muted">没测，不下结论</td><td>人工自查</td><td class="us">代码规则 + 合规审核员，红黄绿；回复和上架文案逐项交叉核对</td></tr>
+    </table></div>
+    <p class="muted" style="font-size:18px;margin:14px 0 0">别的工具写的文案，也能贴进“文案体检”查。我们只写自己测过的：平台自带工具各家不同，没逐个测，不评价具体产品。</p></div>
+  <div class="foot"><span class="src">实测：app/eval/baseline_run.json（同样 8 条询盘、同一套检查打分）；红队：app/data/redteam.json</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">06</span></div>
+</section>
+
 <!-- 6 solution -->
 <section class="slide">
   <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span>合规内核</span><span class="on">合规之上</span><span>配置</span><span>价值</span><span>落地</span></div></div>
-  <div class="kicker"><em>04</em>合规之上：我们还做了什么</div>
-  <h2>以合规为底座打通“数据 → 知识 → 多角色工作流”：一张资料卡加 61 条规则，覆盖 6 个市场，延展出收件箱、回复、上架和看板</h2>
+  <div class="kicker"><em>05</em>同一道关</div>
+  <h2>询盘回复、上架文案、看板都过同一道关：一张资料卡加 61 条带出处规则，发出前逐项核对，做不到的事不会被写成能做到</h2>
   <div class="body"><div class="sol">
     <div class="col"><div class="lbl">数据</div>
       <div class="card"><h4>工厂资料卡</h4><p>价格阶梯、MOQ、交期、认证、材质、付款方式。工厂填一次，所有平台共用</p></div>
@@ -315,13 +331,13 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
       <div class="roles">产出给<span>业务员</span><span>运营</span><span>采购</span><span>生产</span><span>美工</span></div>
       <p style="font-size:17px;color:var(--brand);font-weight:600;margin:2px 0 0">同一张资料卡贯穿：收件箱 → 回复 → 上架 → 看板，是同一个产品的前后几步</p></div>
   </div></div>
-  <div class="foot"><span class="src">知识库来源按规则条数：Amazon 19 · ICC 5 · 阿里 3 · TikTok 3 · eBay 3 · Walmart 3 · Mercado Libre 3 · 速卖通 3 · Etsy 2 · 墨西哥经济部 3 · EUR-Lex 2 · 日本经产省 2 · 欧亚经济委员会 2 · eCFR 2 · Cornell LII 2 · 尼日利亚标准组织 1 · 其他 3</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">06</span></div>
+  <div class="foot"><span class="src">知识库来源按规则条数：Amazon 19 · ICC 5 · 阿里 3 · TikTok 3 · eBay 3 · Walmart 3 · Mercado Libre 3 · 速卖通 3 · Etsy 2 · 墨西哥经济部 3 · EUR-Lex 2 · 日本经产省 2 · 欧亚经济委员会 2 · eCFR 2 · Cornell LII 2 · 尼日利亚标准组织 1 · 其他 3</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">07</span></div>
 </section>
 
 <!-- 7 workflow A -->
 <section class="slide">
   <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span>合规内核</span><span class="on">合规之上</span><span>配置</span><span>价值</span><span>落地</span></div></div>
-  <div class="kicker"><em>05</em>工作流 A · 询盘回复</div>
+  <div class="kicker"><em>06</em>工作流 A · 询盘回复</div>
   <h2>先找出询盘和工厂资料对不上的地方，再用买家的语言如实回复：做不到的事，回复里写明做不到</h2>
   <div class="body"><div class="wfl">
     <div class="clip" style="height:650px"><img src="../img/slide-inquiry.png" alt="询盘回复：回复正文与风险批注"></div>
@@ -332,27 +348,27 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
       <div class="step"><span class="n">4</span><div><h4>反馈</h4><p>原文高亮批注、红黄绿等级；一句中文“按风险提示全部修改”进入第 2 轮，逐词对比</p></div></div>
     </div>
   </div></div>
-  <div class="foot"><span class="src">截图：示例询盘 INQ-US-01（虚构）第 1 轮结果，回放模式；右侧批注的依据是 ICC 原文与链接</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">07</span></div>
+  <div class="foot"><span class="src">截图：示例询盘 INQ-US-01（虚构）第 1 轮结果，回放模式；右侧批注的依据是 ICC 原文与链接</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">08</span></div>
 </section>
 
 <!-- 8 workflow B + C -->
 <section class="slide">
   <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span>合规内核</span><span class="on">合规之上</span><span>配置</span><span>价值</span><span>落地</span></div></div>
-  <div class="kicker"><em>06</em>工作流 B 多平台上架 · 工作流 C 商品看板</div>
-  <h2>一份中文资料同时生成 Amazon 英文 Listing 和 TikTok 西语脚本，各按平台规则检查；看板批量上品，一屏看清卡在哪</h2>
+  <div class="kicker"><em>07</em>工作流 B 多平台上架 · 工作流 C 商品看板</div>
+  <h2>上架文案谁都能生成；我们让每个平台的文案都过同一道关：按平台规则和资料卡检查，看板一屏看清哪些能上</h2>
   <div class="body"><div class="two-shots">
     <figure><div class="clip" style="height:500px"><img src="../img/slide-listing.png" alt="多平台上架"></div>
       <figcaption><b>平台适配，不是直译。</b>从询盘回复页一键带着同一份资料过来；Amazon 标题按官方 75 字符上限计数，TikTok 墨西哥写西语开场钩子和分镜。</figcaption></figure>
     <figure><div class="clip" style="height:500px"><img src="../img/slide-board.png" alt="商品看板"></div>
       <figcaption><b>批量 + 主图检查。</b>一键对全部产品生成并校验；主图的尺寸、白底、占比由代码测像素，徽章、促销字、是否实拍由模型看图。</figcaption></figure>
   </div></div>
-  <div class="foot"><span class="src">Amazon 标题上限：网上多写 200 字符，官方页面现为 75（2026-10-26 核实）；截图为回放模式</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">08</span></div>
+  <div class="foot"><span class="src">Amazon 标题上限：网上多写 200 字符，官方页面现为 75（2026-10-26 核实）；截图为回放模式</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">09</span></div>
 </section>
 
 <!-- 9 platform config & calls -->
 <section class="slide">
   <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span>合规内核</span><span>合规之上</span><span class="on">配置</span><span>价值</span><span>落地</span></div></div>
-  <div class="kicker"><em>07</em>平台配置与能力调用</div>
+  <div class="kicker"><em>08</em>平台配置与能力调用</div>
   <h2>6 个智能体按工作流编排；现场经赛事 Tokenhub 调用 gpt-5.5，一次询盘回复 3 次调用、22 秒出结果</h2>
   <div class="body"><div class="cfg">
     <div class="card" style="padding:20px 24px"><div class="lbl">智能体配置（导出在 app/config/agents.json）</div>
@@ -374,13 +390,13 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
         <div class="tr"><dt>反馈</dt><dd><span class="pill-g">可以发</span>　0 条提示。回复写明没有 UL、没做 BPA 检测、交期 35 天、不接受货到 60 天付款</dd></div>
       </dl></div>
   </div></div>
-  <div class="foot"><span class="src">来源：docs/demo-runs/live-gpt-5.5-INQ-US-01.json（运行 acd116ca 的调用记录）；智能体与工作流配置由 tools/export_config.py 导出</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">09</span></div>
+  <div class="foot"><span class="src">来源：docs/demo-runs/live-gpt-5.5-INQ-US-01.json（运行 acd116ca 的调用记录）；智能体与工作流配置由 tools/export_config.py 导出</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">10</span></div>
 </section>
 
 <!-- 10 value -->
 <section class="slide">
   <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span>合规内核</span><span>合规之上</span><span>配置</span><span class="on">价值</span><span>落地</span></div></div>
-  <div class="kicker"><em>08</em>商业价值</div>
+  <div class="kicker"><em>09</em>商业价值</div>
   <h2>替换掉的是业务员写回复的时间、外包翻译和上架前的人工自查；模型费用每条询盘约 0.24 美元，省多少按工厂自己的数字现场算</h2>
   <div class="body"><div class="val">
     <div class="card soft"><div class="lbl">替换掉什么</div>
@@ -394,25 +410,9 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
       <table class="t"><tr><td>每天询盘 / 工作日</td><td class="r">20 条 / 22 天</td></tr><tr><td>人工回一条 → 用后复核</td><td class="r">20 → 5 分钟</td></tr>
         <tr><td>时薪 / 每月上新 / 外包单价</td><td class="r">45 元 / 10 个 / 300 元</td></tr></table>
       <div class="vres"><div><span>每月省下人工</span><b>110 小时</b></div><div><span>扣除模型费用后净节省</span><b class="green">¥7,193 / 月</b></div></div>
-      <p class="muted" style="font-size:16px;margin:10px 0 0">人工节省没有实测，要在工厂试用时用真实询盘验证</p></div>
+      <p class="muted" style="font-size:16px;margin:10px 0 0">人工节省还没实测：现场在“降本测算 → 现场实测”计时，测到几次标几次（n），可一键替换假设</p></div>
   </div></div>
-  <div class="foot"><span class="src">实测：eval/cost_run.json 与 app/cache 的 token 用量 × claude-opus-5-5 官方价；docs/demo-runs 的实时记录。测算页：评测与对照 → 降本测算，每一步都列出算式</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">10</span></div>
-</section>
-
-<!-- 10b positioning -->
-<section class="slide">
-  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span>合规内核</span><span>合规之上</span><span>配置</span><span class="on">价值</span><span>落地</span></div></div>
-  <div class="kicker"><em>09</em>定位：和现有做法比</div>
-  <h2>我们不替代写作工具，做发出前的合规校验层：自动带上工厂资料，每条提示挂出处，回复和上架文案交叉核对</h2>
-  <div class="body"><div class="card pos" style="padding:10px 26px 14px">
-    <table class="t pos-t"><tr><th style="width:250px"></th><th style="width:440px">直接用通用 AI<br><small>ChatGPT 等，业务员现在的常见做法</small></th><th style="width:250px">平台自带的 AI 写作工具</th><th style="width:250px">外包翻译 / 代运营</th><th class="us">TradeDesk</th></tr>
-      <tr><td><b>用不用工厂自己的资料</b><br><small>认证、MOQ、交期、付款</small></td><td>要业务员每次自己贴。<b class="red">不贴时 8 条回复 8 条带红色问题</b>；贴上后红色清零，仍有 20 处待确认（实测）</td><td class="muted">各家不同，没逐个测</td><td>靠人工沟通，资料给多少写多少</td><td class="us">资料卡自动带进每一次生成和检查；改一轮后 <b class="green">3 / 8 条可直接发</b>，待确认 8 处（实测）</td></tr>
-      <tr><td><b>提示有没有出处</b></td><td>没有</td><td class="muted">没测，不下结论</td><td>没有</td><td class="us">挂规则原文和链接，或资料卡字段；没出处的提示被代码丢掉（红队 5 / 5）</td></tr>
-      <tr><td><b>覆盖范围</b></td><td>什么都能写，但不知道平台规则</td><td>只管自己这个平台</td><td>看服务商</td><td class="us">询盘回复 + 11 个上架平台，同一张资料卡</td></tr>
-      <tr><td><b>发出前核对</b></td><td>没有</td><td class="muted">没测，不下结论</td><td>人工自查</td><td class="us">代码规则 + 合规审核员，红黄绿；回复和上架文案逐项交叉核对</td></tr>
-    </table></div>
-    <p class="muted" style="font-size:18px;margin:14px 0 0">别的工具写的文案，也能贴进“文案体检”查。我们只写自己测过的：平台自带工具各家不同，没逐个测，不评价具体产品。</p></div>
-  <div class="foot"><span class="src">实测：app/eval/baseline_run.json（同样 8 条询盘、同一套检查打分）；红队：app/data/redteam.json</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">11</span></div>
+  <div class="foot"><span class="src">实测：eval/cost_run.json 与 app/cache 的 token 用量 × claude-opus-5-5 官方价；docs/demo-runs 的实时记录。测算页：评测与对照 → 降本测算，每一步都列出算式</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">11</span></div>
 </section>
 
 <!-- 11 roll-out: replicable, deliberate trade-offs -->

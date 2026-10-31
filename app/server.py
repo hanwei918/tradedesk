@@ -25,6 +25,7 @@ from tradedesk import handoff as handoff_check
 from tradedesk.config_export import build as build_config
 from tradedesk.importer import ImportStore, parse as parse_csv
 from tradedesk.catalog_edit import CustomProducts, KNOWN_NOT_HELD, MATERIALS, validate as validate_product
+from tradedesk.live_check import LiveChecks
 from tradedesk.board import Board, CHANNELS
 from tradedesk.evaluate import evaluate, LABEL_ZH
 from tradedesk.inbox import TASK_STATUS
@@ -48,6 +49,8 @@ class App:
         self.imports = ImportStore(STATE / "imported_inquiries.json")
         self.kb.inquiries.extend(self.imports.load())
         self.custom = CustomProducts(STATE / "custom_products.json")
+        self.live_checks = LiveChecks(STATE / "live_checks.json")
+        self.timings = savings.TimingLog(STATE / "timings.json")
         for p in self.custom.load():
             self.kb.products[p["id"]] = p
         self.play_lock = threading.Lock()
@@ -87,7 +90,21 @@ class App:
         return build_config(self.kb, self.llm)
 
     def selfcheck_view(self):
-        return selfcheck.run(self.kb, self.llm, STATE)
+        out = selfcheck.run(self.kb, self.llm, STATE)
+        runs = self.live_checks.load()
+        last_ok = next((r for r in reversed(runs) if r.get("ok")), None)
+        out["env"].insert(2, {"item": "实时验证", "ok": bool(last_ok), "info": True,
+                              "detail_zh": (f"{last_ok['ts']} 用一条新询盘实时跑通：{len(last_ok['steps'])} 次模型调用，{last_ok['seconds']} 秒（{last_ok['model']}）"
+                                            if last_ok else "还没做过：在下面“实时验证”里跑一条新询盘（要 key，3 次调用）")})
+        out["live_checks"] = runs[-5:][::-1]
+        return out
+
+    def live_check(self, payload):
+        """One fresh inquiry through the whole reply flow with real model calls (never the cache)."""
+        live = LLM(provider=self.llm.provider, endpoint=self.llm.endpoint, model=self.llm.model,
+                   api_key=self.llm.api_key, mode="live")
+        return self.live_checks.run(self.kb, live, payload.get("product_id") or "KET-17S", payload.get("text"),
+                                    LOG_PATH, self.board)
 
     def selfcheck_warm(self, payload=None):
         return selfcheck.warm(self.kb, self.llm, self.board, self.runner.inbox, LOG_PATH)
@@ -109,6 +126,8 @@ class App:
             raise ValueError("示例商品不能改（录好的结果要保持能回放）：用“从现有商品复制”新建一个")
         saved = self.custom.save(product, pid)
         self.kb.products[saved["id"]] = saved
+        if pid:  # the card changed, so checks made against the old card no longer hold
+            self.board.forget(pid)
         return {"product": saved}
 
     def product_delete(self, payload):
@@ -206,7 +225,15 @@ class App:
     # ---------------------------------------------------------- red team (citation guard, no model call)
     def savings_view(self, payload=None):
         """Measured model cost and latency from the repo's records, plus editable example assumptions."""
-        return savings.view((payload or {}).get("assumptions"))
+        return savings.view((payload or {}).get("assumptions"), self.timings)
+
+    def timing_add(self, payload):
+        self.timings.add(payload)
+        return self.savings_view()
+
+    def timing_delete(self, payload):
+        self.timings.delete(payload.get("index"))
+        return self.savings_view()
 
     def redteam_preset(self):
         data = json.loads((ROOT / "data" / "redteam.json").read_text(encoding="utf-8"))
@@ -441,7 +468,9 @@ class Handler(SimpleHTTPRequestHandler):
                   "/api/handoff": APP.handoff_view, "/api/selfcheck/warm": APP.selfcheck_warm,
                   "/api/kb/source-check": APP.source_check, "/api/inbox/import": APP.import_inquiries,
                   "/api/inbox/import/clear": APP.clear_imports,
-                  "/api/products/save": APP.product_save, "/api/products/delete": APP.product_delete}
+                  "/api/products/save": APP.product_save, "/api/products/delete": APP.product_delete,
+                  "/api/selfcheck/live": APP.live_check, "/api/savings/timing": APP.timing_add,
+                  "/api/savings/timing/delete": APP.timing_delete}
         fn = routes.get(self.path)
         if not fn:
             return self._json(404, {"error": "not found"})
