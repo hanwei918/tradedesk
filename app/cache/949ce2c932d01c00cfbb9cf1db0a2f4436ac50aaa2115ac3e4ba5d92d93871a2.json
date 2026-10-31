@@ -1,0 +1,26 @@
+{
+ "request": {
+  "model": "gpt-5.5",
+  "messages": [
+   {
+    "role": "system",
+    "content": "你是做 TikTok Shop 墨西哥站的内容运营。根据中文产品资料，写一条西班牙语（墨西哥用语）的短视频种草内容。\n\n要求：\n- 口语化、有画面感，像墨西哥本地创作者在说话，不是翻译腔；用墨西哥常见说法。\n- `hook`：视频前 3 秒的开场白。\n- `script`：15–30 秒口播脚本，分 3–5 个镜头（每个镜头一句画面描述 + 一句台词）。\n- `caption`：发布文案。\n- `hashtags`：5–8 个。\n- 只写资料里有的事实；不能夸大功效（例如\"最好的\"\"100% 安全\"\"保证健康\"），资料里没有的认证和检测不能说有。电压写 127V。\n\n如果给了\"上一版\"和\"修改意见\"，在上一版基础上按意见修改。\n\n只输出 JSON：\n{\"hook\": \"...\", \"script\": [{\"shot_zh\": \"画面描述（中文）\", \"line\": \"西语台词\"}], \"caption\": \"...\", \"hashtags\": [\"#...\"], \"notes_zh\": \"一句话说明写法\"}\n"
+   },
+   {
+    "role": "user",
+    "content": "## 产品资料（中文）\n{\n \"id\": \"TMB-50V\",\n \"factory_id\": \"NH-CUP\",\n \"name_zh\": \"500ml 双层真空保温杯\",\n \"name_en\": \"500ml Double-Wall Vacuum Insulated Tumbler\",\n \"specs\": {\n  \"capacity_ml\": 500,\n  \"inner_material\": \"304 stainless steel\",\n  \"outer_material\": \"304 stainless steel, powder coated\",\n  \"lid_material\": \"PP plastic\",\n  \"insulation\": \"double-wall vacuum\",\n  \"cold_retention\": \"about 24 h with ice (factory internal test, no third-party report)\",\n  \"hot_retention\": \"about 12 h (factory internal test, no third-party report)\",\n  \"care\": \"hand wash only, not dishwasher safe (powder-coated outer wall)\",\n  \"features\": [\n   \"slide lid, leak-resistant when closed\",\n   \"no condensation on the outer wall\",\n   \"fits most car cup holders\"\n  ]\n },\n \"certifications_held\": [\n  \"LFGB test report (304 body and PP lid)\"\n ],\n \"certifications_not_held\": [\n  \"FDA food-contact test report\"\n ],\n \"material_tests\": {\n  \"BPA\": \"盖子为 PP 材质，只有原料供应商的 BPA-free 声明，没有成品第三方报告\"\n },\n \"moq_units\": 1000,\n \"fob_ningbo_usd\": {\n  \"1000-2999\": 4.1,\n  \"3000+\": 3.8\n },\n \"packaging\": \"white box, 24 units per carton\",\n \"selling_points_zh\": [\n  \"304 不锈钢内外胆\",\n  \"双层真空：加冰约 24 小时（工厂内部测试，非第三方报告）\",\n  \"外壁不冒汗\",\n  \"滑盖，合上防漏\",\n  \"只能手洗，不能进洗碗机（外壁喷粉）\"\n ]\n}\n\n## 平台规则（知识库）\n[\n {\n  \"id\": \"MX-01\",\n  \"rule_zh\": \"电器、电子产品和家用电器在墨西哥销售时，包装或外箱上须清晰标出以下西班牙语信息：产品名称或图示、墨西哥制造商或进口商的名称和地址、原产国（如“Hecho en China”），以及额定电气参数（电压 V、功率 W 或电流 A、频率 Hz）。对电热水壶，这条比通用标签标准 NOM-050 更具体；NOM-050 第 2.2 a) 条规定，已有专门 NOM 的产品不适用 NOM-050。\"\n },\n {\n  \"id\": \"MX-02\",\n  \"rule_zh\": \"NOM-024-SCFI-2013 第 6.3 条：使用说明和安全警示必须用西班牙语，用语易懂、清晰可读，可以同时附其他语言；计量单位须符合 NOM-008-SCFI-2002。\"\n },\n {\n  \"id\": \"MX-03\",\n  \"rule_zh\": \"NOM-003-SCFI-2014《电气产品—安全规范》适用于交流 1000 V、直流 1500 V 以下、由公共电网等供电的电气产品，电热水壶在其范围内，需按该标准的合格评定程序取得证书。没有证书资料时，文案不得声称已通过 NOM 认证。\"\n },\n {\n  \"id\": \"TT-01\",\n  \"rule_zh\": \"TikTok Shop 墨西哥内容政策 3.10.3：没有相关、有效、客观的证据时，不得使用夸大描述或绝对化说法，官方示例是“Producto Número 1”和“100% natural”。\"\n },\n {\n  \"id\": \"TT-02\",\n  \"rule_zh\": \"政策 3.10.2：不得夸大承诺产品的性能、效果或价格，官方示例包括“这是你在 TikTok Shop 能找到的最低/最便宜/最好的价格”。\"\n },\n {\n  \"id\": \"TT-03\",\n  \"rule_zh\": \"政策 3.12：内容里不能放其他网站链接、电话号码、社交媒体账号、邮箱、二维码，或任何把用户引到站外的信息，否则可能被删除。\"\n }\n]"
+   }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "response_format": {
+   "type": "json_object"
+  },
+  "reasoning_effort": "low"
+ },
+ "content": "{\"hook\":\"¿Tu vaso deja la mesa toda mojada? Mira esto.\",\"script\":[{\"shot_zh\":\"镜头1：拿起杯子，展示喷粉外壁和杯身\",\"line\":\"Este vaso térmico de 500 mililitros tiene interior y exterior de acero inoxidable 304.\"},{\"shot_zh\":\"镜头2：加入冰块和饮料，特写杯壁\",\"line\":\"Es de doble pared con aislamiento al vacío; con hielo, el frío dura aproximadamente 24 horas, según pruebas internas de fábrica.\"},{\"shot_zh\":\"镜头3：把滑盖合上，再轻轻倾斜杯子\",\"line\":\"La tapa corrediza ayuda a evitar derrames cuando está cerrada, y por fuera no se forma condensación.\"},{\"shot_zh\":\"镜头4：将杯子放入汽车杯架，之后用手清洗\",\"line\":\"Cabe en la mayoría de los portavasos del coche. Ojo: se lava a mano; no va al lavavajillas.\"}],\"caption\":\"Tu bebida fría en un vaso de 500 ml con doble pared al vacío y tapa corrediza. Se lava a mano; no es apto para lavavajillas.\",\"hashtags\":[\"#VasoTermico\",\"#VasoDeAcero\",\"#BebidasFrias\",\"#AccesoriosParaAuto\",\"#TikTokShopMexico\",\"#VidaDiaria\"],\"notes_zh\":\"突出容量、材质和实用功能，并将保冷时长注明为工厂内部测试结果。\"}",
+ "usage": {
+  "input_tokens": 5921,
+  "output_tokens": 324
+ }
+}

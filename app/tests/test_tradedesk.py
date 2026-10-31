@@ -1033,7 +1033,7 @@ class ReplayTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             llm = LLM(api_key="", mode="replay", provider="anthropic", model="claude-opus-5-5", transport=fail)
             runner = Runner(llm, kb, log_path=Path(t) / "calls.jsonl", board=Board(Path(t) / "state"))
-            original = [q for q in kb.inquiries if "market" not in q]
+            original = [q for q in kb.inquiries if "market" not in q and "factory_id" not in kb.product(q["product_id"])]
             self.assertEqual(len(original), 8)
             runner.triage({"inquiry_ids": [q["id"] for q in original]})
             for q in original:
@@ -1045,7 +1045,7 @@ class ReplayTests(unittest.TestCase):
                         f"{i + 1}. {f['problem_zh']}（原文：{f['quote']}）建议：{f['suggestion_zh']}" for i, f in enumerate(r1["findings"]))
                     runner.inquiry(dict(base, understanding=r1["understanding"], language=r1["language"], instruction_zh=fix, round=2,
                                         previous={"reply": r1["reply"], "internal_brief_zh": r1["internal_brief_zh"]}))
-            for pid in kb.products:
+            for pid in [p for p, card in kb.products.items() if "factory_id" not in card]:
                 r1 = runner.listing({"product_id": pid, "platforms": ["amazon_us", "tiktok_mx"], "round": 1})
                 if any(d["findings"] for d in r1["platforms"].values()):
                     fix = "按风险提示全部修改\n风险提示：\n" + "\n".join(
@@ -1076,6 +1076,180 @@ class ReplayTests(unittest.TestCase):
                         f"{i + 1}. {f['problem_zh']}（原文：{f['quote']}）建议：{f['suggestion_zh']}" for i, f in enumerate(r1["findings"]))
                     runner.inquiry(dict(base, understanding=r1["understanding"], language=r1["language"], instruction_zh=fix, round=2,
                                         previous={"reply": r1["reply"], "internal_brief_zh": r1["internal_brief_zh"]}))
+
+
+class SecondFactoryTests(unittest.TestCase):
+    """A second demo factory (another category) must only need a new card, and must not touch the first one's requests."""
+
+    def setUp(self):
+        self.kb = KnowledgeBase()
+        self.cup, self.kettle = self.kb.product("TMB-50V"), self.kb.product("KET-17S")
+
+    def test_each_product_is_checked_against_its_own_factory(self):
+        self.assertEqual(self.kb.factory_for(self.cup)["id"], "NH-CUP")
+        self.assertIs(self.kb.factory_for(self.kettle), self.kb.factory)
+        text = {"reply": "Delivery in 32 days after deposit."}  # cup factory 30 days, kettle factory 35
+        self.assertEqual([f["check"] for f in checks.run_rule_checks(text, self.cup, self.kb, "alibaba_rfq")], [])
+        self.assertEqual([f["check"] for f in checks.run_rule_checks(text, self.kettle, self.kb, "alibaba_rfq")], ["fact_lead"])
+
+    def test_fda_claim_on_the_cup_is_red(self):
+        fs = checks.run_rule_checks({"text": "Insulated Tumbler, FDA Approved"}, self.cup, self.kb, "amazon_us")
+        self.assertIn(("fact_cert", "red"), [(f["check"], f["severity"]) for f in fs])
+
+    def test_reply_prompt_names_the_factory_category(self):
+        with tempfile.TemporaryDirectory() as t:
+            seen = []
+            fake = FakeTransport({"询盘分析员": {"buyer": {"language": "en"}, "requests": [], "signals": [], "conflicts": []},
+                                  "外贸业务员": lambda body: seen.append(body["messages"][0]["content"]) or {"reply": "Hi", "tasks": []},
+                                  "合规审核员": {"findings": []}})
+            runner = Runner(LLM(api_key="k", mode="live", transport=fake), self.kb, log_path=Path(t) / "c.jsonl", board=Board(Path(t) / "s"))
+            for pid in ("TMB-50V", "KET-17S"):
+                runner.inquiry({"inquiry_text": "Hello, price please.", "product_id": pid})
+        self.assertIn("宁波一家不锈钢杯壶工厂", seen[0])
+        self.assertIn("宁波一家小家电工厂", seen[1])
+
+    def test_second_factory_replays_offline(self):
+        def fail(body):
+            raise AssertionError("cache miss")
+        samples = json.loads((ROOT / "data" / "check_samples.json").read_text(encoding="utf-8"))["samples"]
+        q = next(x for x in self.kb.inquiries if x["id"] == "INQ-US-06")
+        with tempfile.TemporaryDirectory() as t:
+            runner = Runner(LLM(api_key="", mode="replay", transport=fail), self.kb, log_path=Path(t) / "c.jsonl", board=Board(Path(t) / "s"))
+            lst = runner.listing({"product_id": "TMB-50V", "platforms": ["amazon_us", "tiktok_mx"], "round": 1})
+            chk = runner.check_text({"platform": "amazon_us", "product_id": "TMB-50V", "text": samples["TMB-50V"]})
+            inq = runner.inquiry({"inquiry_text": q["text"], "intent_zh": q["intent_zh"], "product_id": "TMB-50V", "inquiry_id": q["id"], "round": 1})
+        self.assertFalse(any(d["review_skipped"] for d in lst["platforms"].values()))
+        self.assertIsNone(chk["review_skipped"])
+        self.assertNotIn("FDA approved", inq["reply"])
+
+
+class HandoffTests(unittest.TestCase):
+    def setUp(self):
+        from tradedesk.handoff import consistency
+        self.kb = KnowledgeBase()
+        self.kettle = self.kb.product("KET-17S")
+        self.check = lambda reply, listing: consistency(reply, listing, self.kettle, self.kb)
+        self.reply = "This model is not UL listed. We hold a CB report and CE. Capacity 1.7L, 120V 60Hz."
+
+    def test_consistent_texts_have_no_conflict(self):
+        r = self.check(self.reply, {"title": "[Brand] 1.7L Electric Kettle, 304 Stainless Steel", "bullets[1]": "Works on 120V outlets"})
+        self.assertEqual(r["conflicts"], 0)
+        ul = next(x for x in r["rows"] if x["fact"] == "UL")
+        self.assertEqual((ul["reply"], ul["listing"]), ("如实说没有", "没提"))
+
+    def test_listing_contradicting_the_card_is_flagged(self):
+        r = self.check(self.reply, {"title": "[Brand] 1.8L Kettle, UL Listed, BPA Free", "description": "Plug into 127V"})
+        bad = {x["fact"]: x["listing"] for x in r["rows"] if not x["ok"]}
+        self.assertEqual(bad, {"UL": "写成有", "BPA free": "宣称无检测的", "容量": "写成 1800 ml", "美国电压": "写成 127V"})
+
+    def test_reply_side_is_checked_too(self):
+        r = self.check("Yes, this kettle is UL listed.", {"title": "[Brand] 1.7L Electric Kettle"})
+        self.assertEqual(next(x for x in r["rows"] if x["fact"] == "UL")["reply"], "写成有")
+        self.assertEqual(r["conflicts"], 1)
+
+
+class ImportTests(unittest.TestCase):
+    def setUp(self):
+        from tradedesk import importer
+        self.importer = importer
+        self.products = KnowledgeBase().products
+
+    def test_sample_file_imports_with_aliases_products_and_default(self):
+        raw = (ROOT / "static" / "samples" / "inquiries-sample.csv").read_text(encoding="utf-8")
+        rows, skipped = self.importer.parse(raw, self.products, "GS-12H")
+        self.assertEqual(skipped, [])
+        self.assertEqual([(r["product_id"], r["language"]) for r in rows], [("KET-17S", "es"), ("AF-45D", "en"), ("GS-12H", "en")])
+        self.assertTrue(all(r["imported"] and r["text"] for r in rows))
+
+    def test_chinese_headers_semicolons_duplicates_and_missing_product(self):
+        raw = "买家;询盘内容\nA;Need 500 kettles\nB;need 500  kettles\nC;\n"
+        rows, skipped = self.importer.parse(raw, self.products, None, existing=[])
+        self.assertEqual(rows, [])
+        self.assertEqual([r for _, r in skipped][0], "不知道是哪个产品：加一列 product，或导入时选默认产品")
+        rows, skipped = self.importer.parse(raw, self.products, "KET-17S", existing=[])
+        self.assertEqual(len(rows), 1)
+        self.assertEqual([r for _, r in skipped], ["和已有询盘重复", "询盘内容是空的"])
+
+    def test_rejects_a_file_without_an_inquiry_column(self):
+        with self.assertRaises(ValueError):
+            self.importer.parse("name,country\nA,US\n", self.products, "KET-17S")
+
+    def test_store_numbers_rows_and_clears(self):
+        with tempfile.TemporaryDirectory() as t:
+            store = self.importer.ImportStore(Path(t) / "imp.json")
+            store.add([{"text": "a"}]); store.add([{"text": "b"}])
+            self.assertEqual([r["id"] for r in store.load()], ["IMP-001", "IMP-002"])
+            store.clear()
+            self.assertEqual(store.load(), [])
+
+
+class TriageFailureTests(unittest.TestCase):
+    def test_one_inquiry_without_an_answer_does_not_stop_the_rest(self):
+        kb = KnowledgeBase()
+        kb.inquiries = kb.inquiries[:2] + [dict(kb.inquiries[0], id="IMP-001", text="A brand new inquiry nobody recorded.", imported=True)]
+        with tempfile.TemporaryDirectory() as t:
+            runner = Runner(LLM(api_key="", mode="replay"), kb, log_path=Path(t) / "c.jsonl", board=Board(Path(t) / "s"))
+            r = runner.triage({})
+            self.assertEqual(([x["inquiry_id"] for x in r["triaged"]], [x["inquiry_id"] for x in r["failed"]]),
+                             (["INQ-US-01", "INQ-MX-01"], ["IMP-001"]))
+            with self.assertRaises(LLMError):
+                runner.triage({"inquiry_ids": ["IMP-001"]})
+
+
+class SelfCheckTests(unittest.TestCase):
+    def test_every_demo_step_replays_and_an_empty_cache_fails(self):
+        from tradedesk import selfcheck
+        kb = KnowledgeBase()
+        with tempfile.TemporaryDirectory() as t:
+            r = selfcheck.run(kb, LLM(api_key="", mode="replay"), Path(t) / "state")
+            self.assertTrue(r["steps"] and all(x["ok"] for x in r["steps"]), [x for x in r["steps"] if not x["ok"]])
+            empty = selfcheck.run(kb, LLM(api_key="", mode="replay", cache_dir=Path(t) / "nothing"), Path(t) / "state")
+            self.assertFalse(any(x["ok"] for x in empty["steps"]))
+            self.assertFalse(next(e for e in empty["env"] if e["item"] == "回放覆盖")["ok"])
+
+    def test_warm_fills_the_board_without_network(self):
+        from tradedesk import selfcheck
+        from tradedesk.inbox import Inbox
+        kb = KnowledgeBase()
+        with tempfile.TemporaryDirectory() as t:
+            board = Board(Path(t) / "state")
+            r = selfcheck.warm(kb, LLM(api_key="k", mode="live", transport=lambda body: (_ for _ in ()).throw(AssertionError("network"))),
+                               board, Inbox(board.dir), Path(t) / "calls.jsonl")
+            self.assertEqual(r["warmed"], r["total"])
+            self.assertTrue(list((Path(t) / "state" / "results").glob("*.json")))
+
+
+class SourceCheckTests(unittest.TestCase):
+    RULE = {"id": "X-01", "url": "https://example.test/rule", "excerpt": "Titles must not exceed 75 characters.", "fetched": "2026-10-26"}
+
+    def run_with(self, status, body, url=None, content_type="text/html"):
+        from tradedesk import sources
+        rule = dict(self.RULE, url=url or self.RULE["url"])
+        return sources.check_rule(rule, fetch=lambda u, t: (status, content_type, body))["status"]
+
+    def test_statuses(self):
+        page = b"<html><body>" + b"x" * 500 + b"<p>Titles must not exceed <b>75</b> characters.</p></body></html>"
+        self.assertEqual(self.run_with(200, page), "found")
+        self.assertEqual(self.run_with(200, page.replace(b"75", b"200")), "missing")
+        self.assertEqual(self.run_with(403, b"denied"), "blocked")
+        self.assertEqual(self.run_with(200, page.replace(b"75", b"200"), url="https://sellercentral.amazon.com/help/x"), "browser")
+        self.assertEqual(self.run_with(200, b"%PDF-1.7 ...", url="https://example.test/a.pdf"), "browser")
+
+    def test_network_error_is_reported_not_raised(self):
+        from tradedesk import sources
+        def boom(url, timeout):
+            raise OSError("no network")
+        self.assertEqual(sources.check_rule(self.RULE, fetch=boom)["status"], "error")
+
+
+class ConfigExportTests(unittest.TestCase):
+    def test_page_and_exported_file_are_the_same_document(self):
+        from tradedesk.config_export import build
+        out = build(KnowledgeBase(), LLM(api_key="", mode="replay"))
+        self.assertIn("E", [w["id"] for w in out["workflows"]])
+        self.assertTrue(all(a["input_zh"] and a["output_zh"] and a["guard_zh"] and a["prompt_text"] for a in out["agents"]))
+        saved = json.loads((ROOT / "config" / "agents.json").read_text(encoding="utf-8"))
+        self.assertEqual(saved, json.loads(json.dumps(out)), "config/agents.json is stale: run python3 tools/export_config.py")
 
 
 if __name__ == "__main__":

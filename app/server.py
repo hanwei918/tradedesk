@@ -20,7 +20,10 @@ from pathlib import Path
 
 from tradedesk.kb import KnowledgeBase, PLATFORM_NAMES
 from tradedesk.llm import LLM, LLMError
-from tradedesk import checks, settings, savings
+from tradedesk import checks, settings, savings, selfcheck, sources
+from tradedesk import handoff as handoff_check
+from tradedesk.config_export import build as build_config
+from tradedesk.importer import ImportStore, parse as parse_csv
 from tradedesk.board import Board, CHANNELS
 from tradedesk.evaluate import evaluate, LABEL_ZH
 from tradedesk.inbox import TASK_STATUS
@@ -41,6 +44,8 @@ class App:
         self.llm = LLM()
         self.board = Board()
         self.runner = Runner(self.llm, self.kb, board=self.board)
+        self.imports = ImportStore(STATE / "imported_inquiries.json")
+        self.kb.inquiries.extend(self.imports.load())
         self.play_lock = threading.Lock()
         self.lan_url = None
 
@@ -51,6 +56,8 @@ class App:
             "rules_verified": len(self.kb.rules),
             "rules_total": len(self.kb.all_rules),
             "factory": self.kb.factory,
+            "other_factories": list(self.kb.other_factories.values()),
+            "check_samples": json.loads((ROOT / "data" / "check_samples.json").read_text(encoding="utf-8"))["samples"],
             "products": list(self.kb.products.values()),
             "inquiries": self.kb.inquiries,
             "platforms": PLATFORM_NAMES,
@@ -63,7 +70,44 @@ class App:
                 "rules": [dict(KnowledgeBase.public(r), verified=r.get("verified"), check=r.get("check"),
                                platforms=r.get("platforms"), markets=r.get("markets"))
                           for r in self.kb.all_rules],
-                "check_map": self.kb.check_map}
+                "check_map": self.kb.check_map, "source_check": sources.load()}
+
+    def source_check(self, payload=None):
+        """Re-fetch every rule's source page (needs internet, no model call)."""
+        return sources.save(sources.check_all(self.kb.all_rules))
+
+    # ---------------------------------------------------------- agents, booth self-check, hand-off
+    def agents_view(self):
+        return build_config(self.kb, self.llm)
+
+    def selfcheck_view(self):
+        return selfcheck.run(self.kb, self.llm, STATE)
+
+    def selfcheck_warm(self, payload=None):
+        return selfcheck.warm(self.kb, self.llm, self.board, self.runner.inbox, LOG_PATH)
+
+    def handoff_view(self, payload):
+        """Reply -> listing: do the two texts agree with each other and with the product card? Code only."""
+        product = self.kb.product(payload["product_id"])
+        listing = payload.get("listing")
+        if not isinstance(listing, dict) or not listing:
+            raise ValueError("缺少上架文案")
+        return {"platforms": {pl: handoff_check.consistency(str(payload.get("reply") or ""), fields, product, self.kb)
+                              for pl, fields in listing.items() if isinstance(fields, dict)}}
+
+    # ---------------------------------------------------------- CSV import
+    def import_inquiries(self, payload):
+        rows, skipped = parse_csv(str(payload.get("csv") or ""), self.kb.products, payload.get("product_id") or None,
+                                  [q["text"] for q in self.kb.inquiries])
+        added = self.imports.add(rows)
+        self.kb.inquiries.extend(added)
+        return {"added": [{"id": r["id"], "label_zh": r["label_zh"]} for r in added],
+                "skipped": [{"line": line, "reason_zh": reason} for line, reason in skipped]}
+
+    def clear_imports(self, payload=None):
+        self.kb.inquiries[:] = [q for q in self.kb.inquiries if not q.get("imported")]
+        self.imports.clear()
+        return {"ok": True}
 
     # ---------------------------------------------------------- inbox & tasks
     def inbox_view(self):
@@ -321,7 +365,8 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json(200, play[url.path]())
         routes = {"/api/meta": APP.meta, "/api/kb": APP.kb_rules, "/api/logs": APP.logs, "/api/board": APP.board_view,
                   "/api/inbox": APP.inbox_view, "/api/eval": APP.eval_view, "/api/settings": APP.settings_view,
-                  "/api/redteam": APP.redteam_preset, "/api/savings": APP.savings_view}
+                  "/api/redteam": APP.redteam_preset, "/api/savings": APP.savings_view,
+                  "/api/agents": APP.agents_view, "/api/selfcheck": APP.selfcheck_view}
         if url.path in routes:
             return self._json(200, routes[url.path]())
         if url.path == "/api/baseline":
@@ -366,7 +411,10 @@ class Handler(SimpleHTTPRequestHandler):
                   "/api/settings/models": APP.settings_models,
                   "/api/redteam": APP.redteam_run,"/api/inquiry": APP.runner.inquiry, "/api/listing": APP.runner.listing,
                   "/api/check": APP.runner.check_text, "/api/image-check": APP.runner.image_check,
-                  "/api/board/mark": APP.board_mark, "/api/savings": APP.savings_view}
+                  "/api/board/mark": APP.board_mark, "/api/savings": APP.savings_view,
+                  "/api/handoff": APP.handoff_view, "/api/selfcheck/warm": APP.selfcheck_warm,
+                  "/api/kb/source-check": APP.source_check, "/api/inbox/import": APP.import_inquiries,
+                  "/api/inbox/import/clear": APP.clear_imports}
         fn = routes.get(self.path)
         if not fn:
             return self._json(404, {"error": "not found"})

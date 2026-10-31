@@ -116,6 +116,15 @@
       "product_id": "BL-35P",
       "text": "Hello, we are importers of small kitchen appliances based in Lagos, Nigeria. We want 1,000 pcs of your portable blender cup BL-35P for our supermarket customers. Please confirm the goods will come with SONCAP certificate, because customs in Lagos will not clear the shipment without it. Kindly quote CIF Lagos (Apapa port). Payment: 30% deposit, 70% by L/C at sight. Thanks, Chinedu Okafor (sales@example-lagos.ng)",
       "intent_zh": "报 CIF 拉各斯 1000 台，付款方式可以接受；我们从来没办过 SONCAP，产品证书和 SONCAP 证书需要和买家确认怎么办理，不能保证清关；电池有 UN38.3。"
+    },
+    {
+      "id": "INQ-US-06",
+      "label_zh": "美国亚马逊品牌商 · 英文 · 保温杯（换一家工厂）",
+      "platform": "alibaba_rfq",
+      "language": "en",
+      "product_id": "TMB-50V",
+      "text": "Hello, we are a drinkware brand selling on Amazon US. Looking for a 500ml double-wall vacuum tumbler, 2,000 pcs to start, with our logo laser engraved. The lid must be BPA free and the cup FDA approved, please send the certificates. On our listing we say it keeps ice 24 hours and is dishwasher safe. Target price USD 3.20, DDP Los Angeles, delivery within 25 days. Thanks, Jenna, Northtrail Goods",
+      "intent_zh": "报 FOB 宁波 4.10（3000 以上 3.80），2000 个可免费激光雕刻 logo；没有 FDA 食品接触报告、盖子只有原料商的 BPA-free 声明，如实说明，有 LFGB 报告可以提供；只能手洗；DDP 不报，交期 30 天。"
     }
   ]
 }

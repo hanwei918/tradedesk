@@ -11,10 +11,14 @@ const FLAG = { en: "🇺🇸", es: "🇲🇽", de: "🇩🇪", ja: "🇯🇵" };
 // A Russian or English inquiry can come from several countries, so results show the market's flag.
 const MARKET_FLAG = { US: "🇺🇸", MX: "🇲🇽", EU: "🇩🇪", JP: "🇯🇵", EAEU: "🇰🇿", NG: "🇳🇬" };
 const flagOf = (q) => q.flag || MARKET_FLAG[q.market] || FLAG[q.language] || "🌐";
-const PAGES = { overview: "概览", board: "商品看板", inbox: "询盘收件箱", inquiry: "询盘回复", listing: "多平台上架", check: "文案体检", eval: "评测与对照", kb: "规则知识库", logs: "调用日志", fair: "游园会找茬" };
+const PAGES = { overview: "概览", board: "商品看板", inbox: "询盘收件箱", inquiry: "询盘回复", listing: "多平台上架", check: "文案体检", eval: "评测与对照", kb: "规则知识库", logs: "调用日志", fair: "游园会找茬", agents: "智能体配置", selfcheck: "开摊自检" };
 const PLAT = { amazon_us: { name: "Amazon 美国站", lang: "英语", cls: "amz", mark: "a" }, tiktok_mx: { name: "TikTok Shop 墨西哥", lang: "西班牙语", cls: "tt", mark: "♪" } };
 let META = null, KB = null, page = "overview";
-const state = { inq: { history: [], view: -1, busy: false }, lst: { history: [], view: -1, busy: false }, chkPlatform: "amazon_us" };
+const state = { inq: { history: [], view: -1, busy: false }, lst: { history: [], view: -1, busy: false }, chkPlatform: "amazon_us", handoff: null, handoffHtml: "" };
+// Products of the second demo factory carry factory_id; the label says which factory, so switching is visible.
+const factoryOf = (p) => (META.other_factories || []).find((f) => f.id === p.factory_id);
+const prodLabel = (p) => (factoryOf(p) ? `${p.name_zh} · ${factoryOf(p).name_zh.replace(/（示例工厂）$/, "")}` : p.name_zh);
+const sampleFor = (pid) => (META.check_samples || {})[pid] || "";
 
 // ------------------------------------------------------------------ utils
 async function api(path, body) {
@@ -233,6 +237,8 @@ function go(p) {
   if (p === "fair") renderFair();
   if (p === "kb") renderKB();
   if (p === "logs") renderLogs();
+  if (p === "agents") renderAgents();
+  if (p === "selfcheck") renderSelfcheck();
   window.scrollTo({ top: 0 });
 }
 
@@ -395,7 +401,37 @@ function journeyCard() {
     <button class="btn sm" data-go-tasks>${ic("history", "sm")}看派发的任务</button>
     <button class="btn sm primary" id="inq-next-listing">${ic("store", "sm")}为这个产品生成上架文案</button></div></div>`;
 }
+// Remember the reply this listing is attached to, so the listing page can check the two against each other.
+function handoffFromInquiry() {
+  const r = state.inq.history[state.inq.history.length - 1];
+  const q = META.inquiries.find((x) => x.id === state.inqId);
+  state.handoff = r ? { product_id: $("#inq-product").value, reply: r.reply, round: r.round, label: q ? q.label_zh : "这位买家" } : null;
+}
+async function showHandoff() {
+  const h = state.handoff, r = state.lst.history[state.lst.history.length - 1];
+  state.handoffHtml = "";
+  if (!h || !r || h.product_id !== state.lstProduct) return;
+  const plats = Object.keys(r.platforms);
+  let res;
+  try { res = await api("/api/handoff", { product_id: h.product_id, reply: h.reply, listing: Object.fromEntries(plats.map((p) => [p, r.platforms[p].fields])) }); }
+  catch (e) { return toast(e.message); }
+  const tables = plats.map((p) => res.platforms[p]);
+  const conflicts = tables.reduce((n, t) => n + t.conflicts, 0);
+  const name = (p) => META.listing_catalog.platforms[p]?.name || p;
+  const cell = (v) => `<span class="${/写成|宣称无检测/.test(v) ? "hf-bad" : /如实|一致|提到/.test(v) ? "hf-ok" : "muted"}">${esc(v)}</span>`;
+  const rows = tables[0].rows.map((row, i) => {
+    const ok = tables.every((t) => t.rows[i].ok);
+    return `<tr><td><b>${esc(row.fact)}</b><div class="small muted">${esc(row.kind_zh)}</div></td><td class="small">${esc(row.card)}</td><td>${cell(row.reply)}</td>
+      ${tables.map((t) => `<td>${cell(t.rows[i].listing)}</td>`).join("")}<td>${ok ? `<span class="badge green">${ic("circle-check-big", "sm")}对得上</span>` : `<span class="badge red">${ic("circle-x", "sm")}打架</span>`}</td></tr>`;
+  }).join("");
+  state.handoffHtml = `<div class="card handoff"><div class="card-h"><div><h3>${ic("git-compare-arrows")}回复和上架文案对得上吗</h3>
+      <p>同一张资料卡：给「${esc(h.label)}」的回复（第 ${h.round} 轮）↔ ${esc(plats.map(name).join("、"))}。代码逐项核对，不经过模型。</p></div>
+      <span class="badge ${conflicts ? "red" : "green"}">${conflicts ? `${conflicts} 处说法打架` : "0 处说法打架"}</span></div>
+    <table class="tbl hf-tbl"><thead><tr><th>资料卡上的事实</th><th>资料卡</th><th>回复里</th>${plats.map((p) => `<th>${esc(name(p))} 里</th>`).join("")}<th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  $("#lst-out").insertAdjacentHTML("afterbegin", state.handoffHtml);
+}
 function listingFromInquiry(pid) {
+  handoffFromInquiry();
   go("listing"); pickProduct(pid);
   $("#lst-bench").classList.remove("collapsed");
   const p = META.products.find((x) => x.id === pid);
@@ -479,7 +515,7 @@ async function reviseInquiry() {
 
 // ------------------------------------------------------------------ B: listing
 function renderProducts() {
-  $("#lst-products").innerHTML = META.products.map((p) => `<button class="product" data-id="${p.id}"><b>${esc(p.name_zh)}</b><span>MOQ ${p.moq_units} · ${esc(p.certifications_held.join(" / "))}</span></button>`).join("");
+  $("#lst-products").innerHTML = META.products.map((p) => `<button class="product" data-id="${p.id}"><b>${esc(p.name_zh)}</b><span>${factoryOf(p) ? `另一家工厂：${esc(factoryOf(p).name_zh)} · ` : ""}MOQ ${p.moq_units} · ${esc(p.certifications_held.join(" / "))}</span></button>`).join("");
   $$("#lst-products .product").forEach((b) => b.addEventListener("click", () => pickProduct(b.dataset.id)));
   pickProduct(META.products[0].id);
 }
@@ -589,6 +625,7 @@ function renderListing() {
   wireLinks($("#lst-out")); wireEdit($("#lst-out"));
   $$("#lst-out [data-go-board]").forEach((b) => b.addEventListener("click", () => go("board")));
   if (latest) wireComposer("lst", reviseListing);
+  if (latest && state.handoffHtml) $("#lst-out").insertAdjacentHTML("afterbegin", state.handoffHtml);
 }
 
 const selectedPlatforms = () => $$("#lst-platform-options [data-platform]").filter((row) => $("[data-platform-select]", row).checked).map((row) => row.dataset.platform);
@@ -606,7 +643,9 @@ async function runListing() {
     const r = await api("/api/listing", { product_id: state.lstProduct, platforms: plats, languages, round: 1 });
     state.lst.history = [r]; state.lst.view = 0; $("#lst-bench").classList.add("collapsed");
   } catch (e) { toast(e.message); }
+  state.handoffHtml = "";
   state.lst.busy = false; busy(btn, false); renderListing();
+  await showHandoff();
 }
 
 async function reviseListing() {
@@ -625,7 +664,9 @@ async function reviseListing() {
     st.history.push(r); st.view = st.history.length - 1;
     toast(`第 ${r.round} 轮完成`, "ok");
   } catch (e) { toast(e.message); }
+  state.handoffHtml = "";
   st.busy = false; renderListing();
+  await showHandoff();
 }
 
 // ------------------------------------------------------------------ check
@@ -846,7 +887,7 @@ async function renderInbox() {
     const reply = x.reply ? `<span class="badge ${x.reply.risk}">已生成第 ${x.reply.round} 轮 · ${RISK[x.reply.risk]}</span>` : `<span class="badge">未回复</span>`;
     const why = p ? `<details><summary class="small muted" style="cursor:pointer;margin-top:6px">为什么是 ${p.score} 分</summary><div class="why"><div><span class="d">50</span><span>基础分</span></div>${p.components.map((c) => `<div><span class="d ${c.delta > 0 ? "p" : "n"}">${c.delta > 0 ? "+" : ""}${c.delta}</span><span>${esc(c.label_zh)}${c.quote ? ` <span class="muted">“${esc(c.quote)}”</span>` : ""}</span></div>`).join("")}</div></details>` : "";
     return `<div class="mail"><div class="prio ${p ? p.level : "none"}"${p ? ` style="--p:${Math.max(0, Math.min(100, p.score))}"` : ""}>${p ? `${p.score}<small>${p.level}优先</small>` : "未整理"}</div>
-      <div class="body"><b>${flagOf(q)} ${esc(q.label_zh)}</b> <span class="small muted">${esc(q.id)} · ${esc(b.country_guess || "")} ${esc(b.business_type_zh || "")}</span>
+      <div class="body"><b>${flagOf(q)} ${esc(q.label_zh)}</b>${q.imported ? ' <span class="badge brand">导入</span>' : ""} <span class="small muted">${esc(q.id)} · ${esc(b.country_guess || "")} ${esc(b.business_type_zh || "")}</span>
         <div class="sum">${esc(u.summary_zh || "")}</div><div class="q">${esc(q.text)}</div>${why}</div>
       <div class="side">${reds ? `<span class="badge red">硬冲突 ${reds}</span>` : ""}${ambers ? `<span class="badge amber">待确认 ${ambers}</span>` : ""}${reply}
         <button class="btn sm" data-open="${esc(q.id)}">${ic("send", "sm")}处理</button></div></div>`;
@@ -880,7 +921,10 @@ async function runTriage() {
   const btn = $("#inbox-triage");
   busy(btn, true, "理解每条询盘并打分…");
   $("#inbox-progress").innerHTML = `<div class="progress"><i style="width:35%"></i></div><div class="small muted">询盘分析员逐条读询盘，代码按公式打分…</div>`;
-  try { const r = await api("/api/inbox/triage", {}); toast(`已整理 ${r.triaged.length} 条询盘`, "ok"); }
+  try {
+    const r = await api("/api/inbox/triage", {});
+    toast(`已整理 ${r.triaged.length} 条询盘${r.failed?.length ? `；${r.failed.length} 条没有录好的结果（导入的新询盘要切到实时模式）` : ""}`, "ok");
+  }
   catch (e) { toast(e.message); }
   $("#inbox-progress").innerHTML = ""; busy(btn, false); renderInbox();
 }
@@ -1073,6 +1117,11 @@ async function renderKB() {
   const CAT = catNames();
   const verified = KB.rules.filter((r) => r.verified).length;
   $("#kb-note").textContent = `${verified}/${KB.rules.length} 条已对照原文逐字核实 · 最近更新 ${KB.version} · 未核实的规则不参与检查`;
+  const SC = KB.source_check, scBy = Object.fromEntries((SC?.results || []).map((x) => [x.id, x]));
+  $("#kb-src").innerHTML = SC ? `${ic("globe", "sm")}<span><b>出处自检 ${esc(SC.checked_at)}</b>：程序重新抓取 ${SC.total} 条规则的官方页面 ·
+      <span class="hf-ok">${SC.summary.found} 条原文仍在</span> · ${SC.summary.browser} 条${esc(SC.status_zh.browser)}（${esc(SC.detail_zh.browser)}） ·
+      ${SC.summary.blocked} 条${esc(SC.status_zh.blocked)} · <span class="${SC.summary.missing ? "hf-bad" : ""}">${SC.summary.missing} 条没找到</span>${SC.summary.error ? ` · ${SC.summary.error} 条抓取失败` : ""}</span>`
+    : `${ic("globe", "sm")}<span>还没跑过出处自检：点右边按钮，程序会重新抓取每条规则的官方页面，看原文还在不在（需联网，约 30 秒）</span>`;
   const counts = {};
   KB.rules.forEach((r) => (counts[r.category] = (counts[r.category] || 0) + 1));
   $("#kb-cats").innerHTML = [["all", "全部", KB.rules.length], ...Object.entries(counts).map(([c, n]) => [c, CAT[c] || c, n])]
@@ -1084,7 +1133,7 @@ async function renderKB() {
       <td><span class="badge">${esc(CAT[r.category] || r.category)}</span></td>
       <td>${r.check && r.check.kind === "llm" ? `<span class="badge">${ic("sparkles", "sm")}模型判断</span>` : `<span class="badge">${ic("cpu", "sm")}代码</span>`}</td>
       <td class="small"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(host(r.url))}</a><div class="muted">${esc(r.source_type)}</div></td>
-      <td>${r.verified ? `<span class="badge green">${ic("circle-check-big", "sm")}已核实</span>` : `<span class="badge amber">未核实</span>`}</td></tr>
+      <td>${r.verified ? `<span class="badge green">${ic("circle-check-big", "sm")}已核实</span>` : `<span class="badge amber">未核实</span>`}${scBy[r.id] ? `<div class="small ${scBy[r.id].status === "found" ? "hf-ok" : scBy[r.id].status === "missing" ? "hf-bad" : "muted"}" style="margin-top:4px">${esc(SC.status_zh[scBy[r.id].status])}</div>` : ""}</td></tr>
     <tr class="detail" data-for="${esc(r.id)}" hidden><td></td><td colspan="5"><div class="src" style="border:0;margin:0;padding:0"><blockquote>“${esc(r.excerpt)}”</blockquote>
       <div>${r.check ? `<code>${esc(JSON.stringify(r.check))}</code>` : ""}</div></div></td></tr>`).join("") || `<tr><td colspan="6"><div class="empty">没有匹配的规则</div></td></tr>`;
   $$("#kb-body tr[data-id]").forEach((tr) => tr.addEventListener("click", (e) => {
@@ -1094,6 +1143,13 @@ async function renderKB() {
 }
 
 // ------------------------------------------------------------------ logs
+async function recheckSources() {
+  const btn = $("#kb-recheck"); busy(btn, true, "抓取中…");
+  try { const r = await api("/api/kb/source-check", {}); KB = null; toast(`出处自检完成：${r.summary.found} 条原文仍在，${r.summary.missing} 条没找到`, "ok"); }
+  catch (e) { toast(e.message); }
+  busy(btn, false); renderKB();
+}
+
 async function renderLogs() {
   const { entries } = await api("/api/logs");
   const runs = groupRuns(entries).reverse();
@@ -1112,6 +1168,95 @@ async function renderLogs() {
   }).join("");
 }
 
+
+// ------------------------------------------------------------------ agents (the same document tools/export_config.py writes)
+let AG = null;
+async function renderAgents() {
+  AG = AG || (await api("/api/agents"));
+  const roleOf = Object.fromEntries([...AG.agents.map((a) => [a.id, a.role_zh]), ...AG.listing_agents.map((l) => [l.role, l.role_zh])]);
+  const who = (a) => a.split(" / ").map((id) => roleOf[id] || id).join(" / ");
+  const m = AG.model, kb = AG.knowledge_base;
+  $("#agents-out").innerHTML = `
+    <div class="ag-stats"><div><b>${AG.agents.length}</b><span>个智能体</span></div><div><b>${AG.listing_agents.length}</b><span>个上架平台角色</span></div>
+      <div><b>${AG.workflows.length}</b><span>条工作流</span></div><div><b>${kb.rules_verified}</b><span>条带出处规则</span></div>
+      <div class="ag-model">${ic("cpu", "sm")}<span><b>${esc(m.model)}</b> · temperature ${m.temperature} · seed ${m.seed} · 只输出 JSON · 模式 ${m.modes.join(" / ")}<br><span class="muted">${esc(m.endpoint)} · key 不在这里显示</span></span></div></div>
+    <div class="card ag-wfs"><div class="card-h"><div><h3>${ic("git-compare-arrows")}工作流：哪一步是模型，哪一步是代码</h3><p>灰色是代码，蓝色是智能体；每个智能体的输出都要过代码护栏</p></div></div>
+      <div class="card-b">${AG.workflows.map((w) => `<div class="ag-wf"><div class="ag-wf-h"><span class="badge solid">${esc(w.id)}</span><b>${esc(w.name_zh)}</b><span class="small muted">触发：${esc(w.trigger_zh)}</span></div>
+        <ol class="ag-steps">${w.steps.map((st) => `<li><span class="badge ${st.agent ? "brand" : ""}">${st.agent ? esc(who(st.agent)) : "代码"}</span><span>${esc(st.step_zh)}${st.guard_zh ? `<small>护栏：${esc(st.guard_zh)}</small>` : ""}${st.detail_zh ? `<small>${esc(st.detail_zh)}</small>` : ""}${st.kb_zh ? `<small>${esc(st.kb_zh)}</small>` : ""}</span></li>`).join("")}</ol></div>`).join("")}</div></div>
+    <div class="grid g2" style="margin-top:16px">${AG.agents.map((a) => `<div class="card"><div class="card-h"><div><h3>${ic("sparkles")}${esc(a.role_zh)}</h3><p class="mono">${esc(a.prompt_file)}</p></div></div>
+      <div class="card-b"><dl class="ag-dl"><dt>职责</dt><dd>${esc(a.task_zh)}</dd><dt>输入</dt><dd>${esc(a.input_zh || "")}</dd><dt>输出</dt><dd>${esc(a.output_zh || "")}</dd>
+        <dt>护栏</dt><dd>${esc(a.guard_zh || "")}</dd><dt>交互</dt><dd>${esc(a.interaction_zh)}</dd></dl>
+        <details class="io"><summary class="small muted" style="cursor:pointer">提示词全文（花括号里的内容运行时从资料卡和设置填入）</summary><pre class="json">${esc(a.prompt_text)}</pre></details></div></div>`).join("")}</div>
+    <div class="card" style="margin-top:16px"><div class="card-h"><div><h3>${ic("store")}11 个上架平台的生成角色</h3><p>每个平台一个提示词，注入这个平台适用的规则；生成后都过规则校验和合规审核</p></div></div>
+      <table class="tbl"><thead><tr><th>平台</th><th>角色</th><th>默认语言</th><th>适用规则</th><th>提示词</th></tr></thead><tbody>${AG.listing_agents.map((l) => `<tr data-pl="${esc(l.platform)}"><td><b>${esc(l.platform_name)}</b></td><td>${esc(l.role_zh)}</td><td>${esc(AG.listing_languages[l.default_language] || l.default_language)}</td><td><span class="badge">${l.rules.length} 条</span></td><td class="mono small">${esc(l.prompt_file)}</td></tr>
+        <tr class="detail" data-for="${esc(l.platform)}" hidden><td colspan="5"><div class="small muted" style="margin-bottom:6px">${esc(l.rules.join("、"))}</div><pre class="json">${esc(l.prompt_text)}</pre></td></tr>`).join("")}</tbody></table></div>`;
+  $$("#agents-out tr[data-pl]").forEach((tr) => tr.addEventListener("click", () => { const d = $(`#agents-out tr[data-for="${tr.dataset.pl}"]`); d.hidden = !d.hidden; }));
+}
+function downloadAgents() {
+  if (!AG) return;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(AG, null, 2)], { type: "application/json" }));
+  a.download = "tradedesk-agents.json"; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// ------------------------------------------------------------------ booth self-check
+async function renderSelfcheck() {
+  $("#sc-out").innerHTML = loadingCard(["回放每一条演示路径", "检查模型、知识库和本地数据"]);
+  let r;
+  try { r = await api("/api/selfcheck"); } catch (e) { $("#sc-out").innerHTML = ""; return toast(e.message); }
+  const speech = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  const env = [...r.env,
+    { item: "语音输入", ok: speech, info: true, detail_zh: speech ? "这个浏览器支持（Chrome / Edge，需联网）" : "这个浏览器不支持，用 Chrome 或 Edge 打开" },
+    { item: "屏幕宽度", ok: innerWidth >= 1280, info: true, detail_zh: `${innerWidth} px${innerWidth < 1280 ? "：窄于 1280，建议全屏或把浏览器缩放调小" : ""}` }];
+  const todo = env.filter((e) => !e.ok && !e.info).length + r.steps.filter((x) => !x.ok).length;
+  const mark = (e) => (e.ok ? `<span class="sc-ok">${ic("circle-check-big", "sm")}</span>` : e.info ? `<span class="sc-info">${ic("info", "sm")}</span>` : `<span class="sc-bad">${ic("circle-x", "sm")}</span>`);
+  $("#sc-out").innerHTML = `<div class="card sc-hero ${todo ? "bad" : "ok"}"><div class="card-b">${ic(todo ? "triangle-alert" : "shield-check")}<div><b>${todo ? `还有 ${todo} 项要处理` : "可以开摊"}</b>
+      <span>${esc(r.checked_at)} · ${r.steps.filter((x) => x.ok).length} / ${r.steps.length} 步演示路径在回放模式下离线可走 · 当前 ${esc(MODE_ZH[r.mode] || r.mode)} · ${esc(r.model)}</span></div></div></div>
+    <div class="grid g2" style="margin-top:16px;align-items:start">
+      <div class="card"><div class="card-h"><h3>${ic("cpu")}环境</h3></div><table class="tbl sc-tbl"><tbody>${env.map((e) => `<tr><td>${mark(e)}</td><td><b>${esc(e.item)}</b></td><td class="small">${esc(e.detail_zh)}</td></tr>`).join("")}</tbody></table></div>
+      <div class="card"><div class="card-h"><div><h3>${ic("play")}演示路径回放</h3><p>在临时目录里把每一步回放一遍，不联网、不改看板</p></div></div><table class="tbl sc-tbl"><tbody>${r.steps.map((x) => `<tr><td>${mark(x)}</td><td><span class="badge">${esc(x.path)}</span></td><td><b>${esc(x.step)}</b>${x.ok ? `<div class="small muted">${x.model_steps} 次模型步骤，全部有录好的结果</div>` : `<div class="small" style="color:hsl(var(--red))">${esc(x.reason_zh)}：切到“实时 + 录制”联网走一遍这一步</div>`}</td></tr>`).join("")}</tbody></table></div></div>`;
+}
+async function warmBooth() {
+  const btn = $("#sc-warm"); busy(btn, true, "回放中…");
+  try { const r = await api("/api/selfcheck/warm", {}); KB = null; toast(`已回放 ${r.warmed} / ${r.total} 步：概览、看板、收件箱现在有数据了`, "ok"); }
+  catch (e) { toast(e.message); }
+  busy(btn, false); renderSelfcheck();
+}
+async function testModel() {
+  const btn = $("#sc-test"); busy(btn, true, "连接中…");
+  try {
+    const r = await api("/api/settings/test", {});
+    toast(r.ok ? `模型连得上：${r.model}，${r.seconds} 秒` : `连不上：${r.error}`, r.ok ? "ok" : "err");
+  } catch (e) { toast(e.message); }
+  busy(btn, false);
+}
+
+// ------------------------------------------------------------------ CSV import
+async function reloadMeta() { META = await api("/api/meta"); renderSamples(); }
+function openImport() {
+  openSheet(`<div class="thumb" style="width:40px;height:40px">${ic("database")}</div><div><h3>导入询盘（CSV）</h3><p>任何能另存为 CSV 的询盘列表都可以</p></div>`,
+    `<div class="stack imp">
+      <p>需要一列询盘内容，列名写 <code>text</code>、<code>message</code> 或 <code>询盘内容</code>。可选列：<code>buyer</code> / 买家、<code>country</code> / 国家、<code>product</code> / 产品（写编号或产品名）、<code>subject</code> / 主题。逗号、分号、Tab 分隔都行。</p>
+      <label><span class="fieldlab">没写产品的行，默认是</span><select id="imp-product">${META.products.map((p) => `<option value="${p.id}">${esc(prodLabel(p))}</option>`).join("")}</select></label>
+      <label><span class="fieldlab">选择文件</span><input type="file" id="imp-file" accept=".csv,.tsv,.txt,text/csv"></label>
+      <div class="callout">${ic("info")}<div>导入的是新询盘，没有录好的结果：整理和回复要在实时模式下进行（左下角模型卡片，需要联网和 key）。回放模式下它们会显示“未整理”。<a href="samples/inquiries-sample.csv" download>下载示例 CSV</a></div></div>
+      <div id="imp-out"></div></div>`,
+    `<button class="btn ghost" id="imp-clear">清除已导入的询盘</button><div style="flex:1"></div><button class="btn primary" id="imp-run">${ic("database", "sm")}导入</button>`);
+  $("#imp-run").addEventListener("click", async () => {
+    const f = $("#imp-file").files[0];
+    if (!f) return toast("先选一个 CSV 文件");
+    busy($("#imp-run"), true, "导入中…");
+    try {
+      const r = await api("/api/inbox/import", { csv: await f.text(), product_id: $("#imp-product").value });
+      $("#imp-out").innerHTML = `<div class="callout">${ic("circle-check-big")}<div><b>导入 ${r.added.length} 条</b>${r.skipped.length ? `，跳过 ${r.skipped.length} 行：<ul class="small">${r.skipped.slice(0, 8).map((x) => `<li>第 ${x.line} 行：${esc(x.reason_zh)}</li>`).join("")}</ul>` : ""}</div></div>`;
+      await reloadMeta(); renderInbox();
+    } catch (e) { toast(e.message); }
+    busy($("#imp-run"), false);
+  });
+  $("#imp-clear").addEventListener("click", async () => {
+    try { await api("/api/inbox/import/clear", {}); await reloadMeta(); renderInbox(); toast("已清除导入的询盘", "ok"); } catch (e) { toast(e.message); }
+  });
+}
 
 // ------------------------------------------------------------------ model settings
 const MODE_ZH = { live: "实时调用", record: "实时 + 录制缓存", replay: "回放（不联网）" };
@@ -1206,7 +1351,7 @@ async function tourSteps() {
       run: async () => { window.scrollTo({ top: 0, behavior: "smooth" }); await sleep(300); spot($("#inq-out .finding")); } },
     { d: 7500, cap: "业务员只说一句“按风险提示全部修改”，第 2 轮就变绿；需要采购、生产、美工跟进的事自动派成任务。", sub: "右上角是轮次，“与上一轮对比”里能看到新增的那句话",
       run: async () => { $("#inq-ins").value = "按风险提示全部修改"; await reviseInquiry(); $('#inq-tabs [data-t="diff"]')?.click(); await sleep(200); spot($("#inq-out .result .card")); } },
-    { d: 6500, cap: "商品看板：4 个产品 × 主图 / Amazon / TikTok，运营一眼看到哪里卡住了。", sub: "一键批量生成上品，导出 CSV",
+    { d: 6500, cap: `商品看板：${META.products.length} 个产品 × 主图 / Amazon / TikTok，运营一眼看到哪里卡住了。`, sub: "一键批量生成上品，导出 CSV",
       run: async () => { go("board"); await renderBoard(); spot($(".board")); } },
     { d: 8500, cap: "主图检查：白底、占比、尺寸由代码测像素；徽章、促销字、道具由模型看图，必须写出看到了什么。", sub: "这张图被标了 5 条红；红色时“标记已上架”按钮是灰的",
       run: async () => { await openCell("KET-17S", "image"); } },
@@ -1254,7 +1399,6 @@ async function startTour(loop = false) {
 // ------------------------------------------------------------------ roles
 // Booth mode: a visitor picks a role and sees only that lane, its pages in the sidebar and a fixed path of real
 // actions one step at a time. Every step uses requests that are recorded, so the whole path replays offline.
-const CHECK_SAMPLE = "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping";
 const ROLE_INQUIRY = "INQ-US-01";
 
 function cardTitled(root, text) {
@@ -1292,14 +1436,14 @@ async function roleCheck() {
   go("check");
   state.chkPlatform = "amazon_us"; renderCheckControls();
   $("#chk-product").value = META.products[0].id;
-  $("#chk-text").value = CHECK_SAMPLE;
+  $("#chk-text").value = sampleFor(META.products[0].id);
   await runCheck();
 }
 
 const ROLE_LANES = {
   merchant: {
-    name: "商户", mark: "商", sub: "工厂的业务员和运营 · B2B 询盘", fit: "行业、投资评委", pages: ["inbox", "inquiry"],
-    out: "能直接发给进口商的回复、中文内部备忘、派给采购 / 生产 / 美工的任务",
+    name: "商户", mark: "商", sub: "工厂的业务员和运营 · B2B 询盘", fit: "行业、投资评委", pages: ["inbox", "inquiry", "listing"],
+    out: "能直接发给进口商的回复、中文内部备忘、派给采购 / 生产 / 美工的任务、附给买家的 Amazon 文案",
     steps: [
       { t: "收件箱排好优先级", d: "询盘按公开公式打好了分。高亮这条只有 50 分：和工厂资料有 3 处硬冲突、2 处待确认。分低不是不回，是提醒要小心回。",
         run: async () => {
@@ -1314,10 +1458,17 @@ const ROLE_LANES = {
         run: () => roleInquiryRound(2) },
       { t: "看派出去的任务", d: "这条询盘里要采购、生产、美工跟进的事，已自动拆成任务，每条都挂着询盘原文。",
         run: async () => { taskInquiry = ROLE_INQUIRY; go("inbox"); await renderInbox(); showInboxTab("tasks"); } },
+      { t: "附上 Amazon 美国站文案", d: "Mark 在 Amazon 卖货：同一张资料卡生成他能用的英文 Listing，代码再核对回复和 Listing 有没有说法打架。",
+        run: async () => {
+          if (state.inqId !== ROLE_INQUIRY || state.inq.history.length < 2) await roleInquiryRound(2);
+          handoffFromInquiry();
+          await roleListing(["amazon_us"]);
+          spot("#lst-out .handoff");
+        } },
     ],
   },
   reviewer: {
-    name: "合规审查员", mark: "审", sub: "发出前的最后一道关", fit: "技术评委", pages: ["check", "kb", "eval"],
+    name: "合规审查员", mark: "审", sub: "发出前的最后一道关", fit: "技术评委", pages: ["check", "kb", "eval", "agents"],
     out: "红黄绿结论，每条问题都附规则原文和链接",
     steps: [
       { t: "检查一段待发文案", d: "这段标题埋了 6 个问题：促销语、主观评价、感叹号、没有的 UL、没测的 BPA、免运费；系统还多查出一条：78 字符，超过 75。",
@@ -1328,6 +1479,8 @@ const ROLE_LANES = {
         run: async () => { go("kb"); } },
       { t: "编造的提示拦得住吗", d: "往审核结果里塞 5 条编造的提示（假编号、原文对不上），看代码怎么全部拦下。",
         run: async () => { go("eval"); await showEvalTab("redteam"); await runRedteam(); } },
+      { t: "6 个智能体怎么分工", d: "每个智能体的职责、输入、输出、护栏和提示词全文都在这页；哪一步是代码、哪一步是模型，按工作流列清楚，可以导出成 JSON。",
+        run: async () => { go("agents"); await renderAgents(); spot("#agents-out .ag-wfs"); } },
     ],
   },
   consumer: {
@@ -1350,21 +1503,22 @@ function showRolePicker() {
   let el = $("#rolepick");
   if (!el) { el = document.createElement("div"); el.id = "rolepick"; el.className = "rolepick"; document.body.appendChild(el); }
   el.innerHTML = `<div class="rp-inner"><span class="rp-kick">TradeDesk 出海工作台 · 从合规切入</span><h1>你是哪一类用户？</h1>
-    <div class="rp-proof"><b class="r">8 / 8</b><span>直接用通用 AI 回 8 条外贸询盘，全都不能发</span><i>→</i><b class="g">0 / 8</b><span>TradeDesk 带上工厂资料卡和规则，红色清零</span></div>
+    <div class="rp-proof"><b class="r">8 / 8</b><span>通用 AI 直接回 8 条外贸询盘，条条带红色问题</span><i>→</i><b class="g">3 / 8</b><span>TradeDesk 自动带上工厂资料、改一轮：0 红，3 条可直接发</span></div>
     <p>选一个角色，按你的路径走一遍。每一步都是工作台里的真实操作，左边只留这条路径用得到的页面。</p>
     <div class="rp-cards">${Object.entries(ROLE_LANES).map(([k, r]) => `<button class="rp-card ${k}" data-role="${k}">
       <span class="rp-ic">${r.mark}</span><b>${r.name}</b><small>${esc(r.sub)}</small>
       <span class="rp-meta">约 1 分钟 · ${r.steps.length} 步 · 适合${esc(r.fit)}</span>
       <span class="rp-path">${r.steps.map((s, i) => `<span><i>${i + 1}</i>${esc(s.t)}</span>`).join("")}</span>
       <span class="rp-out">产出：${esc(r.out)}</span></button>`).join("")}</div>
-    <button class="rp-all" data-role="">进入完整工作台（全部功能）</button></div>`;
+    <div class="rp-foot"><button class="rp-all" data-role="">进入完整工作台（全部功能）</button><button class="rp-all" id="rp-selfcheck">开摊前自检</button></div></div>`;
   el.hidden = false;
   $$("#rolepick [data-role]").forEach((b) => b.addEventListener("click", () => setRole(b.dataset.role)));
+  $("#rp-selfcheck").addEventListener("click", () => { setRole(""); go("selfcheck"); });
 }
 
 function setRole(key) {
   role = ROLE_LANES[key] ? key : null;
-  roleStep = 0; taskInquiry = null;
+  roleStep = 0; taskInquiry = null; state.handoff = null; state.handoffHtml = "";
   $("#rolepick")?.setAttribute("hidden", "");
   document.body.classList.toggle("role-mode", !!role);
   document.body.classList.toggle("buyer-view", role === "consumer");
@@ -1429,14 +1583,16 @@ async function boot() {
   renderModelCard();
   const listingEntry = $('[data-go="listing"] .p');
   if (listingEntry) listingEntry.textContent = "一份中文资料生成多平台商品文案，并为每个平台单独选择输出语言。";
-  $$(".product-select").forEach((s) => { s.innerHTML = META.products.map((p) => `<option value="${p.id}">${esc(p.name_zh)}</option>`).join(""); });
+  $$(".product-select").forEach((s) => { s.innerHTML = META.products.map((p) => `<option value="${p.id}">${esc(prodLabel(p))}</option>`).join(""); });
   $("#inq-text").insertAdjacentHTML("afterend", micBar("inq-text", true));
   $("#inq-intent").insertAdjacentHTML("afterend", micBar("inq-intent", false));
   wireMics($("#inq-bench .left"));
   renderSamples(); pickSample(0); renderInquiry();
   renderProducts(); renderListingOptions(); renderListing();
   renderCheckControls();
-  $("#chk-text").value = "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping";
+  $("#chk-text").value = sampleFor($("#chk-product").value);
+  // Switching the product swaps in that product's sample, unless the text was edited by hand.
+  $("#chk-product").addEventListener("change", () => { if (Object.values(META.check_samples || {}).includes($("#chk-text").value)) $("#chk-text").value = sampleFor($("#chk-product").value); });
   $("#chk-out").innerHTML = emptyCard("scan-search", "贴入文案后点“检查”", ["示例里埋了 6 个问题：长度、感叹号、促销用语、主观评价、未持有的认证、没检测过的材料宣称。"]);
   $$("[data-page]").forEach((b) => b.addEventListener("click", () => go(b.dataset.page)));
   $$("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go)));
@@ -1454,6 +1610,12 @@ async function boot() {
   wireTips();
   $("#model-card").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#model-card").click(); } });
   $("#inbox-triage").addEventListener("click", runTriage);
+  $("#inbox-import").addEventListener("click", openImport);
+  $("#agents-dl").addEventListener("click", downloadAgents);
+  $("#kb-recheck").addEventListener("click", recheckSources);
+  $("#sc-run").addEventListener("click", renderSelfcheck);
+  $("#sc-warm").addEventListener("click", warmBooth);
+  $("#sc-test").addEventListener("click", testModel);
   $$("#inbox-tabs button").forEach((b) => b.addEventListener("click", () => showInboxTab(b.dataset.v)));
   $("#eval-fails").addEventListener("change", renderEval);
   $$("#eval-tabs button").forEach((b) => b.addEventListener("click", () => showEvalTab(b.dataset.v)));

@@ -688,3 +688,32 @@ body.buyer-view #lst-out mark{background:none;color:inherit;border:0;box-shadow:
 @media (max-width:1100px){.roleguide{grid-template-columns:minmax(0,1fr);grid-template-areas:"who" "steps" "desc" "acts"}}
 .roleguide{grid-template-areas:"who steps steps" "who desc acts"}
 .rg-acts{align-self:end}
+
+/* ---- 11-01: hand-off check, agents page, booth self-check, rule source check, CSV import */
+.handoff{margin-bottom:16px;border-color:hsl(var(--brand) / .35)}
+.hf-tbl td,.hf-tbl th{padding:5px 12px;font-size:12.5px}.hf-tbl td .small{display:inline;margin-left:6px}.hf-tbl tbody tr{cursor:default}
+.hf-ok{color:hsl(var(--green));font-weight:600}.hf-bad{color:hsl(var(--red));font-weight:600}
+.buyer-view .handoff{display:none}
+.kb-src{display:flex;gap:8px;align-items:flex-start;margin:-4px 0 12px;color:hsl(var(--muted-foreground));line-height:1.6}
+.kb-src .ic{margin-top:3px;flex:none}
+.ag-stats{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.ag-stats>div{display:flex;align-items:baseline;gap:6px;padding:12px 16px;border:1px solid hsl(var(--border));border-radius:12px;background:hsl(var(--card))}
+.ag-stats b{font-size:22px;letter-spacing:-.02em}.ag-stats span{font-size:12.5px;color:hsl(var(--muted-foreground))}
+.ag-stats .ag-model{flex:1;min-width:280px;align-items:flex-start;gap:8px;font-size:12.5px;line-height:1.55}.ag-stats .ag-model b{font-size:13px}
+.ag-wf{padding:10px 0;border-bottom:1px dashed hsl(var(--border))}.ag-wf:last-child{border-bottom:0}
+.ag-wf-h{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.ag-steps{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.ag-steps li{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid hsl(var(--border));border-radius:10px;background:hsl(var(--muted) / .35);font-size:12.5px;max-width:360px}
+.ag-steps li small{display:block;color:hsl(var(--muted-foreground));margin-top:3px;font-size:11.5px;line-height:1.45}
+.ag-dl{display:grid;grid-template-columns:64px 1fr;gap:6px 10px;margin:0 0 10px;font-size:13px}
+.ag-dl dt{color:hsl(var(--muted-foreground))}.ag-dl dd{margin:0}
+.sc-hero .card-b{display:flex;gap:14px;align-items:center}.sc-hero .card-b>.ic{width:28px;height:28px}
+.sc-hero b{display:block;font-size:18px}.sc-hero span{font-size:12.5px;color:hsl(var(--muted-foreground))}
+.sc-hero.ok{border-color:hsl(var(--green) / .4)}.sc-hero.ok .card-b>.ic{color:hsl(var(--green))}
+.sc-hero.bad{border-color:hsl(var(--amber) / .45)}.sc-hero.bad .card-b>.ic{color:hsl(var(--amber))}
+.sc-tbl tbody tr{cursor:default}.sc-tbl td{padding:8px 12px}
+.sc-ok{color:hsl(var(--green))}.sc-bad{color:hsl(var(--red))}.sc-info{color:hsl(var(--muted-foreground))}
+.rp-foot{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.imp p{margin:0;font-size:13px;line-height:1.6}.imp label{display:flex;flex-direction:column;gap:6px}
+.ag-steps .badge{white-space:normal;height:auto;min-height:22px;padding:2px 8px;max-width:140px;flex:none;line-height:1.35}
+.sc-tbl td:nth-child(2){white-space:nowrap}

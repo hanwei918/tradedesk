@@ -52,6 +52,8 @@ class KnowledgeBase:
         self.all_rules_by_id = {r["id"]: r for r in self.all_rules}
         self.catalog = _load(products_path, {"factory": {}, "products": []})
         self.factory = self.catalog.get("factory", {})
+        # A second demo factory (another product category) shows that switching means swapping the card, not the code.
+        self.other_factories = {f["id"]: f for f in self.catalog.get("other_factories", [])}
         self.products = {p["id"]: p for p in self.catalog.get("products", [])}
         self.inquiries = _load(inquiries_path, {"inquiries": []}).get("inquiries", [])
         self.check_map = _load(check_map_path, {})
@@ -61,6 +63,10 @@ class KnowledgeBase:
         if product_id not in self.products:
             raise KeyError(f"未知产品：{product_id}")
         return self.products[product_id]
+
+    def factory_for(self, product):
+        """The factory card a product belongs to; products without factory_id use the default factory."""
+        return self.other_factories.get(product.get("factory_id"), self.factory)
 
     def market_profile(self, market, product_id):
         """What a market added after the US and Mexico needs from one product, or None.

@@ -155,6 +155,8 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
 .vm{padding:12px 0;border-top:1px solid var(--line)}.vm:first-of-type{border-top:0;padding-top:4px}
 .vm b{display:block;font-size:44px;font-weight:700;color:var(--brand);letter-spacing:-.02em;line-height:1.1}
 .vm span{font-size:18px;color:var(--muted);line-height:1.45}
+.pos-t th{font-size:18px;vertical-align:bottom}.pos-t th small,.pos-t td small{font-weight:500;color:var(--muted);font-size:15px}
+.pos-t td{font-size:19px;padding:13px 14px}.pos-t .us{background:var(--brand-soft)}.pos-t th.us{color:var(--brand);font-size:22px}
 .tag{display:inline-block;font-size:15px;font-weight:700;border-radius:6px;padding:2px 8px;letter-spacing:0;margin-right:6px}
 .tag.m{background:var(--brand-soft);color:var(--brand)}.tag.a{background:#f1f5f9;color:var(--muted);border:1px solid var(--line)}
 .t td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -250,7 +252,7 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
         <div><b>③ 出处守卫</b>编号不存在、原文里没有那句话 → 丢弃，界面显示丢了几条</div>
       </div>
       <div class="cov"><span class="lbl" style="margin:0">四类规则 + 资料核对</span><span>目标国合规<small>FTC · 加州 65 · NOM · CE / RoHS · PSE · EAC · SONCAP</small></span><span>平台规则<small>Amazon · 阿里 · TikTok</small></span><span>合同条款<small>Incoterms</small></span><span>商务礼仪<small>墨西哥</small></span><span>资料卡核对<small>认证 · 价格 · 交期 · 付款</small></span></div>
-      <p class="muted" style="font-size:18px;margin:16px 0 0">Python 标准库服务端 + 原生 JS 前端，无需安装依赖 · 模型接口可换（OpenAI 兼容 / Claude）· 77 项自动化测试</p>
+      <p class="muted" style="font-size:18px;margin:16px 0 0">Python 标准库服务端 + 原生 JS 前端，无需安装依赖 · 模型接口可换（OpenAI 兼容 / Claude）· 94 项自动化测试</p>
     </div>
     <div class="card" style="padding:20px 24px"><div class="lbl">异常处理（节选）</div>
       <table class="t"><tr><th>情况</th><th>处理</th></tr>
@@ -362,7 +364,7 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
         <tr><td><b>主图审核员</b></td><td>看图检查主图</td><td>规则编号 + 看到了什么</td></tr>
         <tr><td><b>合规审核员</b></td><td>按知识库审核生成结果</td><td>问题 + 规则编号 + 原文</td></tr>
       </table>
-      <p class="muted" style="font-size:17px;margin:12px 0 0">三种模式：实时 · 录制（实时调用并存缓存）· 回放（不联网）。仓库里的回放缓存用 claude-opus-5-5 录制。</p></div>
+      <p class="muted" style="font-size:17px;margin:12px 0 0">三种模式：实时 · 录制（实时调用并存缓存）· 回放（不联网）。界面“智能体配置”页可看每个智能体的输入、输出、护栏和提示词全文，并导出 JSON。</p></div>
     <div class="card soft" style="padding:22px 28px"><div class="lbl">一次完整调用 · 2026-10-30 23:58 · 实时模式</div>
       <dl class="trace">
         <div class="tr"><dt>触发</dt><dd>业务员点“理解 → 生成 → 校验”</dd></div>
@@ -397,15 +399,31 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
   <div class="foot"><span class="src">实测：eval/cost_run.json 与 app/cache 的 token 用量 × claude-opus-5-5 官方价；docs/demo-runs 的实时记录。测算页：评测与对照 → 降本测算，每一步都列出算式</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">10</span></div>
 </section>
 
+<!-- 10b positioning -->
+<section class="slide">
+  <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span>合规内核</span><span>合规之上</span><span>配置</span><span class="on">价值</span><span>落地</span></div></div>
+  <div class="kicker"><em>09</em>定位：和现有做法比</div>
+  <h2>我们不替代写作工具，做发出前的合规校验层：自动带上工厂资料，每条提示挂出处，回复和上架文案交叉核对</h2>
+  <div class="body"><div class="card pos" style="padding:10px 26px 14px">
+    <table class="t pos-t"><tr><th style="width:250px"></th><th style="width:440px">直接用通用 AI<br><small>ChatGPT 等，业务员现在的常见做法</small></th><th style="width:250px">平台自带的 AI 写作工具</th><th style="width:250px">外包翻译 / 代运营</th><th class="us">TradeDesk</th></tr>
+      <tr><td><b>用不用工厂自己的资料</b><br><small>认证、MOQ、交期、付款</small></td><td>要业务员每次自己贴。<b class="red">不贴时 8 条回复 8 条带红色问题</b>；贴上后红色清零，仍有 20 处待确认（实测）</td><td class="muted">各家不同，没逐个测</td><td>靠人工沟通，资料给多少写多少</td><td class="us">资料卡自动带进每一次生成和检查；改一轮后 <b class="green">3 / 8 条可直接发</b>，待确认 8 处（实测）</td></tr>
+      <tr><td><b>提示有没有出处</b></td><td>没有</td><td class="muted">没测，不下结论</td><td>没有</td><td class="us">挂规则原文和链接，或资料卡字段；没出处的提示被代码丢掉（红队 5 / 5）</td></tr>
+      <tr><td><b>覆盖范围</b></td><td>什么都能写，但不知道平台规则</td><td>只管自己这个平台</td><td>看服务商</td><td class="us">询盘回复 + 11 个上架平台，同一张资料卡</td></tr>
+      <tr><td><b>发出前核对</b></td><td>没有</td><td class="muted">没测，不下结论</td><td>人工自查</td><td class="us">代码规则 + 合规审核员，红黄绿；回复和上架文案逐项交叉核对</td></tr>
+    </table></div>
+    <p class="muted" style="font-size:18px;margin:14px 0 0">别的工具写的文案，也能贴进“文案体检”查。我们只写自己测过的：平台自带工具各家不同，没逐个测，不评价具体产品。</p></div>
+  <div class="foot"><span class="src">实测：app/eval/baseline_run.json（同样 8 条询盘、同一套检查打分）；红队：app/data/redteam.json</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">11</span></div>
+</section>
+
 <!-- 11 roll-out: replicable, deliberate trade-offs -->
 <section class="slide">
   <div class="top"><div class="mark"><i><svg viewBox="0 0 24 24"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></i>TradeDesk<span>出海工作台</span></div><div class="track"><span>摘要</span><span>切入点</span><span>合规内核</span><span>合规之上</span><span>配置</span><span>价值</span><span class="on">落地</span></div></div>
-  <div class="kicker"><em>09</em>可复制与功能取舍</div>
+  <div class="kicker"><em>10</em>可复制与功能取舍</div>
   <h2>换一家同品类工厂只换资料卡，加平台复用整套校验和出处守卫；几件事我们故意不做，因为做了会违规或替商家乱承诺</h2>
   <div class="body"><div class="demo">
     <div class="card" style="padding:22px 32px"><div class="lbl">可复制给别的商家、别的平台（不为演示硬编码）</div>
       <div class="tl">
-        <div class="it"><span class="n">1</span><div><h4>换一家工厂</h4><p>替换 app/data/products.json（工厂信息、价格阶梯、MOQ、交期、认证），代码不用改；换品类时再补这个品类的认证规则，改回复提示词里的一句角色设定</p></div></div>
+        <div class="it"><span class="n">1</span><div><h4>换一家工厂、换品类（已验证）</h4><p>10-31 加了第二家示例工厂：宁海杯壶的 500ml 保温杯。只写资料卡（工厂、认证、价格阶梯、交期），加一个认证名的识别；上架、文案体检、询盘回复直接跑通，原工厂的请求一字不变</p></div></div>
         <div class="it"><span class="n">2</span><div><h4>加一个平台</h4><p>规则写进 app/kb/rules.json（原文、链接、检查方式），加一个生成提示词，在代码里登记平台和预览；代码规则、出处守卫、看板、日志都复用</p></div></div>
         <div class="it"><span class="n">3</span><div><h4>加一个市场（已验证）</h4><p>10-31 新增欧盟、日本、哈萨克斯坦、尼日利亚：加了规则、市场资料和示例询盘，代码加了按国家判断市场；美国、墨西哥的请求一字不变</p></div></div>
         <div class="it"><span class="n">4</span><div><h4>部署</h4><p>Python 标准库，不装依赖；Mac / Windows 双击启动；断网用回放演示</p></div></div>
@@ -419,10 +437,10 @@ table.t{width:100%;border-collapse:collapse;font-size:19px;line-height:1.45}
       <div class="card soft" style="padding:20px 26px"><div class="lbl">数据合规</div><ul class="tight"><li>演示用的工厂、产品、询盘全部虚构</li><li>规则摘自公开页面，每条附链接和日期</li><li>key 只存本机，不进仓库</li></ul></div>
     </div>
   </div></div>
-  <div class="foot"><span class="src">下一步：接入询盘接口、扩充品类认证知识、找宁波工厂试用并用真实询盘复测</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">11</span></div>
+  <div class="foot"><span class="src">已能从 CSV 导入询盘；下一步：接入平台询盘接口、扩充品类认证知识、找宁波工厂试用并用真实询盘复测</span><span>INTERCITY HACK 宁波站 · 赛道二</span><span class="pg">12</span></div>
 </section>
 
-<!-- 12 closing -->
+<!-- 13 closing -->
 <section class="slide dark grid-bg closing">
   <div style="position:relative;padding-top:300px">
     <div class="tagline">TradeDesk 出海工作台</div>

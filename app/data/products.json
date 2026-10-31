@@ -188,6 +188,71 @@
         "杯体分离时自动断电",
         "一次充电约 12 次（工厂内部测试）"
       ]
+    },
+    {
+      "id": "TMB-50V",
+      "factory_id": "NH-CUP",
+      "name_zh": "500ml 双层真空保温杯",
+      "name_en": "500ml Double-Wall Vacuum Insulated Tumbler",
+      "specs": {
+        "capacity_ml": 500,
+        "inner_material": "304 stainless steel",
+        "outer_material": "304 stainless steel, powder coated",
+        "lid_material": "PP plastic",
+        "insulation": "double-wall vacuum",
+        "cold_retention": "about 24 h with ice (factory internal test, no third-party report)",
+        "hot_retention": "about 12 h (factory internal test, no third-party report)",
+        "care": "hand wash only, not dishwasher safe (powder-coated outer wall)",
+        "features": [
+          "slide lid, leak-resistant when closed",
+          "no condensation on the outer wall",
+          "fits most car cup holders"
+        ]
+      },
+      "certifications_held": [
+        "LFGB test report (304 body and PP lid)"
+      ],
+      "certifications_not_held": [
+        "FDA food-contact test report"
+      ],
+      "material_tests": {
+        "BPA": "盖子为 PP 材质，只有原料供应商的 BPA-free 声明，没有成品第三方报告"
+      },
+      "moq_units": 1000,
+      "fob_ningbo_usd": {
+        "1000-2999": 4.1,
+        "3000+": 3.8
+      },
+      "packaging": "white box, 24 units per carton",
+      "selling_points_zh": [
+        "304 不锈钢内外胆",
+        "双层真空：加冰约 24 小时（工厂内部测试，非第三方报告）",
+        "外壁不冒汗",
+        "滑盖，合上防漏",
+        "只能手洗，不能进洗碗机（外壁喷粉）"
+      ]
+    }
+  ],
+  "other_factories": [
+    {
+      "id": "NH-CUP",
+      "name_zh": "宁海杯壶（示例工厂）",
+      "name_en": "Ninghai Drinkware (demo factory)",
+      "category_zh": "不锈钢杯壶",
+      "city": "Ningbo",
+      "port": "Ningbo-Zhoushan",
+      "capacity_units_per_month": 60000,
+      "standard_lead_time_days": 30,
+      "payment_terms_accepted": [
+        "30% T/T deposit, 70% against B/L copy",
+        "L/C at sight"
+      ],
+      "sales_contact_role": "业务员",
+      "services": [
+        "可寄样：样品免费，国际运费由买家承担",
+        "可激光雕刻 logo：1000 个以上免费，以下每个加收 USD 0.20",
+        "只报 FOB 宁波；DDP 需要货代另行报价，工厂不承诺到门价格和时效"
+      ]
     }
   ]
 }

@@ -104,7 +104,7 @@ class Runner:
 
     def _facts(self, product, market=None):
         """Factory and product card, plus what a newer market needs from this product (none for the US or Mexico)."""
-        facts = {"factory": self.kb.factory, "product": product}
+        facts = {"factory": self.kb.factory_for(product), "product": product}
         profile = self.kb.market_profile(market, product["id"]) if market else None
         if profile:
             facts["market"] = profile
@@ -124,7 +124,7 @@ class Runner:
                                for r in llm_rules]
             user = (f"## 平台\n{PLATFORM_NAMES.get(platform, platform)}\n\n"
                     f"## 规则\n{dumps(rules_for_model)}\n\n"
-                    f"## 工厂与产品资料（只用来核对事实，不是待审文本）\n{dumps(self._facts(product, market) if profile else {'factory': self.kb.factory, 'product': product})}\n\n"
+                    f"## 工厂与产品资料（只用来核对事实，不是待审文本）\n{dumps(self._facts(product, market) if profile else {'factory': self.kb.factory_for(product), 'product': product})}\n\n"
                     f"## 待审文本（按字段）\n{dumps(fields)}")
             try:
                 data = self._step(trace, run_id, workflow, f"合规审核 · {platform}", "compliance",
@@ -171,7 +171,8 @@ class Runner:
         if previous:
             parts += [f"## 上一版回复\n{previous.get('reply', '')}", f"## 修改意见\n{instruction}"]
         draft = self._step(trace, run_id, "A 询盘回复", f"生成回复 · 第 {rnd} 轮", "sales",
-                           prompt("reply_inquiry", language_name=LANGUAGE_NAMES[language]),
+                           prompt("reply_inquiry", language_name=LANGUAGE_NAMES[language],
+                                  factory_kind=self.kb.factory_for(product).get("category_zh", "小家电")),
                            "\n\n".join(parts), trigger)
         reply = draft.get("reply", "")
         review = self.review(trace, run_id, "A 询盘回复", "alibaba_rfq", {"reply": reply}, product, trigger, market)
@@ -202,18 +203,24 @@ class Runner:
     def triage(self, payload):
         """Understand every inquiry in the inbox (or the given ids) and score its priority."""
         ids = payload.get("inquiry_ids") or [q["id"] for q in self.kb.inquiries]
-        out = []
+        out, failed = [], []
         for q in self.kb.inquiries:
             if q["id"] not in ids:
                 continue
             run_id = uuid.uuid4().hex[:8]
             trace = []
             product = self.kb.product(q["product_id"])
-            u = self._understand(trace, run_id, "收件箱整理", q["text"].strip(), product, "整理收件箱", q.get("market"))
+            try:
+                u = self._understand(trace, run_id, "收件箱整理", q["text"].strip(), product, "整理收件箱", q.get("market"))
+            except LLMError as exc:  # one inquiry without an answer (e.g. imported, in replay mode) must not stop the rest
+                failed.append({"inquiry_id": q["id"], "reason_zh": str(exc)})
+                continue
             prio = priority(u, product)
             self.inbox.set_triage(q["id"], u, prio)
             out.append({"inquiry_id": q["id"], "priority": prio, "trace": trace})
-        return {"triaged": out}
+        if failed and not out:
+            raise LLMError(failed[0]["reason_zh"])
+        return {"triaged": out, "failed": failed}
 
     @staticmethod
     def _guard_understanding(data, inquiry_text):
@@ -246,7 +253,7 @@ class Runner:
         market = MARKET_BY_LANGUAGE.get(q.get("language"), "US")
         user = self.BASELINE_ASK + q["text"].strip()
         if variant == "with_facts":
-            user += (f"\n\n我们工厂和产品的资料如下，请按资料回复：\n{dumps({'factory': self.kb.factory, 'product': product})}"
+            user += (f"\n\n我们工厂和产品的资料如下，请按资料回复：\n{dumps({'factory': self.kb.factory_for(product), 'product': product})}"
                      f"\n\n我的意图：{q.get('intent_zh', '')}")
         elif variant != "plain":
             raise ValueError("variant 只能是 plain 或 with_facts")

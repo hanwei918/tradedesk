@@ -1,0 +1,7 @@
+{
+  "note": "文案体检页的示例文案（按产品）。故意埋了问题，用来演示检查；回放缓存按这段原文录制，改动后需要重新录制。",
+  "samples": {
+    "KET-17S": "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping",
+    "TMB-50V": "BEST SELLER! [Brand] 500ml Insulated Tumbler, FDA Approved, BPA Free Lid, Dishwasher Safe, Keeps Ice 48 Hours"
+  }
+}

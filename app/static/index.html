@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=25">
+<link rel="stylesheet" href="style.css?v=26">
 <script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -28,6 +28,8 @@
       <button data-page="eval"><svg class="ic"><use href="#i-shield-check"/></svg><span class="t">评测与对照</span><span class="kbd">7</span></button>
       <button data-page="kb"><svg class="ic"><use href="#i-book-open-check"/></svg><span class="t">规则知识库</span><span class="kbd">8</span></button>
       <button data-page="logs"><svg class="ic"><use href="#i-scroll-text"/></svg><span class="t">调用日志</span><span class="kbd">9</span></button>
+      <button data-page="agents"><svg class="ic"><use href="#i-cpu"/></svg><span class="t">智能体配置</span></button>
+      <button data-page="selfcheck"><svg class="ic"><use href="#i-circle-check-big"/></svg><span class="t">开摊自检</span></button>
       <button data-page="fair"><svg class="ic"><use href="#i-zap"/></svg><span class="t">游园会找茬</span></button>
     </nav>
     <div class="side-foot">
@@ -100,6 +102,7 @@
       <section class="page" id="page-inbox">
         <div class="page-head"><div><h1>询盘收件箱</h1><p>先回最值得跟的买家。优先级由代码按公开的公式计算，每一分都能看到依据。</p></div>
           <div class="row"><div class="seg" id="inbox-tabs"><button class="on" data-v="list">收件箱</button><button data-v="tasks">协同任务 <span id="task-count"></span></button></div>
+          <button class="btn" id="inbox-import" title="从 CSV 文件导入询盘"><svg class="ic"><use href="#i-database"/></svg>导入 CSV</button>
           <button class="btn primary" id="inbox-triage"><svg class="ic"><use href="#i-sparkles"/></svg>整理收件箱</button></div></div>
         <div id="inbox-progress"></div>
         <div id="inbox-list"></div>
@@ -180,9 +183,27 @@
       <!-- ================= kb ================= -->
       <section class="page" id="page-kb">
         <div class="page-head"><div><h1>规则知识库</h1><p id="kb-note"></p></div>
-          <div class="row"><input type="search" id="kb-q" placeholder="搜索编号、规则、原文…" style="width:260px"></div></div>
+          <div class="row"><input type="search" id="kb-q" placeholder="搜索编号、规则、原文…" style="width:260px">
+            <button class="btn" id="kb-recheck" title="重新抓取每条规则的官方页面，看原文还在不在（需联网，不调用模型）"><svg class="ic"><use href="#i-globe"/></svg>重新抓取出处</button></div></div>
+        <div class="kb-src small" id="kb-src"></div>
         <div class="chips" id="kb-cats" style="margin-bottom:12px"></div>
         <div class="card"><table class="tbl"><thead><tr><th>编号</th><th>规则</th><th>分类</th><th>检查方式</th><th>来源</th><th></th></tr></thead><tbody id="kb-body"></tbody></table></div>
+      </section>
+
+      <!-- ================= agents ================= -->
+      <section class="page" id="page-agents">
+        <div class="page-head"><div><h1>智能体配置</h1><p>每个智能体的职责、输入输出、护栏和提示词全文；和 config/agents.json 是同一份配置</p></div>
+          <button class="btn" id="agents-dl"><svg class="ic"><use href="#i-file-text"/></svg>下载配置 JSON</button></div>
+        <div id="agents-out"></div>
+      </section>
+
+      <!-- ================= self-check ================= -->
+      <section class="page" id="page-selfcheck">
+        <div class="page-head"><div><h1>开摊自检</h1><p>开摊前点一下：每条演示路径都在回放模式下离线走一遍，模型、知识库、本地数据逐项检查</p></div>
+          <div class="row"><button class="btn" id="sc-test" title="发一次很小的真实请求，确认 key 和网络（会产生极少费用）"><svg class="ic"><use href="#i-zap"/></svg>测试模型连接</button>
+            <button class="btn" id="sc-warm" title="把演示路径回放进看板、收件箱和调用日志（不联网）"><svg class="ic"><use href="#i-history"/></svg>一键预热</button>
+            <button class="btn primary" id="sc-run"><svg class="ic"><use href="#i-circle-check-big"/></svg>重新检查</button></div></div>
+        <div id="sc-out"></div>
       </section>
 
       <!-- ================= logs ================= -->
@@ -197,6 +218,6 @@
 <aside class="sheet" id="sheet" aria-hidden="true"><div class="sheet-h" id="sheet-h"></div><div class="sheet-b" id="sheet-b"></div><div class="sheet-f" id="sheet-f"></div></aside>
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
-<script src="app.js?v=27"></script>
+<script src="app.js?v=28"></script>
 </body>
 </html>

@@ -1,0 +1,26 @@
+{
+ "request": {
+  "model": "gpt-5.5",
+  "messages": [
+   {
+    "role": "system",
+    "content": "你是外贸合规审核员。下面给你一段待发布的文本，以及一组规则（每条有编号、规则原文摘录和要判断的问题）。\n\n只根据给出的规则判断。另外会给你工厂与产品资料，用来核对待审文本里的价格、条款、材料、认证等事实；资料本身不是待审对象。\n如果待审文本与资料一致、也符合规则，就不要报。对每一个问题：\n- 必须写 `rule_id`：只能是下面列出的规则编号之一。\n- 必须写 `quote`：从待审文本里逐字复制出有问题的那一小段（不超过 20 个词）。\n- 写不出规则编号或原文片段的问题，不要输出。宁可漏报，不要编造。\n- severity：red = 明确违反规则；amber = 有风险、需要人确认。\n- problem_zh / suggestion_zh 用简体中文，suggestion 给出具体改法。\n\n只输出 JSON：\n{\"findings\": [{\"rule_id\": \"...\", \"quote\": \"...\", \"severity\": \"red|amber\", \"problem_zh\": \"...\", \"suggestion_zh\": \"...\"}]}\n如果没有问题：{\"findings\": []}\n"
+   },
+   {
+    "role": "user",
+    "content": "## 平台\nTikTok Shop 墨西哥 · 种草短视频\n\n## 规则\n[\n {\n  \"rule_id\": \"MX-01\",\n  \"title_zh\": \"电器包装信息须用西班牙语（NOM-024-SCFI-2013）\",\n  \"excerpt\": \"en el empaque o envase, de manera clara y legible, como mínimo, los siguientes datos en idioma español\",\n  \"question_zh\": \"面向墨西哥的产品资料或回复，是否提醒包装需用西班牙语标注产品名、进口商名称地址、原产国以及电压/功率/频率？\"\n },\n {\n  \"rule_id\": \"MX-02\",\n  \"title_zh\": \"说明书和警示须用西班牙语\",\n  \"excerpt\": \"Los instructivos y las advertencias deben redactarse en idioma español y en términos comprensibles y legibles\",\n  \"question_zh\": \"回复墨西哥买家时，是否在需要时说明说明书和警示语会提供西班牙语版本，并且没有承诺只提供英文说明书？\"\n },\n {\n  \"rule_id\": \"MX-03\",\n  \"title_zh\": \"电器安全须符合 NOM-003-SCFI-2014\",\n  \"excerpt\": \"aplica a los productos eléctricos que utilizan para su alimentación la energía eléctrica del servicio público\",\n  \"question_zh\": \"文案或回复是否在没有供应商提供 NOM-003 证书的情况下声称产品“已获 NOM 认证/符合 NOM”？\"\n }\n]\n\n## 工厂与产品资料（只用来核对事实，不是待审文本）\n{\n \"factory\": {\n  \"id\": \"NH-CUP\",\n  \"name_zh\": \"宁海杯壶（示例工厂）\",\n  \"name_en\": \"Ninghai Drinkware (demo factory)\",\n  \"category_zh\": \"不锈钢杯壶\",\n  \"city\": \"Ningbo\",\n  \"port\": \"Ningbo-Zhoushan\",\n  \"capacity_units_per_month\": 60000,\n  \"standard_lead_time_days\": 30,\n  \"payment_terms_accepted\": [\n   \"30% T/T deposit, 70% against B/L copy\",\n   \"L/C at sight\"\n  ],\n  \"sales_contact_role\": \"业务员\",\n  \"services\": [\n   \"可寄样：样品免费，国际运费由买家承担\",\n   \"可激光雕刻 logo：1000 个以上免费，以下每个加收 USD 0.20\",\n   \"只报 FOB 宁波；DDP 需要货代另行报价，工厂不承诺到门价格和时效\"\n  ]\n },\n \"product\": {\n  \"id\": \"TMB-50V\",\n  \"factory_id\": \"NH-CUP\",\n  \"name_zh\": \"500ml 双层真空保温杯\",\n  \"name_en\": \"500ml Double-Wall Vacuum Insulated Tumbler\",\n  \"specs\": {\n   \"capacity_ml\": 500,\n   \"inner_material\": \"304 stainless steel\",\n   \"outer_material\": \"304 stainless steel, powder coated\",\n   \"lid_material\": \"PP plastic\",\n   \"insulation\": \"double-wall vacuum\",\n   \"cold_retention\": \"about 24 h with ice (factory internal test, no third-party report)\",\n   \"hot_retention\": \"about 12 h (factory internal test, no third-party report)\",\n   \"care\": \"hand wash only, not dishwasher safe (powder-coated outer wall)\",\n   \"features\": [\n    \"slide lid, leak-resistant when closed\",\n    \"no condensation on the outer wall\",\n    \"fits most car cup holders\"\n   ]\n  },\n  \"certifications_held\": [\n   \"LFGB test report (304 body and PP lid)\"\n  ],\n  \"certifications_not_held\": [\n   \"FDA food-contact test report\"\n  ],\n  \"material_tests\": {\n   \"BPA\": \"盖子为 PP 材质，只有原料供应商的 BPA-free 声明，没有成品第三方报告\"\n  },\n  \"moq_units\": 1000,\n  \"fob_ningbo_usd\": {\n   \"1000-2999\": 4.1,\n   \"3000+\": 3.8\n  },\n  \"packaging\": \"white box, 24 units per carton\",\n  \"selling_points_zh\": [\n   \"304 不锈钢内外胆\",\n   \"双层真空：加冰约 24 小时（工厂内部测试，非第三方报告）\",\n   \"外壁不冒汗\",\n   \"滑盖，合上防漏\",\n   \"只能手洗，不能进洗碗机（外壁喷粉）\"\n  ]\n }\n}\n\n## 待审文本（按字段）\n{\n \"hook\": \"¿Tu vaso deja la mesa toda mojada? Mira esto.\",\n \"script[1]\": \"Este vaso térmico de 500 mililitros tiene interior y exterior de acero inoxidable 304.\",\n \"script[2]\": \"Es de doble pared con aislamiento al vacío; con hielo, el frío dura aproximadamente 24 horas, según pruebas internas de fábrica.\",\n \"script[3]\": \"La tapa corrediza ayuda a evitar derrames cuando está cerrada, y por fuera no se forma condensación.\",\n \"script[4]\": \"Cabe en la mayoría de los portavasos del coche. Ojo: se lava a mano; no va al lavavajillas.\",\n \"caption\": \"Tu bebida fría en un vaso de 500 ml con doble pared al vacío y tapa corrediza. Se lava a mano; no es apto para lavavajillas.\",\n \"hashtags\": \"#VasoTermico #VasoDeAcero #BebidasFrias #AccesoriosParaAuto #TikTokShopMexico #VidaDiaria\"\n}"
+   }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "response_format": {
+   "type": "json_object"
+  },
+  "reasoning_effort": "low"
+ },
+ "content": "{\"findings\": []}",
+ "usage": {
+  "input_tokens": 6032,
+  "output_tokens": 13
+ }
+}

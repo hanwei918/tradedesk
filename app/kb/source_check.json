@@ -1,0 +1,454 @@
+{
+ "checked_at": "2026-10-31 18:59",
+ "seconds": 32.8,
+ "total": 61,
+ "summary": {
+  "found": 24,
+  "browser": 35,
+  "blocked": 2,
+  "missing": 0,
+  "error": 0
+ },
+ "status_zh": {
+  "found": "原文仍在",
+  "browser": "需人工打开核对",
+  "blocked": "网站拒绝程序抓取",
+  "missing": "没找到，需人工复核",
+  "error": "抓取失败"
+ },
+ "detail_zh": {
+  "browser": "页面靠脚本显示、会把程序跳走，或是 PDF：程序看不到正文，建档时已在浏览器或用 pdftotext 逐字核对",
+  "blocked": "网站对程序返回 403 或验证码（不绕过）",
+  "missing": "页面能打开，但找不到这段原文：可能改版了，要人工复核",
+  "error": "网络或证书问题"
+ },
+ "results": [
+  {
+   "id": "AMZ-01",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AMZ-02",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AMZ-03",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AMZ-04",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AMZ-05",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/GX5L8BF8GLMML6CX",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AMZ-06",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G200390640",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AMZ-07",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G200390640",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AMZ-DE-01",
+   "url": "https://sellercentral.amazon.de/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AMZ-JP-01",
+   "url": "https://sellercentral.amazon.co.jp/help/hub/reference/external/GYTR6SYGFA5E3EQC",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "ALI-01",
+   "url": "https://rule.alibaba.com/rule/detail/11000682.htm",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "ALI-02",
+   "url": "https://rule.alibaba.com/rule/detail/11000682.htm",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "ALI-03",
+   "url": "https://rule.alibaba.com/rule/detail/2063.htm",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "TT-01",
+   "url": "https://seller-mx.tiktok.com/university/essay?knowledge_id=8289533054535425&lang=es-419",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "TT-02",
+   "url": "https://seller-mx.tiktok.com/university/essay?knowledge_id=8289533054535425&lang=es-419",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "TT-03",
+   "url": "https://seller-mx.tiktok.com/university/essay?knowledge_id=8289533054535425&lang=es-419",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "US-01",
+   "url": "https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-16?part=260&section=260.4",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "US-02",
+   "url": "https://www.ecfr.gov/api/renderer/v1/content/enhanced/current/title-16?part=323",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "US-03",
+   "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25602",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "US-04",
+   "url": "https://www.law.cornell.edu/regulations/california/27-CCR-25603",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "MX-01",
+   "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "MX-02",
+   "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/024scfi2013.pdf",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "MX-03",
+   "url": "https://platiica.economia.gob.mx/wp-content/uploads/sites/2/PDF_Normas_Publicas/003scfi2015.pdf",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "INC-01",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "INC-02",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "INC-03",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-fas-or-fob/",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "INC-04",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-cfr-or-cif/",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "INC-05",
+   "url": "https://academy.iccwbo.org/incoterms/article/incoterms-2020-cfr-or-cif/",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "CUL-01",
+   "url": "https://gringogazette.com/doing-business-in-mexico-dont-get-lost-in-translation/",
+   "verified_by_hand": "2026-10-26",
+   "status": "blocked",
+   "http": 403
+  },
+  {
+   "id": "CUL-02",
+   "url": "https://gringogazette.com/doing-business-in-mexico-dont-get-lost-in-translation/",
+   "verified_by_hand": "2026-10-26",
+   "status": "blocked",
+   "http": 403
+  },
+  {
+   "id": "CUL-03",
+   "url": "https://cibtvisas.com/blog/business-etiquette-mexico",
+   "verified_by_hand": "2026-10-26",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "IMG-01",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-02",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-03",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-04",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-05",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-06",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-07",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-08",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-09",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "IMG-10",
+   "url": "https://sellercentral.amazon.com/help/hub/reference/external/G1881",
+   "verified_by_hand": "2026-10-26",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "EU-01",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0035",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 202
+  },
+  {
+   "id": "EU-02",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32011L0065",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 202
+  },
+  {
+   "id": "JP-01",
+   "url": "https://www.meti.go.jp/english/policy/economy/consumer/pse/",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "JP-02",
+   "url": "https://www.meti.go.jp/english/policy/economy/consumer/pse/",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "EA-01",
+   "url": "https://eec.eaeunion.org/upload/medialibrary/269/TR-TS-Downvolt.pdf",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "EA-02",
+   "url": "https://eec.eaeunion.org/upload/medialibrary/269/TR-TS-Downvolt.pdf",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "NG-01",
+   "url": "https://son.gov.ng/soncap-faq/",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "EBAY-01",
+   "url": "https://www.ebay.com/help/selling/listings/listing-tips/optimising-listings-best-match?id=4166",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "EBAY-02",
+   "url": "https://www.ebay.com/help/policies/listing-policies/search-manipulation-policy?id=4243",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "EBAY-03",
+   "url": "https://www.ebay.com/help/policies/payment-policies/offering-buy-sell-outside-ebay-policy?id=4272",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "ETSY-01",
+   "url": "https://help.etsy.com/hc/en-us/articles/115015628707-How-to-Create-a-Listing",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "ETSY-02",
+   "url": "https://help.etsy.com/hc/en-us/articles/23948763872151-Does-Etsy-Allow-Drop-Shipping-or-Reselling",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "WMT-01",
+   "url": "https://marketplacelearn.walmart.com/guides/Item%20setup/Item%20content,%20imagery,%20and%20media/Product-Detail-Page:-overview",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "WMT-02",
+   "url": "https://marketplacelearn.walmart.com/guides/Item%20setup/Item%20content,%20imagery,%20and%20media/Product-Detail-Page:-overview",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "WMT-03",
+   "url": "https://marketplacelearn.walmart.com/guides/Item%20setup/Item%20content,%20imagery,%20and%20media/Product-Detail-Page:-overview",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "ML-01",
+   "url": "https://developers.mercadolibre.com.mx/es_ar/publica-productos",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "ML-02",
+   "url": "https://developers.mercadolibre.com.mx/es_ar/publica-productos",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "ML-03",
+   "url": "https://www.mercadolibre.com.mx/seguro_publicacion.html",
+   "verified_by_hand": "2026-10-31",
+   "status": "found",
+   "http": 200
+  },
+  {
+   "id": "AE-01",
+   "url": "https://rule.aliexpress.com/rule-channels/36963666/122523152",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AE-02",
+   "url": "https://rule.aliexpress.com/rule-channels/36963666/122523152",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  },
+  {
+   "id": "AE-03",
+   "url": "https://rule.aliexpress.com/rule-channels/36963666/122523152",
+   "verified_by_hand": "2026-10-31",
+   "status": "browser",
+   "http": 200
+  }
+ ]
+}

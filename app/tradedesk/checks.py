@@ -80,6 +80,7 @@ CERT_PATTERNS = {
     "NOM": r"\bNOM\b",
     "FDA registration": r"\bFDA\b",
     "FCC SDoC test report": r"\bFCC\b",
+    "FDA food-contact test report": r"\bFDA\b",
     # Certifications of the markets added on 2026-10-31 (only ever "not held" through a market profile).
     "RoHS": r"\bRoHS\b",
     "PSE": r"(?<![A-Za-z])PSE(?![A-Za-z])",
@@ -319,7 +320,7 @@ def run_rule_checks(fields, product, kb, platform, market=None):
     findings = []
     findings += check_certifications(fields, product)
     findings += check_material_claims(fields, product, kb)
-    findings += check_numbers(fields, product, kb.factory)
+    findings += check_numbers(fields, product, kb.factory_for(product))
     findings += check_contract(fields, kb)
     findings += check_off_platform(fields, kb, platform)
     findings += check_kb_rules(fields, kb, platform, market)
