@@ -1,0 +1,26 @@
+{
+ "request": {
+  "model": "gpt-5.5",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You are an experienced AliExpress marketplace operator writing an English product listing.\nKeep `notes_zh` in Simplified Chinese. Write a clear title, short description, five factual benefits, full description, and relevant search keywords. Use only supplied product facts; do not invent certifications, guarantees, specifications, prices, or delivery promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+   },
+   {
+    "role": "user",
+    "content": "## 产品资料（中文）\n{\n \"id\": \"KET-17S\",\n \"name_zh\": \"1.7L 不锈钢电热水壶\",\n \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n \"specs\": {\n  \"capacity_l\": 1.7,\n  \"power_w_us\": 1500,\n  \"voltage_us\": \"120V 60Hz\",\n  \"power_w_mx\": 1500,\n  \"voltage_mx\": \"127V 60Hz\",\n  \"inner_material\": \"304 stainless steel\",\n  \"lid_handle_material\": \"PP plastic\",\n  \"features\": [\n   \"auto shut-off\",\n   \"boil-dry protection\",\n   \"360° swivel base\",\n   \"concealed heating element\"\n  ]\n },\n \"certifications_held\": [\n  \"CB report (IEC 60335-2-15)\",\n  \"CE (LVD/EMC)\"\n ],\n \"certifications_not_held\": [\n  \"UL\",\n  \"ETL\",\n  \"NOM\",\n  \"FDA registration\"\n ],\n \"material_tests\": {\n  \"BPA\": \"未做 BPA 检测报告\",\n  \"LFGB\": \"未做\"\n },\n \"moq_units\": 500,\n \"fob_ningbo_usd\": {\n  \"500-1999\": 9.8,\n  \"2000-4999\": 9.2,\n  \"5000+\": 8.7\n },\n \"packaging\": \"color box, 6 units per carton\",\n \"selling_points_zh\": [\n  \"304 不锈钢内胆\",\n  \"干烧自动断电\",\n  \"360° 旋转底座\",\n  \"隐藏式发热盘，好清洁\",\n  \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n ]\n}\n\n## 平台规则（知识库）\n[\n {\n  \"id\": \"AE-01\",\n  \"rule_zh\": \"《全球速卖通商品发布规范》（北京时间 2026-04-29 修订）列出标题禁止情形，其中包括标题带有联系方式。\"\n },\n {\n  \"id\": \"AE-02\",\n  \"rule_zh\": \"《全球速卖通商品发布规范》：不得以任何明示或暗示的方式，在商品描述等页面引导买家跳转或访问平台以外的链接。\"\n },\n {\n  \"id\": \"AE-03\",\n  \"rule_zh\": \"《全球速卖通商品发布规范》禁止标题没有明确商品名、堆砌商品名或修饰词、出现与商品无关的字眼、与图片或详细描述不符等情况，需要人工或模型判断。\"\n }\n]"
+   }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "response_format": {
+   "type": "json_object"
+  },
+  "reasoning_effort": "low"
+ },
+ "content": "{\"title\":\"1.7L Stainless Steel Electric Kettle with Auto Shut-Off and 360° Swivel Base\",\"short_description\":\"A 1.7L electric kettle with a 304 stainless steel inner body, concealed heating element, auto shut-off and boil-dry protection.\",\"bullets\":[\"1.7L capacity for boiling water.\",\"304 stainless steel inner body.\",\"Auto shut-off and boil-dry protection.\",\"360° swivel base for placement from different directions.\",\"Concealed heating element for easier cleaning; lid and handle are made of PP plastic.\"],\"description\":\"This 1.7L stainless steel electric kettle has a 304 stainless steel inner body and a concealed heating element. It features auto shut-off, boil-dry protection and a 360° swivel base. The lid and handle are made of PP plastic.\\n\\nElectrical versions: US version, 120V 60Hz, 1500W; Mexico version, 127V 60Hz, 1500W. The factory reports that 1.7L takes about 5 minutes to boil in internal testing; this is not a third-party test result.\",\"keywords\":[\"1.7L electric kettle\",\"stainless steel kettle\",\"electric water kettle\"],\"notes_zh\":\"标题明确商品名称和容量，未加入联系方式、站外引流或无关词。仅使用已提供的产品事实；约5分钟烧开为工厂内部测试结果，已注明非第三方报告。认证、价格、起订量及包装信息未用于面向消费者的商品文案。\"}",
+ "usage": {
+  "input_tokens": 5243,
+  "output_tokens": 329
+ }
+}

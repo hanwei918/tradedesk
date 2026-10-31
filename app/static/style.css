@@ -617,3 +617,49 @@ input.bad{border-color:hsl(var(--red));box-shadow:0 0 0 3px hsl(var(--red) / .15
 .btn.mic.on .ic{animation:micpulse 1.1s ease-in-out infinite}
 @keyframes micpulse{0%,100%{opacity:1}50%{opacity:.35}}
 .composer .btn.mic{height:36px;width:36px;flex:none}
+
+/* ---------- role mode (booth): pick a role, walk its lane ---------- */
+.rolepick{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:24px;overflow:auto;color:#cbd5e1;
+  background:radial-gradient(60% 50% at 100% 0%,rgba(59,130,246,.45),transparent 70%),radial-gradient(55% 45% at 0% 100%,rgba(34,211,238,.25),transparent 70%),radial-gradient(40% 40% at 0% 0%,rgba(167,139,250,.25),transparent 70%),#050816}
+.rolepick[hidden]{display:none}
+.rp-inner{width:min(1120px,100%)}
+.rp-kick{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.16em;color:#22d3ee;border:1px solid rgba(34,211,238,.45);border-radius:999px;padding:4px 12px;background:rgba(34,211,238,.08)}
+.rolepick h1{font-size:46px;line-height:1.15;color:#fff;margin:16px 0 8px;letter-spacing:-.02em}
+.rolepick p{margin:0 0 24px;font-size:16px;line-height:1.6;color:#cbd5e1}
+.rp-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.rp-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:8px;padding:22px;border-radius:18px;border:1px solid rgba(148,163,255,.25);background:rgba(255,255,255,.05);transition:transform .15s,border-color .15s,background .15s}
+.rp-card:hover,.rp-card:focus-visible{transform:translateY(-3px);background:rgba(255,255,255,.09)}
+.rp-card b{font-size:26px;color:#fff;line-height:1.2}
+.rp-card small{font-size:14px;color:#8b98b8}
+.rp-ic{width:54px;height:54px;border-radius:15px;display:grid;place-items:center;font-size:27px;font-weight:800;color:#fff}
+.rp-path{display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.45;color:#e2e8f0;margin-top:6px}
+.rp-path i{font-style:normal;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;background:rgba(255,255,255,.1);font-size:12px;font-weight:700;margin-right:8px}
+.rp-out{font-size:13.5px;line-height:1.5;color:#cbd5e1;border-top:1px dashed rgba(255,255,255,.16);padding-top:10px;margin-top:auto}
+.rp-card.merchant .rp-ic{background:linear-gradient(140deg,#3b82f6,#1d4ed8);box-shadow:0 0 22px rgba(59,130,246,.5)}.rp-card.merchant:hover{border-color:#3b82f6}
+.rp-card.reviewer .rp-ic{background:linear-gradient(140deg,#a78bfa,#7c3aed);box-shadow:0 0 22px rgba(167,139,250,.5)}.rp-card.reviewer:hover{border-color:#a78bfa}
+.rp-card.consumer .rp-ic{background:linear-gradient(140deg,#22d3ee,#0891b2);box-shadow:0 0 22px rgba(34,211,238,.45)}.rp-card.consumer:hover{border-color:#22d3ee}
+.rp-all{all:unset;cursor:pointer;margin-top:20px;font-size:14px;color:#8b98b8;text-decoration:underline;text-underline-offset:3px}
+.rp-all:hover{color:#fff}
+@media (max-width:860px){.rp-cards{grid-template-columns:minmax(0,1fr)}.rolepick h1{font-size:32px}}
+.roleguide{position:sticky;top:56px;z-index:4;display:grid;grid-template-columns:auto minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:center;
+  padding:12px 32px;border-bottom:1px solid hsl(var(--border));background:hsl(var(--card));box-shadow:0 6px 18px -14px rgba(11,19,36,.5)}
+.roleguide[hidden]{display:none}
+.rg-who{display:flex;align-items:center;gap:10px}
+.rg-who b{display:block;font-size:15px}.rg-who small{display:block;font-size:12px;color:hsl(var(--muted-foreground))}
+.rg-ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:19px;flex:none}
+.rg-who.merchant .rg-ic{background:linear-gradient(140deg,#3b82f6,#1d4ed8)}.rg-who.reviewer .rg-ic{background:linear-gradient(140deg,#a78bfa,#7c3aed)}.rg-who.consumer .rg-ic{background:linear-gradient(140deg,#22d3ee,#0891b2)}
+.rg-steps{list-style:none;margin:0;padding:0;display:flex;gap:6px;flex-wrap:wrap}
+.rg-steps button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-size:13px;padding:6px 10px;border-radius:9px;border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground))}
+.rg-steps button:hover{border-color:hsl(var(--brand))}
+.rg-steps i{font-style:normal;display:inline-grid;place-items:center;width:19px;height:19px;border-radius:6px;background:hsl(var(--muted));font-size:11.5px;font-weight:700}
+.rg-steps .now button{border-color:hsl(var(--brand));color:hsl(var(--foreground));background:hsl(var(--brand-soft));font-weight:600}
+.rg-steps .now i{background:hsl(var(--brand));color:#fff}
+.rg-steps .done i{background:hsl(var(--green, 142 71% 45%));color:#fff}
+.rg-now p{margin:0 0 8px;font-size:13px;line-height:1.5;color:hsl(var(--muted-foreground))}
+.rg-now p b{display:block;font-size:14px;color:hsl(var(--foreground));margin-bottom:2px}
+.rg-now .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rg-done{font-size:13px;font-weight:600;color:hsl(var(--green, 142 71% 35%))}
+.roleguide.busy .rg-now p::after{content:"  · 运行中…";color:hsl(var(--brand))}
+body.role-mode #tour-btn{display:none}
+@media (max-width:1100px){.roleguide{grid-template-columns:minmax(0,1fr);gap:10px;padding:10px 16px}}
+.nav button[hidden],.nav-label[hidden]{display:none}

@@ -1,0 +1,26 @@
+{
+ "request": {
+  "model": "gpt-5.5",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You are an experienced Amazon Germany marketplace operator writing a product listing in German.\nUse natural German suitable for a German-language product detail page. Keep `notes_zh` in Simplified Chinese.\n\nWrite a concise title, five factual benefit-led bullets, a 2-3 paragraph description, and search terms. Do not invent local laws, certifications, guarantees, product specifications, prices, or shipping promises. Use only the supplied factory and product facts. Never claim a certification or test that the factory does not hold. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"search_terms\":\"...\",\"notes_zh\":\"...\"}\n"
+   },
+   {
+    "role": "user",
+    "content": "## 产品资料（中文）\n{\n \"id\": \"KET-17S\",\n \"name_zh\": \"1.7L 不锈钢电热水壶\",\n \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n \"specs\": {\n  \"capacity_l\": 1.7,\n  \"power_w_us\": 1500,\n  \"voltage_us\": \"120V 60Hz\",\n  \"power_w_mx\": 1500,\n  \"voltage_mx\": \"127V 60Hz\",\n  \"inner_material\": \"304 stainless steel\",\n  \"lid_handle_material\": \"PP plastic\",\n  \"features\": [\n   \"auto shut-off\",\n   \"boil-dry protection\",\n   \"360° swivel base\",\n   \"concealed heating element\"\n  ]\n },\n \"certifications_held\": [\n  \"CB report (IEC 60335-2-15)\",\n  \"CE (LVD/EMC)\"\n ],\n \"certifications_not_held\": [\n  \"UL\",\n  \"ETL\",\n  \"NOM\",\n  \"FDA registration\"\n ],\n \"material_tests\": {\n  \"BPA\": \"未做 BPA 检测报告\",\n  \"LFGB\": \"未做\"\n },\n \"moq_units\": 500,\n \"fob_ningbo_usd\": {\n  \"500-1999\": 9.8,\n  \"2000-4999\": 9.2,\n  \"5000+\": 8.7\n },\n \"packaging\": \"color box, 6 units per carton\",\n \"selling_points_zh\": [\n  \"304 不锈钢内胆\",\n  \"干烧自动断电\",\n  \"360° 旋转底座\",\n  \"隐藏式发热盘，好清洁\",\n  \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n ]\n}\n\n## 平台规则（知识库）\n[\n {\n  \"id\": \"AMZ-01\",\n  \"rule_zh\": \"亚马逊美国站现行规则：商品标题（Item name）含空格最多 75 个字符，适用于除媒体类以外的所有品类；放不下的卖点可写进 125 字符的 Item highlights。注意：网上很多文章还写着旧的 200 字符上限，2026-10-26 抓取的官方页面已是 75。\"\n },\n {\n  \"id\": \"AMZ-02\",\n  \"rule_zh\": \"标题不得出现 ! $ ? _ { } ^ ¬ ¦ 这些字符（品牌名本身含有的除外，应填到 Brand 字段）；~ # < > * 只能用于型号或尺寸等特定场景，不能做装饰。\"\n },\n {\n  \"id\": \"AMZ-03\",\n  \"rule_zh\": \"标题里不能写促销话术，官方举例是“free shipping”和“100% quality guaranteed”。\"\n },\n {\n  \"id\": \"AMZ-04\",\n  \"rule_zh\": \"官方最佳实践把“Hot Item”“Best seller”列为主观评价，标题里不应使用；不合规示例里也出现了全大写和 ★ 装饰。\"\n },\n {\n  \"id\": \"AMZ-DE-01\",\n  \"rule_zh\": \"亚马逊德国站的标题规则页面把德语促销用语列为示例：标题不得包含“kostenloser Versand”（免运费）、“100%ige Qualitätsgarantie”（百分百质量保证）这类说法。\"\n },\n {\n  \"id\": \"EU-01\",\n  \"rule_zh\": \"低电压指令 2014/35/EU 第 17 条要求把 CE 标志清晰、牢固地加贴在电器或其铭牌上；CE 只代表产品符合所声明的那些指令。资料卡写明的 CE 只覆盖 LVD/EMC，回复不能把它说成已经涵盖 RoHS 等其他要求。\"\n },\n {\n  \"id\": \"EU-02\",\n  \"rule_zh\": \"RoHS 指令 2011/65/EU 第 4 条要求投放欧盟市场的电子电气设备不含附件 II 所列物质（铅、汞、镉、六价铬、多溴联苯、多溴二苯醚等，按均质材料中的最大浓度限值）。没有检测报告时，不能声称产品“符合 RoHS”。\"\n }\n]"
+   }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "response_format": {
+   "type": "json_object"
+  },
+  "reasoning_effort": "low"
+ },
+ "content": "{\"title\":\"Edelstahl Wasserkocher 1,7 l mit 304-Edelstahl-Innenraum und 360°-Sockel\",\"bullets\":[\"1,7 l Fassungsvermögen: Bereitet Wasser für mehrere Tassen oder zum Kochen größerer Mengen auf einmal zu.\",\"Innenraum aus 304-Edelstahl: Robuste Innenfläche aus Edelstahl; Deckel und Griff bestehen aus PP-Kunststoff.\",\"Automatische Abschaltung und Trockengehschutz: Schaltet sich nach dem Erhitzen automatisch ab und bietet Schutz, wenn das Gerät ohne ausreichend Wasser eingeschaltet wird.\",\"360°-Sockel: Der Wasserkocher lässt sich auf dem Sockel in verschiedenen Ausrichtungen aufsetzen.\",\"Verdecktes Heizelement: Das Heizelement liegt unter der Innenfläche und erleichtert die Reinigung des Wasserkochers.\"] ,\"description\":\"Der Wasserkocher KET-17S fasst 1,7 l und hat einen Innenraum aus 304-Edelstahl. Deckel und Griff sind aus PP-Kunststoff gefertigt. Das verdeckte Heizelement ist unter der Innenfläche angeordnet und erleichtert die Reinigung.\\n\\nFür den täglichen Gebrauch verfügt das Gerät über eine automatische Abschaltung und einen Trockengehschutz. Der 360°-Sockel ermöglicht das Aufsetzen in verschiedenen Ausrichtungen.\",\"search_terms\":\"wasserkocher edelstahl 1,7 liter 304 inox elektrischer wasserkocher küchenwasserkocher verdecktes heizelement 360 grad sockel trockengehschutz\",\"notes_zh\":\"标题采用德语商品名，并突出容量、304不锈钢内胆和360°底座。未写入约5分钟烧开时间，因为该数据来自工厂内部测试；未声称RoHS、UL、ETL、NOM、FDA、BPA或LFGB相关认证或检测。\"}",
+ "usage": {
+  "input_tokens": 5685,
+  "output_tokens": 395
+ }
+}

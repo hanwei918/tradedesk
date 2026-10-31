@@ -1,0 +1,26 @@
+{
+ "request": {
+  "model": "gpt-5.5",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You are an experienced Shopify storefront content operator writing an English product page.\nKeep `notes_zh` in Simplified Chinese. Present the product's supplied features clearly in a title, short introduction, five factual bullets, longer description, and search keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+   },
+   {
+    "role": "user",
+    "content": "## 产品资料（中文）\n{\n \"id\": \"KET-17S\",\n \"name_zh\": \"1.7L 不锈钢电热水壶\",\n \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n \"specs\": {\n  \"capacity_l\": 1.7,\n  \"power_w_us\": 1500,\n  \"voltage_us\": \"120V 60Hz\",\n  \"power_w_mx\": 1500,\n  \"voltage_mx\": \"127V 60Hz\",\n  \"inner_material\": \"304 stainless steel\",\n  \"lid_handle_material\": \"PP plastic\",\n  \"features\": [\n   \"auto shut-off\",\n   \"boil-dry protection\",\n   \"360° swivel base\",\n   \"concealed heating element\"\n  ]\n },\n \"certifications_held\": [\n  \"CB report (IEC 60335-2-15)\",\n  \"CE (LVD/EMC)\"\n ],\n \"certifications_not_held\": [\n  \"UL\",\n  \"ETL\",\n  \"NOM\",\n  \"FDA registration\"\n ],\n \"material_tests\": {\n  \"BPA\": \"未做 BPA 检测报告\",\n  \"LFGB\": \"未做\"\n },\n \"moq_units\": 500,\n \"fob_ningbo_usd\": {\n  \"500-1999\": 9.8,\n  \"2000-4999\": 9.2,\n  \"5000+\": 8.7\n },\n \"packaging\": \"color box, 6 units per carton\",\n \"selling_points_zh\": [\n  \"304 不锈钢内胆\",\n  \"干烧自动断电\",\n  \"360° 旋转底座\",\n  \"隐藏式发热盘，好清洁\",\n  \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n ]\n}\n\n## 平台规则（知识库）\n[]"
+   }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "response_format": {
+   "type": "json_object"
+  },
+  "reasoning_effort": "low"
+ },
+ "content": "{\"title\":\"1.7L Stainless Steel Electric Kettle with 304 Stainless Steel Interior\",\"short_description\":\"A 1.7L electric kettle with a 304 stainless steel interior, concealed heating element, and 360° swivel base. Features automatic shut-off and boil-dry protection.\",\"bullets\":[\"1.7L capacity; approximately 5 minutes to boil 1.7L in internal factory testing, not a third-party report.\",\"304 stainless steel interior; lid and handle are made of PP plastic.\",\"Automatic shut-off and boil-dry protection.\",\"Concealed heating element for easier cleaning.\",\"360° swivel base. Rated at 1500W, 120V 60Hz for the US and 1500W, 127V 60Hz for Mexico.\"],\"description\":\"Designed for everyday boiling, this 1.7L electric kettle has a 304 stainless steel interior and a concealed heating element that is easier to clean. Its 360° swivel base supports convenient placement, while automatic shut-off and boil-dry protection are built-in features. The lid and handle are made of PP plastic. In internal factory testing, the kettle boiled 1.7L of water in approximately 5 minutes; this result is not based on a third-party report. Electrical ratings are 1500W, 120V 60Hz for the US and 1500W, 127V 60Hz for Mexico.\",\"keywords\":[\"1.7L electric kettle\",\"304 stainless steel kettle\",\"electric kettle with boil-dry protection\"],\"notes_zh\":\"已按提供资料整理英文商品页，保留约5分钟烧开时间为工厂内部测试且非第三方报告的说明。未添加未持有的认证、价格、起订量或运输承诺。\"}",
+ "usage": {
+  "input_tokens": 5060,
+  "output_tokens": 373
+ }
+}

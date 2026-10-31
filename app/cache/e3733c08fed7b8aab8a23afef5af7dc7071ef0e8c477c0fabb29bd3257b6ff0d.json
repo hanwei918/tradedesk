@@ -1,0 +1,26 @@
+{
+ "request": {
+  "model": "gpt-5.5",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You are an experienced Mercado Libre Mexico marketplace operator writing a product listing in Mexican Spanish.\nUse natural Mexican Spanish. Keep `notes_zh` in Simplified Chinese. Write a clear title, short description, five factual benefits, full description, and relevant Spanish keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+   },
+   {
+    "role": "user",
+    "content": "## 产品资料（中文）\n{\n \"id\": \"KET-17S\",\n \"name_zh\": \"1.7L 不锈钢电热水壶\",\n \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n \"specs\": {\n  \"capacity_l\": 1.7,\n  \"power_w_us\": 1500,\n  \"voltage_us\": \"120V 60Hz\",\n  \"power_w_mx\": 1500,\n  \"voltage_mx\": \"127V 60Hz\",\n  \"inner_material\": \"304 stainless steel\",\n  \"lid_handle_material\": \"PP plastic\",\n  \"features\": [\n   \"auto shut-off\",\n   \"boil-dry protection\",\n   \"360° swivel base\",\n   \"concealed heating element\"\n  ]\n },\n \"certifications_held\": [\n  \"CB report (IEC 60335-2-15)\",\n  \"CE (LVD/EMC)\"\n ],\n \"certifications_not_held\": [\n  \"UL\",\n  \"ETL\",\n  \"NOM\",\n  \"FDA registration\"\n ],\n \"material_tests\": {\n  \"BPA\": \"未做 BPA 检测报告\",\n  \"LFGB\": \"未做\"\n },\n \"moq_units\": 500,\n \"fob_ningbo_usd\": {\n  \"500-1999\": 9.8,\n  \"2000-4999\": 9.2,\n  \"5000+\": 8.7\n },\n \"packaging\": \"color box, 6 units per carton\",\n \"selling_points_zh\": [\n  \"304 不锈钢内胆\",\n  \"干烧自动断电\",\n  \"360° 旋转底座\",\n  \"隐藏式发热盘，好清洁\",\n  \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n ]\n}\n\n## 平台规则（知识库）\n[\n {\n  \"id\": \"ML-01\",\n  \"rule_zh\": \"Mercado Libre 开发者文档说明，标题长度上限由商品所在类目决定（max_title_length）。2026-10-31 查询官方类目接口：墨西哥站“Teteras Eléctricas”（MLM120037）的 max_title_length 是 60；空气炸锅、熨烫、榨汁类目查到的也是 60。\"\n },\n {\n  \"id\": \"ML-02\",\n  \"rule_zh\": \"Mercado Libre 开发者文档的标题建议：不要在标题里写其他优惠信息，例如退货、免运费（envío gratis）或分期付款（pagos en cuotas）。原文列在“避免违规”的建议里。\"\n },\n {\n  \"id\": \"ML-03\",\n  \"rule_zh\": \"Mercado Libre 墨西哥《Políticas de Publicación》禁止在描述、图片、问答和昵称里放联系方式，并定义联系方式包括邮箱、地址、邮编、电话或传真、银行信息以及网址。\"\n },\n {\n  \"id\": \"MX-01\",\n  \"rule_zh\": \"电器、电子产品和家用电器在墨西哥销售时，包装或外箱上须清晰标出以下西班牙语信息：产品名称或图示、墨西哥制造商或进口商的名称和地址、原产国（如“Hecho en China”），以及额定电气参数（电压 V、功率 W 或电流 A、频率 Hz）。对电热水壶，这条比通用标签标准 NOM-050 更具体；NOM-050 第 2.2 a) 条规定，已有专门 NOM 的产品不适用 NOM-050。\"\n },\n {\n  \"id\": \"MX-02\",\n  \"rule_zh\": \"NOM-024-SCFI-2013 第 6.3 条：使用说明和安全警示必须用西班牙语，用语易懂、清晰可读，可以同时附其他语言；计量单位须符合 NOM-008-SCFI-2002。\"\n },\n {\n  \"id\": \"MX-03\",\n  \"rule_zh\": \"NOM-003-SCFI-2014《电气产品—安全规范》适用于交流 1000 V、直流 1500 V 以下、由公共电网等供电的电气产品，电热水壶在其范围内，需按该标准的合格评定程序取得证书。没有证书资料时，文案不得声称已通过 NOM 认证。\"\n }\n]"
+   }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "response_format": {
+   "type": "json_object"
+  },
+  "reasoning_effort": "low"
+ },
+ "content": "{\n  \"title\": \"Hervidor Eléctrico 1.7 L Acero Inoxidable 304 1500 W\",\n  \"short_description\": \"Calienta agua para tus bebidas con este hervidor de 1.7 L, interior de acero inoxidable 304, apagado automático y protección contra funcionamiento sin agua. Versión para México: 127 V, 60 Hz.\",\n  \"bullets\": [\n    \"Capacidad de 1.7 L para calentar agua para varias bebidas.\",\n    \"Interior de acero inoxidable 304; tapa y asa de plástico PP.\",\n    \"Apagado automático y protección contra funcionamiento sin agua.\",\n    \"Base giratoria de 360° para colocar el hervidor desde distintos ángulos.\",\n    \"Resistencia oculta que facilita la limpieza del interior.\"\n  ],\n  \"description\": \"Prepara agua caliente para café, té e infusiones con el hervidor eléctrico KET-17S de 1.7 L.\\n\\nSu interior es de acero inoxidable 304 y cuenta con tapa y asa de plástico PP. La resistencia oculta facilita la limpieza del interior, mientras que la base giratoria de 360° permite colocar el hervidor desde distintos ángulos.\\n\\nIncluye apagado automático y protección contra funcionamiento sin agua.\\n\\nCaracterísticas de la versión para México:\\nCapacidad: 1.7 L.\\nPotencia: 1500 W.\\nAlimentación: 127 V, 60 Hz.\\nMaterial interior: acero inoxidable 304.\\nMaterial de tapa y asa: plástico PP.\",\n  \"keywords\": [\n    \"hervidor eléctrico\",\n    \"tetera eléctrica\",\n    \"hervidor de agua\",\n    \"hervidor 1.7 litros\",\n    \"hervidor acero inoxidable 304\",\n    \"hervidor 1500 W\",\n    \"tetera 127 V\",\n    \"hervidor con apagado automático\",\n    \"base giratoria 360 grados\"\n  ],\n  \"notes_zh\": \"标题控制在所提供的60字符上限内，电气参数采用墨西哥版本127 V、60 Hz、1500 W。未加入价格、起订量、运费或交付承诺。未宣称NOM、UL、ETL、FDA、BPA或LFGB认证或检测，也未将CB报告及CE信息表述为墨西哥市场准入证明。约5分钟烧开1.7 L仅有工厂内部测试支持，本版未采用该时效卖点。根据所提供的规则，上架销售前需取得适用的NOM安全认证，并核实包装或外箱上的西班牙语产品信息、墨西哥制造商或进口商名称与地址、原产国及额定电气参数，同时准备西班牙语说明书和安全警示；进口商地址应放在法规要求的标签位置，不写入平台商品描述。\"\n}",
+ "usage": {
+  "input_tokens": 5478,
+  "output_tokens": 629
+ }
+}

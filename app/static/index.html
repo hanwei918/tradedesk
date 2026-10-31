@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=23">
+<link rel="stylesheet" href="style.css?v=24">
 <script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -42,8 +42,10 @@
       <div class="spacer"></div>
       <span class="small muted">示例数据均为虚构 · 规则以来源页面为准</span>
       <button class="mode-pill" id="mode-pill" title="模型设置"></button>
+      <button class="btn sm" id="role-btn" title="按角色体验：商户 / 合规审查员 / 消费者"><svg class="ic sm"><use href="#i-building-2"/></svg>选角色</button>
       <button class="btn sm primary" id="tour-btn" title="自动演示（约 90 秒，Esc 退出）"><svg class="ic sm"><use href="#i-play"/></svg>自动演示</button>
     </header>
+    <div class="roleguide" id="roleguide" hidden></div>
 
     <div class="content">
       <!-- ================= overview ================= -->
@@ -195,6 +197,6 @@
 <aside class="sheet" id="sheet" aria-hidden="true"><div class="sheet-h" id="sheet-h"></div><div class="sheet-b" id="sheet-b"></div><div class="sheet-f" id="sheet-f"></div></aside>
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
-<script src="app.js?v=25"></script>
+<script src="app.js?v=26"></script>
 </body>
 </html>

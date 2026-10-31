@@ -1,0 +1,26 @@
+{
+ "request": {
+  "model": "gpt-5.5",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You are an experienced Walmart US Marketplace content operator writing a US English product listing.\nKeep `notes_zh` in Simplified Chinese. Write a factual, easy-to-scan title, short description, five benefit-led bullets, full description, and relevant search keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+   },
+   {
+    "role": "user",
+    "content": "## 产品资料（中文）\n{\n \"id\": \"KET-17S\",\n \"name_zh\": \"1.7L 不锈钢电热水壶\",\n \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n \"specs\": {\n  \"capacity_l\": 1.7,\n  \"power_w_us\": 1500,\n  \"voltage_us\": \"120V 60Hz\",\n  \"power_w_mx\": 1500,\n  \"voltage_mx\": \"127V 60Hz\",\n  \"inner_material\": \"304 stainless steel\",\n  \"lid_handle_material\": \"PP plastic\",\n  \"features\": [\n   \"auto shut-off\",\n   \"boil-dry protection\",\n   \"360° swivel base\",\n   \"concealed heating element\"\n  ]\n },\n \"certifications_held\": [\n  \"CB report (IEC 60335-2-15)\",\n  \"CE (LVD/EMC)\"\n ],\n \"certifications_not_held\": [\n  \"UL\",\n  \"ETL\",\n  \"NOM\",\n  \"FDA registration\"\n ],\n \"material_tests\": {\n  \"BPA\": \"未做 BPA 检测报告\",\n  \"LFGB\": \"未做\"\n },\n \"moq_units\": 500,\n \"fob_ningbo_usd\": {\n  \"500-1999\": 9.8,\n  \"2000-4999\": 9.2,\n  \"5000+\": 8.7\n },\n \"packaging\": \"color box, 6 units per carton\",\n \"selling_points_zh\": [\n  \"304 不锈钢内胆\",\n  \"干烧自动断电\",\n  \"360° 旋转底座\",\n  \"隐藏式发热盘，好清洁\",\n  \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n ]\n}\n\n## 平台规则（知识库）\n[\n {\n  \"id\": \"US-01\",\n  \"rule_zh\": \"FTC《绿色指南》16 CFR 260.4(b)：营销者不应做无限定的笼统环保宣称。条文例 1 明确说“Eco-friendly”这类说法会被理解为具有广泛环保益处，难以证实，因此具有欺骗性；只有附上清晰、可证实的具体限定（比如具体用了多少再生材料）才可能合规。\"\n },\n {\n  \"id\": \"US-02\",\n  \"rule_zh\": \"FTC《Made in USA 标签规则》16 CFR 323.2：除非最终组装或加工在美国完成、所有重要加工在美国、且全部或几乎全部部件在美国生产和采购，否则不得标“美国制造”；323.1 定义里 made、manufactured、built、produced、created、crafted in USA/America 都算。在中国生产的水壶不能这样写。\"\n },\n {\n  \"id\": \"US-03\",\n  \"rule_zh\": \"加州法规 27 CCR 25602(b)：如果产品需要 65 号提案警示，网购时警示须放在商品展示页，或在商品展示页放一个写着“WARNING”/“CA WARNING”/“CALIFORNIA WARNING”的明显链接，或在完成购买前醒目展示；买家要在网站里翻找才能看到的不算醒目。是否需要警示取决于产品是否会让消费者接触清单上的化学物质，需由供应商的检测资料确认，模型不能自行判断。\"\n },\n {\n  \"id\": \"US-04\",\n  \"rule_zh\": \"27 CCR 25603(a)：安全港警示须包含黄色等边三角形内黑色感叹号的标志、全大写加粗的“WARNING:”（或 CA WARNING: / CALIFORNIA WARNING:），写出至少一种化学物质的名称和危害类型（致癌 / 生殖危害），并附 www.P65Warnings.ca.gov。\"\n },\n {\n  \"id\": \"WMT-01\",\n  \"rule_zh\": \"Walmart Marketplace《Product details policy》（2026-10-06 更新）：商品标题应简短，不超过 150 个字符。\"\n },\n {\n  \"id\": \"WMT-02\",\n  \"rule_zh\": \"Walmart《Product details policy》禁止在标题和描述里写促销宣称，官方示例包括 free shipping、hot sale、top rated、premium quality、best-selling、clearance、Black Friday、low price 等（示例不是完整清单）。\"\n },\n {\n  \"id\": \"WMT-03\",\n  \"rule_zh\": \"Walmart《Product details policy》：标题不得全大写，也不得使用特殊字符，官方示例为 ~ ! * $。\"\n }\n]"
+   }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "response_format": {
+   "type": "json_object"
+  },
+  "reasoning_effort": "low"
+ },
+ "content": "{\"title\":\"1.7L Stainless Steel Electric Kettle with Auto Shut-Off and 360-Degree Swivel Base\",\"short_description\":\"Boil water for tea, coffee, and other everyday needs with this 1.7-liter electric kettle. Its 304 stainless steel interior, concealed heating element, auto shut-off, and boil-dry protection support convenient daily use.\",\"bullets\":[\"Boils up to 1.7 liters of water for tea, coffee, and other everyday uses.\",\"304 stainless steel interior provides a durable surface for everyday water heating.\",\"Auto shut-off turns the kettle off after boiling, while boil-dry protection helps prevent operation without water.\",\"360-degree swivel base makes it easy to position the kettle from different angles.\",\"Concealed heating element creates a smooth interior surface that is easier to clean.\"] ,\"description\":\"Heat water for hot drinks and everyday kitchen tasks with the 1.7L Stainless Steel Electric Kettle. The kettle has a 304 stainless steel interior and a concealed heating element for a smooth interior surface. Auto shut-off turns the kettle off after boiling, and boil-dry protection helps prevent operation without water. A 360-degree swivel base supports convenient placement and lifting. The lid and handle are made of PP plastic.\",\"keywords\":[\"1.7 liter electric kettle\",\"stainless steel tea kettle\",\"electric water boiler\"] ,\"notes_zh\":\"已按美国站点撰写，未加入未经证实的认证、BPA/LFGB 声明、加州 65 号提案警示或约 5 分钟烧开时间；未提及批发价、包装或产地。标题保持简短且未使用促销用语。\"}",
+ "usage": {
+  "input_tokens": 5701,
+  "output_tokens": 355
+ }
+}

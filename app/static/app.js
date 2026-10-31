@@ -1250,6 +1250,133 @@ async function startTour(loop = false) {
   closeSheet(); spot(null); box.remove(); document.body.classList.remove("touring");
 }
 
+// ------------------------------------------------------------------ roles
+// Booth mode: a visitor picks a role and sees only that lane, its pages in the sidebar and a fixed path of real
+// actions one step at a time. Every step uses requests that are recorded, so the whole path replays offline.
+const CHECK_SAMPLE = "BEST SELLER!! [Brand] 1.7L Electric Kettle, BPA Free, UL Listed, Free Shipping";
+
+async function roleInquiryRound(n) {
+  go("inquiry");
+  if (!state.inq.history.length || state.inqId !== "INQ-US-01") { pickSample(0); await runInquiry(); }
+  if (n > 1 && state.inq.history.length < 2) { $("#inq-ins").value = "按风险提示全部修改"; await reviseInquiry(); }
+  if (n > 1) $('#inq-tabs [data-t="diff"]')?.click();
+  spot("#inq-out .risk-hero");
+}
+
+async function roleListing(ids) {
+  go("listing");
+  pickProduct(META.products[0].id);
+  $$("#lst-platform-options [data-platform]").forEach((row) => {
+    $("[data-platform-select]", row).checked = ids.includes(row.dataset.platform);
+    $("[data-platform-language]", row).value = META.listing_catalog.platforms[row.dataset.platform].default_language;
+  });
+  await runListing();
+}
+
+async function roleCheck() {
+  go("check");
+  state.chkPlatform = "amazon_us"; renderCheckControls();
+  $("#chk-product").value = META.products[0].id;
+  $("#chk-text").value = CHECK_SAMPLE;
+  await runCheck();
+}
+
+const ROLE_LANES = {
+  merchant: {
+    name: "商户", mark: "商", sub: "工厂的业务员和运营 · B2B 询盘", pages: ["inbox", "inquiry"],
+    out: "能直接发给进口商的回复、中文内部备忘、派给采购 / 生产 / 美工的任务",
+    steps: [
+      { t: "收件箱排好优先级", d: "今天进来的询盘，按公开公式打好了分：分数越高越值得先回。每个分数都能点开看是怎么算的。",
+        run: async () => { go("inbox"); const d = await api("/api/inbox"); if (!d.items.some((x) => x.priority)) await runTriage(); } },
+      { t: "理解并回复美国询盘", d: "这条询盘要 UL、BPA free、FOB 空运、20 天交货、货到 60 天付款。系统先找出和工厂资料对不上的地方，再用英语如实回复，每句承诺都过合规检查。",
+        run: () => roleInquiryRound(1) },
+      { t: "一句中文改第 2 轮", d: "业务员只说一句“按风险提示全部修改”，系统在上一版基础上改：红黄提示变少，改动逐词标出来。",
+        run: () => roleInquiryRound(2) },
+      { t: "看派出去的任务", d: "回复里需要采购、生产、美工跟进的事，已经自动拆成任务，每条都挂着询盘原文。",
+        run: async () => { go("inbox"); await renderInbox(); showInboxTab("tasks"); } },
+    ],
+  },
+  reviewer: {
+    name: "合规审查员", mark: "审", sub: "发出前的最后一道关", pages: ["check", "kb", "eval"],
+    out: "红黄绿结论，每条问题都附规则原文和链接",
+    steps: [
+      { t: "检查一段待发文案", d: "这段 Amazon 标题里埋了 6 个问题：促销用语、主观评价、感叹号、工厂没有的 UL、没测过的 BPA、免运费。",
+        run: roleCheck },
+      { t: "每条问题都有出处", d: "每条提示都挂着规则原文和链接，或工厂资料卡上的那个字段。模型说不出出处的提示，代码直接丢掉。",
+        run: async () => { if (!$("#chk-out .finding")) await roleCheck(); spot("#chk-out .finding"); } },
+      { t: "61 条规则逐条核实", d: "规则覆盖 11 个平台、6 个市场，每条都对照官方原文核实过，附链接和抓取日期。可以按平台或市场筛选。",
+        run: async () => { go("kb"); } },
+      { t: "编造的提示拦得住吗", d: "红队测试：往审核结果里塞 5 条编造的提示（假规则编号、原文对不上），看代码怎么全部拦下。",
+        run: async () => { go("eval"); await showEvalTab("redteam"); await runRedteam(); } },
+    ],
+  },
+  consumer: {
+    name: "消费者", mark: "买", sub: "海外买家看到的商品页 · B2C 上架", pages: ["listing", "check"],
+    out: "按平台和语言生成、只写工厂真有的认证和参数的商品页",
+    steps: [
+      { t: "美国和墨西哥的商品页", d: "同一份中文资料：美国买家在 Amazon 看到英文 Listing，墨西哥买家在 TikTok 看到西语短视频脚本。",
+        run: () => roleListing(["amazon_us", "tiktok_mx"]) },
+      { t: "换到德国和墨西哥电商", d: "换成 Amazon 德国站（德语）和 Mercado Libre 墨西哥（西语）：格式和语言跟着平台走，各按当地平台规则和法规检查。",
+        run: () => roleListing(["amazon_de", "mercadolibre_mx"]) },
+      { t: "页面上不会出现的话", d: "工厂没有 UL、没测过 BPA，所以你看到的商品页里不会有 “UL Listed”“BPA Free”。把这种文案贴进来，系统直接判红。",
+        run: roleCheck },
+    ],
+  },
+};
+let role = null, roleStep = 0, roleBusy = false;
+
+function showRolePicker() {
+  let el = $("#rolepick");
+  if (!el) { el = document.createElement("div"); el.id = "rolepick"; el.className = "rolepick"; document.body.appendChild(el); }
+  el.innerHTML = `<div class="rp-inner"><span class="rp-kick">从合规切入的外贸 AI 工作台</span><h1>你是哪一类用户？</h1>
+    <p>选一个角色，按你的路径走一遍。每一步都是工作台里的真实操作，左边只留这条路径用得到的页面。</p>
+    <div class="rp-cards">${Object.entries(ROLE_LANES).map(([k, r]) => `<button class="rp-card ${k}" data-role="${k}">
+      <span class="rp-ic">${r.mark}</span><b>${r.name}</b><small>${esc(r.sub)}</small>
+      <span class="rp-path">${r.steps.map((s, i) => `<span><i>${i + 1}</i>${esc(s.t)}</span>`).join("")}</span>
+      <span class="rp-out">产出：${esc(r.out)}</span></button>`).join("")}</div>
+    <button class="rp-all" data-role="">进入完整工作台（全部功能）</button></div>`;
+  el.hidden = false;
+  $$("#rolepick [data-role]").forEach((b) => b.addEventListener("click", () => setRole(b.dataset.role)));
+}
+
+function setRole(key) {
+  role = ROLE_LANES[key] ? key : null;
+  roleStep = 0;
+  $("#rolepick")?.setAttribute("hidden", "");
+  document.body.classList.toggle("role-mode", !!role);
+  document.body.dataset.role = role || "";
+  const lane = role && ROLE_LANES[role];
+  $$(".nav button").forEach((b) => { b.hidden = !!lane && !lane.pages.includes(b.dataset.page); });
+  $$(".nav-label").forEach((l) => { l.hidden = !!lane && !$$("button:not([hidden])", l.nextElementSibling).length; });
+  history.replaceState(null, "", role ? `#role=${role}` : location.pathname);
+  renderRoleGuide();
+  if (lane) runRoleStep(0); else go("overview");
+}
+
+function renderRoleGuide() {
+  const g = $("#roleguide"), lane = role && ROLE_LANES[role];
+  if (!lane) { g.hidden = true; return; }
+  const st = lane.steps[roleStep], last = roleStep === lane.steps.length - 1;
+  g.hidden = false;
+  g.innerHTML = `<div class="rg-who ${role}"><span class="rg-ic">${lane.mark}</span><div><b>${lane.name}</b><small>${esc(lane.sub)}</small></div></div>
+    <ol class="rg-steps">${lane.steps.map((s, i) => `<li class="${i < roleStep ? "done" : i === roleStep ? "now" : ""}"><button data-step="${i}"><i>${i < roleStep ? "✓" : i + 1}</i>${esc(s.t)}</button></li>`).join("")}</ol>
+    <div class="rg-now"><p><b>第 ${roleStep + 1} 步 · ${esc(st.t)}</b>${esc(st.d)}</p>
+      <div class="row">${last ? `<span class="rg-done">走完了 · 产出：${esc(lane.out)}</span>` : `<button class="btn sm primary" id="rg-next">下一步：${esc(lane.steps[roleStep + 1].t)}${ic("arrow-right", "sm")}</button>`}
+      <button class="btn sm ghost" id="rg-switch">换个角色</button></div></div>`;
+  $$("#roleguide [data-step]").forEach((b) => b.addEventListener("click", () => runRoleStep(+b.dataset.step)));
+  $("#rg-next")?.addEventListener("click", () => runRoleStep(roleStep + 1));
+  $("#rg-switch").addEventListener("click", showRolePicker);
+}
+
+async function runRoleStep(i) {
+  const lane = role && ROLE_LANES[role];
+  if (!lane || roleBusy || i < 0 || i >= lane.steps.length) return;
+  roleStep = i; renderRoleGuide();
+  roleBusy = true; $("#roleguide").classList.add("busy");
+  try { await lane.steps[i].run(); } catch (e) { toast(e.message); }
+  roleBusy = false; $("#roleguide").classList.remove("busy");
+}
+
 // ------------------------------------------------------------------ boot
 function renderModelCard() {
   const m = META.llm;
@@ -1292,6 +1419,7 @@ async function boot() {
   $("#log-refresh").addEventListener("click", renderLogs);
   $("#board-batch").addEventListener("click", runBatch);
   $("#tour-btn").addEventListener("click", () => startTour(false));
+  $("#role-btn").addEventListener("click", showRolePicker);
   addEventListener("keydown", (e) => { if (e.key === "Escape" && tourState.on) tourState.on = false; });
   $("#model-card").addEventListener("click", () => openSettings().catch((e) =>
     toast(/not found|404/i.test(e.message) ? "服务端还是旧版本：在终端按 Ctrl+C 停掉服务，再重新启动" : `打不开模型设置：${e.message}`)));
@@ -1317,6 +1445,7 @@ async function boot() {
     } else if (!typing && !e.metaKey && !e.ctrlKey && /^[1-9]$/.test(e.key) && !$("#sheet").classList.contains("on")) go(Object.keys(PAGES)[+e.key - 1]);
   });
   renderOverview();
+  if (/^#roles?\b/.test(location.hash)) { const m = location.hash.match(/^#role=(\w+)/); return m ? setRole(m[1]) : showRolePicker(); }
   if (/^#tour/.test(location.hash)) return startTour(location.hash === "#tour=loop");
   await runDemoFromHash();
 }

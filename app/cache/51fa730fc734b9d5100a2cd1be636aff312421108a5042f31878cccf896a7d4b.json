@@ -1,0 +1,26 @@
+{
+ "request": {
+  "model": "gpt-5.5",
+  "messages": [
+   {
+    "role": "system",
+    "content": "You are an experienced Etsy marketplace operator writing an English product listing.\nKeep `notes_zh` in Simplified Chinese. Describe only the supplied product and its verified attributes. Do not imply an item is handmade, vintage, or custom-made unless the supplied facts explicitly establish that. Write a clear title, concise description, five factual bullets, and relevant keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+   },
+   {
+    "role": "user",
+    "content": "## 产品资料（中文）\n{\n \"id\": \"KET-17S\",\n \"name_zh\": \"1.7L 不锈钢电热水壶\",\n \"name_en\": \"1.7L Stainless Steel Electric Kettle\",\n \"specs\": {\n  \"capacity_l\": 1.7,\n  \"power_w_us\": 1500,\n  \"voltage_us\": \"120V 60Hz\",\n  \"power_w_mx\": 1500,\n  \"voltage_mx\": \"127V 60Hz\",\n  \"inner_material\": \"304 stainless steel\",\n  \"lid_handle_material\": \"PP plastic\",\n  \"features\": [\n   \"auto shut-off\",\n   \"boil-dry protection\",\n   \"360° swivel base\",\n   \"concealed heating element\"\n  ]\n },\n \"certifications_held\": [\n  \"CB report (IEC 60335-2-15)\",\n  \"CE (LVD/EMC)\"\n ],\n \"certifications_not_held\": [\n  \"UL\",\n  \"ETL\",\n  \"NOM\",\n  \"FDA registration\"\n ],\n \"material_tests\": {\n  \"BPA\": \"未做 BPA 检测报告\",\n  \"LFGB\": \"未做\"\n },\n \"moq_units\": 500,\n \"fob_ningbo_usd\": {\n  \"500-1999\": 9.8,\n  \"2000-4999\": 9.2,\n  \"5000+\": 8.7\n },\n \"packaging\": \"color box, 6 units per carton\",\n \"selling_points_zh\": [\n  \"304 不锈钢内胆\",\n  \"干烧自动断电\",\n  \"360° 旋转底座\",\n  \"隐藏式发热盘，好清洁\",\n  \"5 分钟左右烧开 1.7L（工厂内部测试，非第三方报告）\"\n ]\n}\n\n## 平台规则（知识库）\n[\n {\n  \"id\": \"ETSY-01\",\n  \"rule_zh\": \"Etsy 帮助中心《How to Create a Listing》：listing 标题最多 140 个字符，并建议少于 15 个词。\"\n },\n {\n  \"id\": \"ETSY-02\",\n  \"rule_zh\": \"Etsy 帮助中心说明：转售是指卖家出售不是自己制作或设计、市面上可以买到的商品，Etsy 不允许。工厂批量生产的通用小家电要先确认是否符合 Etsy 的创作标准，再决定上不上 Etsy。\"\n }\n]"
+   }
+  ],
+  "temperature": 0,
+  "seed": 42,
+  "response_format": {
+   "type": "json_object"
+  },
+  "reasoning_effort": "low"
+ },
+ "content": "{\n  \"title\": \"1.7L Stainless Steel Electric Kettle, 1500W, Auto Shut-Off, 360° Swivel Base\",\n  \"short_description\": \"A 1.7L electric kettle with a 304 stainless steel interior, concealed heating element, auto shut-off, and boil-dry protection.\",\n  \"bullets\": [\n    \"1.7L capacity with a 304 stainless steel interior.\",\n    \"1500W power; US version rated 120V, 60Hz, and Mexico version rated 127V, 60Hz.\",\n    \"Auto shut-off and boil-dry protection.\",\n    \"360° swivel base and concealed heating element.\",\n    \"PP plastic lid and handle.\"\n  ],\n  \"description\": \"The KET-17S electric kettle has a 1.7L capacity and a 304 stainless steel interior. It features auto shut-off, boil-dry protection, a 360° swivel base, and a concealed heating element. The lid and handle are made from PP plastic.\\n\\nElectrical ratings vary by market: the US version is rated 1500W at 120V, 60Hz; the Mexico version is rated 1500W at 127V, 60Hz.\",\n  \"keywords\": [\n    \"electric kettle\",\n    \"1.7L kettle\",\n    \"stainless steel\",\n    \"304 steel interior\",\n    \"1500W kettle\",\n    \"auto shut off\",\n    \"boil dry protection\",\n    \"360 swivel base\",\n    \"concealed element\"\n  ],\n  \"notes_zh\": \"此文案仅供草稿审核，不代表产品已符合 Etsy 上架条件。资料显示该产品为工厂批量生产的通用小家电，尚未提供符合 Etsy 创作标准的依据；应先核实资格，再决定是否上架，不应将其描述为手工、古董或定制商品。标题少于 140 个字符且少于 15 个词。美国版与墨西哥版电压不同，上架时应明确实际销售版本，不可暗示单一产品兼容两种额定电压。已提供 CB 报告及 CE（LVD/EMC）信息，但无 UL、ETL、NOM 或 FDA 注册，且未做 BPA、LFGB 检测；文案未添加相关认证、BPA-free 或食品接触安全宣称。约 5 分钟烧开 1.7L 仅为工厂内部测试结果，未纳入文案。批发起订量、FOB 阶梯报价及装箱资料未作为零售价格、单件销售包装或配送承诺使用。\"\n}",
+ "usage": {
+  "input_tokens": 5070,
+  "output_tokens": 576
+ }
+}
