@@ -721,3 +721,10 @@ body.buyer-view #lst-out mark{background:none;color:inherit;border:0;box-shadow:
 .pf-checks{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}.pf-checks label{flex-direction:row;align-items:center;gap:5px}
 .pf-mat span{font-size:12.5px;font-weight:600}
 .product.add{border-style:dashed;color:hsl(var(--brand))}.product.add b{display:flex;align-items:center;gap:6px}
+.stat.bump{animation:statBump 1.8s ease}
+@keyframes statBump{0%,100%{box-shadow:none}15%{box-shadow:0 0 0 3px hsl(var(--brand) / .45)}60%{box-shadow:0 0 0 3px hsl(var(--brand) / .2)}}
+.stat .delta{display:inline-block;vertical-align:middle;margin-left:8px;padding:1px 8px;border-radius:999px;font-size:13px;font-weight:650;letter-spacing:0;animation:deltaFade 7s forwards}
+.stat .delta.up{background:hsl(var(--brand-soft));color:hsl(var(--brand))}.stat .delta.down{background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+@keyframes deltaFade{0%,70%{opacity:1}100%{opacity:0}}
+.board tr.flash td{animation:rowFlash 2.6s ease}
+@keyframes rowFlash{0%,35%{background:hsl(var(--brand-soft))}100%{background:transparent}}

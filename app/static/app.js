@@ -705,13 +705,19 @@ async function renderBoard() {
   const rows = boardState.data.rows;
   const cells = rows.flatMap((r) => Object.values(r.cells));
   const n = (f) => cells.filter(f).length;
-  const stat = (k, iconName, v, d, cls = "") => `<div class="card stat"><div class="k">${esc(k)}${ic(iconName)}</div><div class="v ${cls}">${v}</div><div class="d">${d}</div></div>`;
+  // Numbers that changed since the last render get a +N / −N chip and a pulse, so a new product or a fresh check is visible at a glance.
+  const vals = { products: rows.length, ok: n((c) => c.risk === "green" || c.listed), amber: n((c) => c.risk === "amber" && !c.listed),
+    red: n((c) => c.risk === "red"), none: n((c) => !c.risk) };
+  const prev = boardState.prevStats; boardState.prevStats = vals;
+  const changed = (key) => prev && vals[key] !== prev[key];
+  const chip = (key) => (changed(key) ? `<span class="delta ${vals[key] > prev[key] ? "up" : "down"}">${vals[key] > prev[key] ? "+" : "−"}${Math.abs(vals[key] - prev[key])}</span>` : "");
+  const stat = (key, k, iconName, v, d, cls = "") => `<div class="card stat${changed(key) ? " bump" : ""}"><div class="k">${esc(k)}${ic(iconName)}</div><div class="v ${cls}">${v}${chip(key)}</div><div class="d">${d}</div></div>`;
   $("#board-stats").innerHTML =
-    stat("产品", "package", rows.length, `${cells.length} 个渠道格子`) +
-    stat("可上架 / 已上架", "circle-check-big", n((c) => c.risk === "green" || c.listed), `其中已上架 ${n((c) => c.listed)}`, "green") +
-    stat("需人工确认", "triangle-alert", n((c) => c.risk === "amber" && !c.listed), "黄色：有依据的风险点", "amber") +
-    stat("不能发", "shield-alert", n((c) => c.risk === "red"), "红色：明确违反规则", "red") +
-    stat("未生成 / 未上传", "circle-dot", n((c) => !c.risk), "点格子开始");
+    stat("products", "产品", "package", vals.products, `${cells.length} 个渠道格子`) +
+    stat("ok", "可上架 / 已上架", "circle-check-big", vals.ok, `其中已上架 ${n((c) => c.listed)}`, "green") +
+    stat("amber", "需人工确认", "triangle-alert", vals.amber, "黄色：有依据的风险点", "amber") +
+    stat("red", "不能发", "shield-alert", vals.red, "红色：明确违反规则", "red") +
+    stat("none", "未生成 / 未上传", "circle-dot", vals.none, "点格子开始");
   $("#board-body").innerHTML = rows.map((r) => {
     const p = META.products.find((x) => x.id === r.product_id);
     const thumb = r.has_image ? `<img src="/api/image/${r.product_id}?t=${Date.now()}" alt="">` : ic("package", "lg");
@@ -724,12 +730,13 @@ async function renderBoard() {
       const counts = [c.red ? `<span class="badge red">红 ${c.red}</span>` : "", c.amber ? `<span class="badge amber">黄 ${c.amber}</span>` : ""].join("");
       return `<button class="cell ${cls}" data-cell="${key}"><span class="st"><i></i>${esc(c.status)}</span><span class="meta">${counts || '<span class="badge green">0 风险</span>'}<span>${esc((c.updated || "").slice(5))}</span></span></button>`;
     };
-    return `<tr class="${boardState.selected.has(r.product_id) ? "sel" : ""}"><td><input type="checkbox" class="ck" data-sel="${r.product_id}" ${boardState.selected.has(r.product_id) ? "checked" : ""}></td>
+    return `<tr class="${boardState.selected.has(r.product_id) ? "sel" : ""}${boardState.flash === r.product_id ? " flash" : ""}" data-row="${esc(r.product_id)}"><td><input type="checkbox" class="ck" data-sel="${r.product_id}" ${boardState.selected.has(r.product_id) ? "checked" : ""}></td>
       <td><div class="prod"><div class="thumb">${thumb}</div><div><b>${esc(p.name_zh)}${isCustom(p) ? ` <button class="btn sm ghost" data-edit="${esc(p.id)}">${ic("file-text", "sm")}编辑</button>` : ""}</b><span>${esc(p.id)} · ${esc(p.name_en)}</span><span>MOQ ${p.moq_units} · ${esc(priceRange(p))}</span></div></div></td>
       <td>${cellHtml("image")}</td><td>${cellHtml("amazon_us")}</td><td>${cellHtml("tiktok_mx")}</td></tr>`;
   }).join("");
   $$("#board-body [data-cell]").forEach((b) => b.addEventListener("click", () => { const [pid, ch] = b.dataset.cell.split(":"); openCell(pid, ch); }));
   $$("#board-body [data-edit]").forEach((b) => b.addEventListener("click", () => openProductForm(b.dataset.edit)));
+  if (boardState.flash) { $(`#board-body tr[data-row="${boardState.flash}"]`)?.scrollIntoView({ block: "center", behavior: "smooth" }); boardState.flash = null; }
   $$("#board-body [data-sel]").forEach((c) => c.addEventListener("change", () => {
     c.checked ? boardState.selected.add(c.dataset.sel) : boardState.selected.delete(c.dataset.sel); renderBoard();
   }));
@@ -809,7 +816,7 @@ async function regenCell(pid, ch) {
   boardState.running.add(`${pid}:${ch}`); await renderBoard();
   try { await api("/api/listing", { product_id: pid, platforms: [ch], round: 1 }); toast("生成并校验完成", "ok"); }
   catch (e) { toast(e.message); }
-  boardState.running.delete(`${pid}:${ch}`); renderBoard();
+  boardState.running.delete(`${pid}:${ch}`); boardState.flash = pid; renderBoard();
 }
 
 function metricHtml(m) {
@@ -862,7 +869,7 @@ async function openImageCell(p, row, cell) {
     $("#img-run").addEventListener("click", async () => {
       if (!chosen) return;
       busy($("#img-run"), true, "测量像素、看图审核中…");
-      try { r = await api("/api/image-check", { product_id: p.id, image: chosen.url, name: chosen.name }); cell.listed = false; toast(`主图检查完成：${RISK[r.risk]}`, "ok"); renderBoard(); render(); }
+      try { r = await api("/api/image-check", { product_id: p.id, image: chosen.url, name: chosen.name }); cell.listed = false; toast(`主图检查完成：${RISK[r.risk]}`, "ok"); boardState.flash = p.id; renderBoard(); render(); }
       catch (e) { toast(e.message); busy($("#img-run"), false); }
     });
   };
@@ -1292,7 +1299,8 @@ function openProductForm(editId) {
     busy($("#pf-save"), true, "保存中…");
     try {
       const r = await api("/api/products/save", { product, id: editing ? editing.id : null });
-      await reloadMeta(); closeSheet(); if (page === "board") renderBoard();
+      await reloadMeta(); closeSheet();
+      if (page === "board") { boardState.flash = r.product.id; renderBoard(); } else if (page === "listing") pickProduct(r.product.id);
       toast(`已保存：${r.product.name_zh}（${r.product.id}）。生成上架文案、检查主图要在实时模式下`, "ok");
     } catch (e) { $("#pf-err").innerHTML = `<div class="callout" style="border-color:hsl(var(--red) / .4)">${ic("triangle-alert")}<div>${esc(e.message)}</div></div>`; busy($("#pf-save"), false); }
   });
