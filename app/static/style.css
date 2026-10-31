@@ -585,3 +585,21 @@ input.bad{border-color:hsl(var(--red));box-shadow:0 0 0 3px hsl(var(--red) / .15
 .sv-f span{color:hsl(var(--muted-foreground));font-weight:600}
 .sv-f code{white-space:normal;word-break:break-word}
 @media (max-width:1180px){.sv-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* while the input column is open the result column is half as wide: stack the result cards instead of squeezing them */
+.bench:not(.collapsed) .result,
+.bench:not(.collapsed) #lst-out .grid.g2{grid-template-columns:minmax(0,1fr)}
+.tabs{overflow-x:auto}
+.tabs button{white-space:nowrap;flex:none}
+.step .t[data-tip]{cursor:help;border-bottom:1px dotted hsl(var(--muted-foreground) / .5)}
+/* the TikTok card can be narrow (input column open on a small laptop): stack phone and script when it is */
+#lst-out [data-plat]{container-type:inline-size}
+@container (max-width:540px){.phone-wrap{grid-template-columns:minmax(0,1fr);justify-items:center}.phone-wrap .shots{width:100%}}
+
+/* ---------- voice input */
+.mic-bar{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;font-weight:400}
+.mic-bar select{width:auto;padding:4px 8px;font-size:12px;height:30px}
+.btn.mic.on{background:hsl(var(--red-soft));color:hsl(var(--red));border-color:hsl(var(--red) / .45)}
+.btn.mic.on .ic{animation:micpulse 1.1s ease-in-out infinite}
+@keyframes micpulse{0%,100%{opacity:1}50%{opacity:.35}}
+.composer .btn.mic{height:36px;width:36px;flex:none}

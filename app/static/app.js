@@ -7,7 +7,10 @@ const ic = (n, cls = "") => `<svg class="ic ${cls}"><use href="#i-${n}"/></svg>`
 const RISK = { red: "不能发", amber: "需人工确认", green: "可以发" };
 const RISK_ICON = { red: "shield-alert", amber: "triangle-alert", green: "shield-check" };
 const SEV = { red: "红", amber: "黄" };
-const FLAG = { en: "🇺🇸", es: "🇲🇽" };
+const FLAG = { en: "🇺🇸", es: "🇲🇽", de: "🇩🇪", ja: "🇯🇵" };
+// A Russian or English inquiry can come from several countries, so results show the market's flag.
+const MARKET_FLAG = { US: "🇺🇸", MX: "🇲🇽", EU: "🇩🇪", JP: "🇯🇵", EAEU: "🇰🇿", NG: "🇳🇬" };
+const flagOf = (q) => q.flag || MARKET_FLAG[q.market] || FLAG[q.language] || "🌐";
 const PAGES = { overview: "概览", board: "商品看板", inbox: "询盘收件箱", inquiry: "询盘回复", listing: "多平台上架", check: "文案体检", eval: "评测与对照", kb: "规则知识库", logs: "调用日志", fair: "游园会找茬" };
 const PLAT = { amazon_us: { name: "Amazon 美国站", lang: "英语", cls: "amz", mark: "a" }, tiktok_mx: { name: "TikTok Shop 墨西哥", lang: "西班牙语", cls: "tt", mark: "♪" } };
 let META = null, KB = null, page = "overview";
@@ -38,7 +41,7 @@ const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { ret
 const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return u; } };
 const fmtS = (s) => (s == null ? "" : s < 1 ? `${Math.round(s * 1000)}ms` : `${s.toFixed(1)}s`);
 const worst = (risks) => (risks.includes("red") ? "red" : risks.includes("amber") ? "amber" : "green");
-const catNames = () => ({ platform_amazon: "Amazon 平台", platform_amazon_image: "Amazon 主图", platform_alibaba: "阿里国际站", platform_tiktok: "TikTok Shop", compliance_us: "美国合规", compliance_mx: "墨西哥合规", contract: "合同条款", culture: "商务礼仪" });
+const catNames = () => ({ platform_amazon: "Amazon 平台", platform_amazon_image: "Amazon 主图", platform_alibaba: "阿里国际站", platform_tiktok: "TikTok Shop", compliance_us: "美国合规", compliance_mx: "墨西哥合规", compliance_eu: "欧盟合规", compliance_jp: "日本合规", compliance_eaeu: "欧亚经济联盟合规", compliance_ng: "尼日利亚合规", contract: "合同条款", culture: "商务礼仪" });
 
 // ------------------------------------------------------------------ shared renderers
 function highlight(text, findings, field) {
@@ -133,7 +136,10 @@ function stepsBar(names, trace, running) {
   const items = names.map((n, i) => {
     const t = trace && trace[i];
     const cls = running ? (i === 0 ? "run" : "") : "done";
-    const meta = t ? `<span class="t">${t.meta.source === "replay" ? "回放 " : ""}${fmtS(t.meta.seconds)}</span>` : "";
+    // replay = no model call, the recorded answer was reused, so there is no latency worth showing
+    const meta = !t ? "" : t.meta.source === "replay"
+      ? `<span class="t" data-tip="这一步没有调用模型，用的是 ${esc(t.meta.model || "")} 录制的结果（回放模式）；切到实时模式后这里显示实际耗时">回放 · 录制结果</span>`
+      : `<span class="t" data-tip="这一步实时调用了 ${esc(t.meta.model || "模型")}">实时 ${fmtS(t.meta.seconds)}</span>`;
     const num = running ? (i === 0 ? ic("loader-circle", "sm spin") : i + 1) : ic("circle-check-big", "sm");
     return `<div class="step ${cls}"><span class="n">${num}</span><span>${esc(n)}</span>${meta}</div>`;
   });
@@ -151,13 +157,56 @@ function roundsHtml(st, key) {
 function composer(id, chips, round) {
   return `<div class="composer"><div class="chips">${chips.map((c) => `<button class="chip" data-chip="${id}">${esc(c)}</button>`).join("")}</div>
     <div class="in"><textarea id="${id}-ins" rows="1" placeholder="用中文提修改意见，例如：按风险提示全部修改"></textarea>
+    <button class="btn icon mic" data-mic="${id}-ins" data-lang="zh-CN" title="${esc(MIC_TIP)}">${ic("mic")}</button>
     <button class="btn primary" id="${id}-rev">${ic("send", "sm")}改出第 ${round} 轮</button></div></div>`;
 }
 
 function wireComposer(id, fn) {
   $$(`[data-chip="${id}"]`).forEach((b) => b.addEventListener("click", () => { $(`#${id}-ins`).value = b.textContent; $(`#${id}-ins`).focus(); }));
   $(`#${id}-rev`).addEventListener("click", fn);
+  wireMics($(`#${id}-ins`).closest(".composer"));
   $(`#${id}-ins`).addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); fn(); } });
+}
+
+// ------------------------------------------------------------------ voice input
+// Speech to text is done by the browser (Chrome sends the audio to its speech service, so it needs the internet);
+// no model call and no audio is stored. Only Chrome and Edge have it.
+const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+const MIC_TIP = "语音输入：由浏览器把语音转成文字（Chrome / Edge，需联网，音频会发到浏览器的语音服务），不经过我们的模型";
+const MIC_LANGS = [["en-US", "英语"], ["es-MX", "西语"], ["de-DE", "德语"], ["ja-JP", "日语"], ["ru-RU", "俄语"], ["zh-CN", "中文"]];
+const LANG_FOR = { en: "en-US", es: "es-MX", de: "de-DE", ja: "ja-JP", ru: "ru-RU" };
+let micOn = null;
+function micBar(targetId, langs) {
+  const pick = langs ? `<select class="mic-lang" data-for="${targetId}" title="说的是哪种语言">${MIC_LANGS.map(([v, n]) => `<option value="${v}">${n}</option>`).join("")}</select>` : "";
+  return `<div class="mic-bar"><button type="button" class="btn sm mic" data-mic="${targetId}" data-lang="zh-CN" title="${esc(MIC_TIP)}">${ic("mic", "sm")}<span>语音输入</span></button>${pick}
+    <span class="small muted">${langs ? "听买家电话或语音时直接转写" : "用中文说出意图"}</span></div>`;
+}
+function wireMics(root) {
+  $$("[data-mic]", root).forEach((b) => b.addEventListener("click", (e) => {
+    e.preventDefault();
+    const sel = $(`.mic-lang[data-for="${b.dataset.mic}"]`);
+    toggleMic(b, $(`#${b.dataset.mic}`), sel ? sel.value : b.dataset.lang);
+  }));
+}
+function toggleMic(btn, el, lang) {
+  if (micOn) { const same = micOn.btn === btn; micOn.rec.stop(); if (same) return; }
+  if (!SpeechRec) return toast("这个浏览器不支持语音识别，请用 Chrome 或 Edge 打开");
+  const rec = new SpeechRec();
+  rec.lang = lang; rec.interimResults = true; rec.continuous = true;
+  const before = el.value, sep = before && !/\s$/.test(before) && !lang.startsWith("zh") && !lang.startsWith("ja") ? " " : "";
+  let done = "";
+  rec.onresult = (e) => {
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) done += e.results[i][0].transcript; else interim += e.results[i][0].transcript;
+    }
+    el.value = before + sep + done + interim;
+  };
+  rec.onerror = (e) => toast(({ "not-allowed": "没有麦克风权限：请在浏览器地址栏允许使用麦克风", "service-not-allowed": "浏览器不允许使用语音服务",
+    "no-speech": "没有听到声音，请再试一次", network: "语音识别需要联网（浏览器把音频发到它的语音服务）", "audio-capture": "没有找到麦克风" })[e.error] || `语音识别出错：${e.error}`);
+  rec.onend = () => { btn.classList.remove("on"); if (micOn && micOn.rec === rec) micOn = null; };
+  try { rec.start(); } catch (err) { return toast(`语音识别没有启动：${err.message}`); }
+  btn.classList.add("on"); micOn = { rec, btn };
 }
 
 function loadingCard(names) {
@@ -307,7 +356,7 @@ async function renderOverview() {
 
 // ------------------------------------------------------------------ A: inquiry
 function renderSamples() {
-  $("#inq-samples").innerHTML = META.inquiries.map((q, i) => `<button class="sample" data-i="${i}"><span class="flag">${FLAG[q.language] || "🌐"}</span><span><b>${esc(q.label_zh)}</b><span>${esc(q.text.slice(0, 64))}…</span></span></button>`).join("");
+  $("#inq-samples").innerHTML = META.inquiries.map((q, i) => `<button class="sample" data-i="${i}"><span class="flag">${flagOf(q)}</span><span><b>${esc(q.label_zh)}</b><span>${esc(q.text.slice(0, 64))}…</span></span></button>`).join("");
   $$("#inq-samples .sample").forEach((b) => b.addEventListener("click", () => pickSample(+b.dataset.i)));
 }
 function pickSample(i) {
@@ -315,13 +364,14 @@ function pickSample(i) {
   state.inqId = q.id;
   $$("#inq-samples .sample").forEach((b) => b.classList.toggle("on", +b.dataset.i === i));
   $("#inq-text").value = q.text; $("#inq-intent").value = q.intent_zh; $("#inq-product").value = q.product_id;
+  const sel = $('.mic-lang[data-for="inq-text"]'); if (sel && LANG_FOR[q.language]) sel.value = LANG_FOR[q.language];
 }
 
-function analysisCard(u) {
+function analysisCard(u, flag) {
   const b = u.buyer || {};
   const items = (arr, fn) => (arr && arr.length ? arr.map(fn).join("") : `<div class="small muted">无</div>`);
   return `<div class="card" style="margin-top:16px"><div class="card-h"><div><h3>${ic("user")}询盘分析</h3><p>每一条都标了询盘原文；找不到原文出处的条目已被丢弃${u.dropped_without_quote ? `（${u.dropped_without_quote} 条）` : ""}</p></div></div>
-    <div class="analysis-grid"><div class="buyer"><div class="row"><div class="avatar">${FLAG[b.language] || "🌐"}</div><div><b>${esc(b.country_guess || "未知国家")}</b><div class="small muted">${esc(b.business_type_zh || "")}</div></div></div>
+    <div class="analysis-grid"><div class="buyer"><div class="row"><div class="avatar">${flag || FLAG[b.language] || "🌐"}</div><div><b>${esc(b.country_guess || "未知国家")}</b><div class="small muted">${esc(b.business_type_zh || "")}</div></div></div>
       <div class="kv"><span>渠道</span><b>${esc(b.sales_channel_zh || "—")}</b><span>语言</span><b>${esc(b.language || "—")}</b></div>
       <div class="sep"></div><div class="small">${esc(u.summary_zh || "")}</div></div>
     <div class="items">
@@ -369,7 +419,7 @@ function renderInquiry() {
     </div>
     <div class="result" style="margin-top:16px" data-scope>
       <div class="card"><div class="tabs" id="inq-tabs">
-          <button class="on" data-t="reply">${ic("send", "sm")}发给买家 <span class="badge">${FLAG[r.language] || ""} ${esc(r.language)}</span></button>
+          <button class="on" data-t="reply">${ic("send", "sm")}发给买家 <span class="badge">${flagOf(r)} ${esc(r.language)}</span></button>
           <button data-t="brief">${ic("building-2", "sm")}内部备忘 <span class="badge">中文</span></button>
           <button data-t="diff" ${r.diff ? "" : "disabled"}>${ic("git-compare-arrows", "sm")}与上一轮对比</button>
         </div>
@@ -382,7 +432,7 @@ function renderInquiry() {
     </div>
     ${latest ? journeyCard() : ""}
     ${tasksCard(r)}
-    ${analysisCard(st.history[0].understanding)}
+    ${analysisCard(st.history[0].understanding, flagOf(r))}
     ${latest ? composer("inq", ["按风险提示全部修改", "语气更热情一点，强调可以寄样", "把定金改成 50%", "再简短一点"], st.history.length + 1) : ""}`;
   $$("#inq-tabs button").forEach((b) => b.addEventListener("click", () => {
     $$("#inq-tabs button").forEach((x) => x.classList.toggle("on", x === b));
@@ -752,7 +802,7 @@ async function renderInbox() {
     const reply = x.reply ? `<span class="badge ${x.reply.risk}">已生成第 ${x.reply.round} 轮 · ${RISK[x.reply.risk]}</span>` : `<span class="badge">未回复</span>`;
     const why = p ? `<details><summary class="small muted" style="cursor:pointer;margin-top:6px">为什么是 ${p.score} 分</summary><div class="why"><div><span class="d">50</span><span>基础分</span></div>${p.components.map((c) => `<div><span class="d ${c.delta > 0 ? "p" : "n"}">${c.delta > 0 ? "+" : ""}${c.delta}</span><span>${esc(c.label_zh)}${c.quote ? ` <span class="muted">“${esc(c.quote)}”</span>` : ""}</span></div>`).join("")}</div></details>` : "";
     return `<div class="mail"><div class="prio ${p ? p.level : "none"}"${p ? ` style="--p:${Math.max(0, Math.min(100, p.score))}"` : ""}>${p ? `${p.score}<small>${p.level}优先</small>` : "未整理"}</div>
-      <div class="body"><b>${FLAG[q.language] || ""} ${esc(q.label_zh)}</b> <span class="small muted">${esc(q.id)} · ${esc(b.country_guess || "")} ${esc(b.business_type_zh || "")}</span>
+      <div class="body"><b>${flagOf(q)} ${esc(q.label_zh)}</b> <span class="small muted">${esc(q.id)} · ${esc(b.country_guess || "")} ${esc(b.business_type_zh || "")}</span>
         <div class="sum">${esc(u.summary_zh || "")}</div><div class="q">${esc(q.text)}</div>${why}</div>
       <div class="side">${reds ? `<span class="badge red">硬冲突 ${reds}</span>` : ""}${ambers ? `<span class="badge amber">待确认 ${ambers}</span>` : ""}${reply}
         <button class="btn sm" data-open="${esc(q.id)}">${ic("send", "sm")}处理</button></div></div>`;
@@ -977,7 +1027,7 @@ async function renderKB() {
   KB = KB || (await api("/api/kb"));
   const CAT = catNames();
   const verified = KB.rules.filter((r) => r.verified).length;
-  $("#kb-note").textContent = `${verified}/${KB.rules.length} 条已对照原文逐字核实 · 抓取日期 ${KB.version} · 未核实的规则不参与检查`;
+  $("#kb-note").textContent = `${verified}/${KB.rules.length} 条已对照原文逐字核实 · 最近更新 ${KB.version} · 未核实的规则不参与检查`;
   const counts = {};
   KB.rules.forEach((r) => (counts[r.category] = (counts[r.category] || 0) + 1));
   $("#kb-cats").innerHTML = [["all", "全部", KB.rules.length], ...Object.entries(counts).map(([c, n]) => [c, CAT[c] || c, n])]
@@ -1103,7 +1153,7 @@ async function tourSteps() {
   return [
     { d: 6000, cap: "TradeDesk 出海工作台：询盘 → 回复 → 上架，每一条风险提示都有出处。", sub: "给宁波中小外贸工厂的 AI 助手（演示数据为虚构）",
       run: async () => { go("overview"); await sleep(400); spot("#ov-stats"); } },
-    { d: 7000, cap: "业务员每天先看收件箱：8 条询盘按优先级排好，每一分都能看到依据。", sub: "分数由代码按公开公式计算，依据是询盘原文",
+    { d: 7000, cap: `业务员每天先看收件箱：${META.inquiries.length} 条询盘按优先级排好，每一分都能看到依据。`, sub: "分数由代码按公开公式计算，依据是询盘原文",
       run: async () => { go("inbox"); await renderInbox(); showInboxTab("list"); const d = $("#inbox-list details"); if (d) d.open = true; spot($("#inbox-list .mail")); } },
     { d: 8000, cap: "这条美国询盘里埋了五个坑：要 UL、要 BPA free、FOB 空运、20 天交货、货到 60 天付款。", sub: "询盘分析员逐条找出和工厂资料对不上的地方，每条都标了询盘原文",
       run: async () => { go("inquiry"); pickSample(0); state.inqId = null; await runInquiry(); await sleep(300); spot($("#inq-out .analysis-grid")); } },
@@ -1180,6 +1230,9 @@ async function boot() {
   META = await api("/api/meta");
   renderModelCard();
   $$(".product-select").forEach((s) => { s.innerHTML = META.products.map((p) => `<option value="${p.id}">${esc(p.name_zh)}</option>`).join(""); });
+  $("#inq-text").insertAdjacentHTML("afterend", micBar("inq-text", true));
+  $("#inq-intent").insertAdjacentHTML("afterend", micBar("inq-intent", false));
+  wireMics($("#inq-bench .left"));
   renderSamples(); pickSample(0); renderInquiry();
   renderProducts(); renderListing();
   renderCheckControls();
