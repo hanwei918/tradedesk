@@ -1,8 +1,8 @@
 {
   "app": "TradeDesk 出海工作台",
   "model": {
-    "endpoint": "https://api.anthropic.com",
-    "model": "claude-opus-5-5",
+    "endpoint": "https://api.tokenhubcloud.net/v1/chat/completions",
+    "model": "gpt-5.5",
     "temperature": 0,
     "seed": 42,
     "response_format": "json_object",
@@ -68,6 +68,201 @@
       "prompt_text": "你是外贸合规审核员。下面给你一段待发布的文本，以及一组规则（每条有编号、规则原文摘录和要判断的问题）。\n\n只根据给出的规则判断。另外会给你工厂与产品资料，用来核对待审文本里的价格、条款、材料、认证等事实；资料本身不是待审对象。\n如果待审文本与资料一致、也符合规则，就不要报。对每一个问题：\n- 必须写 `rule_id`：只能是下面列出的规则编号之一。\n- 必须写 `quote`：从待审文本里逐字复制出有问题的那一小段（不超过 20 个词）。\n- 写不出规则编号或原文片段的问题，不要输出。宁可漏报，不要编造。\n- severity：red = 明确违反规则；amber = 有风险、需要人确认。\n- problem_zh / suggestion_zh 用简体中文，suggestion 给出具体改法。\n\n只输出 JSON：\n{\"findings\": [{\"rule_id\": \"...\", \"quote\": \"...\", \"severity\": \"red|amber\", \"problem_zh\": \"...\", \"suggestion_zh\": \"...\"}]}\n如果没有问题：{\"findings\": []}\n"
     }
   ],
+  "listing_agents": [
+    {
+      "platform": "amazon_us",
+      "platform_name": "Amazon 美国站",
+      "role": "ops_amazon",
+      "role_zh": "Amazon 运营",
+      "default_language": "en",
+      "rules": [
+        "AMZ-01",
+        "AMZ-02",
+        "AMZ-03",
+        "AMZ-04",
+        "AMZ-05",
+        "AMZ-06",
+        "AMZ-07",
+        "IMG-01",
+        "IMG-02",
+        "IMG-03",
+        "IMG-04",
+        "IMG-05",
+        "IMG-06",
+        "IMG-07",
+        "IMG-08",
+        "IMG-09",
+        "IMG-10",
+        "US-01",
+        "US-02",
+        "US-03",
+        "US-04"
+      ],
+      "prompt_file": "prompts/listing_amazon.md",
+      "prompt_text": "你是熟悉 Amazon US 的跨境运营。根据中文产品资料，写一个美国站 Listing（英文）。\n\n要求：\n- 用美国消费者的说法写卖点，不要逐字翻译中文。\n- 标题：品牌占位用 \"[Brand]\"，包含核心关键词、容量、材质、主要功能。\n- 5 条要点（bullets），每条先给一个大写短语，再解释好处。\n- 描述（description）2–3 段。\n- search_terms：后台搜索词，空格分隔。\n- 只写资料里有的事实。资料里写明\"没有\"的认证、\"未做\"的检测，不能写成具备；工厂内部测试的数据不要写成第三方认证结论。\n\n如果给了\"上一版\"和\"修改意见\"，在上一版基础上按意见修改。\n\n只输出 JSON：\n{\"title\": \"...\", \"bullets\": [\"...\", \"...\", \"...\", \"...\", \"...\"], \"description\": \"...\", \"search_terms\": \"...\", \"notes_zh\": \"一句话说明写法\"}\n"
+    },
+    {
+      "platform": "tiktok_mx",
+      "platform_name": "TikTok Shop 墨西哥",
+      "role": "ops_tiktok",
+      "role_zh": "TikTok 内容运营",
+      "default_language": "es",
+      "rules": [
+        "MX-01",
+        "MX-02",
+        "MX-03",
+        "TT-01",
+        "TT-02",
+        "TT-03"
+      ],
+      "prompt_file": "prompts/listing_tiktok.md",
+      "prompt_text": "你是做 TikTok Shop 墨西哥站的内容运营。根据中文产品资料，写一条西班牙语（墨西哥用语）的短视频种草内容。\n\n要求：\n- 口语化、有画面感，像墨西哥本地创作者在说话，不是翻译腔；用墨西哥常见说法。\n- `hook`：视频前 3 秒的开场白。\n- `script`：15–30 秒口播脚本，分 3–5 个镜头（每个镜头一句画面描述 + 一句台词）。\n- `caption`：发布文案。\n- `hashtags`：5–8 个。\n- 只写资料里有的事实；不能夸大功效（例如\"最好的\"\"100% 安全\"\"保证健康\"），资料里没有的认证和检测不能说有。电压写 127V。\n\n如果给了\"上一版\"和\"修改意见\"，在上一版基础上按意见修改。\n\n只输出 JSON：\n{\"hook\": \"...\", \"script\": [{\"shot_zh\": \"画面描述（中文）\", \"line\": \"西语台词\"}], \"caption\": \"...\", \"hashtags\": [\"#...\"], \"notes_zh\": \"一句话说明写法\"}\n"
+    },
+    {
+      "platform": "amazon_uk",
+      "platform_name": "Amazon 英国站",
+      "role": "ops_amazon",
+      "role_zh": "Amazon 运营",
+      "default_language": "en",
+      "rules": [
+        "AMZ-01",
+        "AMZ-02",
+        "AMZ-03",
+        "AMZ-04"
+      ],
+      "prompt_file": "prompts/listing_amazon_uk.md",
+      "prompt_text": "You are an experienced Amazon UK marketplace operator writing a product listing in UK English.\nUse natural UK English spelling and phrasing. Keep `notes_zh` in Simplified Chinese.\n\nWrite a concise title, five factual benefit-led bullets, a 2-3 paragraph description, and search terms. Do not invent local laws, certifications, guarantees, product specifications, prices, or shipping promises. Use only the supplied factory and product facts. Never claim a certification or test that the factory does not hold. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"search_terms\":\"...\",\"notes_zh\":\"...\"}\n"
+    },
+    {
+      "platform": "amazon_de",
+      "platform_name": "Amazon 德国站",
+      "role": "ops_amazon",
+      "role_zh": "Amazon 运营",
+      "default_language": "de",
+      "rules": [
+        "AMZ-01",
+        "AMZ-02",
+        "AMZ-03",
+        "AMZ-04",
+        "AMZ-DE-01",
+        "EU-01",
+        "EU-02"
+      ],
+      "prompt_file": "prompts/listing_amazon_de.md",
+      "prompt_text": "You are an experienced Amazon Germany marketplace operator writing a product listing in German.\nUse natural German suitable for a German-language product detail page. Keep `notes_zh` in Simplified Chinese.\n\nWrite a concise title, five factual benefit-led bullets, a 2-3 paragraph description, and search terms. Do not invent local laws, certifications, guarantees, product specifications, prices, or shipping promises. Use only the supplied factory and product facts. Never claim a certification or test that the factory does not hold. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"search_terms\":\"...\",\"notes_zh\":\"...\"}\n"
+    },
+    {
+      "platform": "amazon_jp",
+      "platform_name": "Amazon 日本站",
+      "role": "ops_amazon",
+      "role_zh": "Amazon 运营",
+      "default_language": "ja",
+      "rules": [
+        "AMZ-01",
+        "AMZ-02",
+        "AMZ-03",
+        "AMZ-04",
+        "AMZ-JP-01",
+        "JP-01"
+      ],
+      "prompt_file": "prompts/listing_amazon_jp.md",
+      "prompt_text": "You are an experienced Amazon Japan marketplace operator writing a product listing in Japanese.\nUse natural Japanese suitable for a Japanese-language product detail page. Keep `notes_zh` in Simplified Chinese.\n\nWrite a concise product title, five factual benefit-led bullets, a clear description, and Japanese search terms. Do not invent local laws, certifications, guarantees, product specifications, prices, or shipping promises. Use only the supplied factory and product facts. Never claim a certification or test that the factory does not hold. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"search_terms\":\"...\",\"notes_zh\":\"...\"}\n"
+    },
+    {
+      "platform": "ebay",
+      "platform_name": "eBay",
+      "role": "ops_ebay",
+      "role_zh": "eBay 运营",
+      "default_language": "en",
+      "rules": [
+        "EBAY-01",
+        "EBAY-02",
+        "EBAY-03"
+      ],
+      "prompt_file": "prompts/listing_ebay.md",
+      "prompt_text": "You are an experienced eBay marketplace operator writing an English product listing.\nKeep `notes_zh` in Simplified Chinese. Make the title identify the product clearly, then organize the supplied facts into a short description, five factual bullets, and relevant search keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+    },
+    {
+      "platform": "shopify",
+      "platform_name": "Shopify 独立站",
+      "role": "ops_shopify",
+      "role_zh": "Shopify 运营",
+      "default_language": "en",
+      "rules": [],
+      "prompt_file": "prompts/listing_shopify.md",
+      "prompt_text": "You are an experienced Shopify storefront content operator writing an English product page.\nKeep `notes_zh` in Simplified Chinese. Present the product's supplied features clearly in a title, short introduction, five factual bullets, longer description, and search keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+    },
+    {
+      "platform": "etsy",
+      "platform_name": "Etsy",
+      "role": "ops_etsy",
+      "role_zh": "Etsy 运营",
+      "default_language": "en",
+      "rules": [
+        "ETSY-01",
+        "ETSY-02"
+      ],
+      "prompt_file": "prompts/listing_etsy.md",
+      "prompt_text": "You are an experienced Etsy marketplace operator writing an English product listing.\nKeep `notes_zh` in Simplified Chinese. Describe only the supplied product and its verified attributes. Do not imply an item is handmade, vintage, or custom-made unless the supplied facts explicitly establish that. Write a clear title, concise description, five factual bullets, and relevant keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+    },
+    {
+      "platform": "walmart_us",
+      "platform_name": "Walmart 美国站",
+      "role": "ops_walmart",
+      "role_zh": "Walmart 运营",
+      "default_language": "en",
+      "rules": [
+        "US-01",
+        "US-02",
+        "US-03",
+        "US-04",
+        "WMT-01",
+        "WMT-02",
+        "WMT-03"
+      ],
+      "prompt_file": "prompts/listing_walmart_us.md",
+      "prompt_text": "You are an experienced Walmart US Marketplace content operator writing a US English product listing.\nKeep `notes_zh` in Simplified Chinese. Write a factual, easy-to-scan title, short description, five benefit-led bullets, full description, and relevant search keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+    },
+    {
+      "platform": "mercadolibre_mx",
+      "platform_name": "Mercado Libre 墨西哥",
+      "role": "ops_mercadolibre",
+      "role_zh": "Mercado Libre 运营",
+      "default_language": "es",
+      "rules": [
+        "ML-01",
+        "ML-02",
+        "ML-03",
+        "MX-01",
+        "MX-02",
+        "MX-03"
+      ],
+      "prompt_file": "prompts/listing_mercadolibre_mx.md",
+      "prompt_text": "You are an experienced Mercado Libre Mexico marketplace operator writing a product listing in Mexican Spanish.\nUse natural Mexican Spanish. Keep `notes_zh` in Simplified Chinese. Write a clear title, short description, five factual benefits, full description, and relevant Spanish keywords. Do not invent certifications, guarantees, specifications, prices, or shipping promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+    },
+    {
+      "platform": "aliexpress",
+      "platform_name": "AliExpress",
+      "role": "ops_aliexpress",
+      "role_zh": "AliExpress 运营",
+      "default_language": "en",
+      "rules": [
+        "AE-01",
+        "AE-02",
+        "AE-03"
+      ],
+      "prompt_file": "prompts/listing_aliexpress.md",
+      "prompt_text": "You are an experienced AliExpress marketplace operator writing an English product listing.\nKeep `notes_zh` in Simplified Chinese. Write a clear title, short description, five factual benefits, full description, and relevant search keywords. Use only supplied product facts; do not invent certifications, guarantees, specifications, prices, or delivery promises. If a previous version and revision notes are supplied, revise that version while preserving unaffected content.\n\nReturn JSON only:\n{\"title\":\"...\",\"short_description\":\"...\",\"bullets\":[\"...\",\"...\",\"...\",\"...\",\"...\"],\"description\":\"...\",\"keywords\":[\"...\",\"...\",\"...\"],\"notes_zh\":\"...\"}\n"
+    }
+  ],
+  "listing_languages": {
+    "en": "英语",
+    "es": "西班牙语",
+    "zh": "中文",
+    "de": "德语",
+    "ja": "日语",
+    "ru": "俄语"
+  },
   "workflows": [
     {
       "id": "D",
@@ -164,6 +359,11 @@
       "trigger_zh": "新品上架 / 运营修改意见",
       "steps": [
         {
+          "step_zh": "选上架平台（11 个）和每个平台的输出语言（6 种）",
+          "agent": null,
+          "detail_zh": "默认 Amazon 美国站英语 + TikTok 墨西哥西语；其他平台的生成角色和提示词见 listing_agents"
+        },
+        {
           "step_zh": "生成 Amazon 美国站 Listing（英语）",
           "agent": "ops_amazon",
           "kb_zh": "注入 amazon_us 规则摘要"
@@ -188,17 +388,26 @@
   "platforms": {
     "alibaba_rfq": "阿里巴巴国际站 · RFQ 回复",
     "amazon_us": "Amazon 美国站 · Listing",
-    "tiktok_mx": "TikTok Shop 墨西哥 · 种草短视频"
+    "tiktok_mx": "TikTok Shop 墨西哥 · 种草短视频",
+    "amazon_uk": "Amazon 英国站 · Listing",
+    "amazon_de": "Amazon 德国站 · Listing",
+    "amazon_jp": "Amazon 日本站 · Listing",
+    "ebay": "eBay · Listing",
+    "shopify": "Shopify 独立站 · Listing",
+    "etsy": "Etsy · Listing",
+    "walmart_us": "Walmart 美国站 · Listing",
+    "mercadolibre_mx": "Mercado Libre 墨西哥 · Listing",
+    "aliexpress": "AliExpress · Listing"
   },
   "knowledge_base": {
     "file": "kb/rules.json",
-    "version": "2026-10-26",
-    "rules_total": 38,
-    "rules_verified": 38,
+    "version": "2026-10-31",
+    "rules_total": 61,
+    "rules_verified": 61,
     "by_category": {
       "platform_amazon": {
-        "verified": 7,
-        "total": 7
+        "verified": 9,
+        "total": 9
       },
       "platform_alibaba": {
         "verified": 3,
@@ -227,6 +436,42 @@
       "platform_amazon_image": {
         "verified": 10,
         "total": 10
+      },
+      "compliance_eu": {
+        "verified": 2,
+        "total": 2
+      },
+      "compliance_jp": {
+        "verified": 2,
+        "total": 2
+      },
+      "compliance_eaeu": {
+        "verified": 2,
+        "total": 2
+      },
+      "compliance_ng": {
+        "verified": 1,
+        "total": 1
+      },
+      "platform_ebay": {
+        "verified": 3,
+        "total": 3
+      },
+      "platform_etsy": {
+        "verified": 2,
+        "total": 2
+      },
+      "platform_walmart": {
+        "verified": 3,
+        "total": 3
+      },
+      "platform_mercadolibre": {
+        "verified": 3,
+        "total": 3
+      },
+      "platform_aliexpress": {
+        "verified": 3,
+        "total": 3
       }
     },
     "check_map": {

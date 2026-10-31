@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from tradedesk.kb import KnowledgeBase, PLATFORM_NAMES  # noqa: E402
+from tradedesk.listing_catalog import LANGUAGES, LISTING_PLATFORMS  # noqa: E402
 from tradedesk.llm import LLM  # noqa: E402
 from tradedesk.workflows import ROLES  # noqa: E402
 
@@ -58,6 +59,8 @@ WORKFLOWS = [
      ]},
     {"id": "B", "name_zh": "多平台上架", "trigger_zh": "新品上架 / 运营修改意见",
      "steps": [
+         {"step_zh": "选上架平台（11 个）和每个平台的输出语言（6 种）", "agent": None,
+          "detail_zh": "默认 Amazon 美国站英语 + TikTok 墨西哥西语；其他平台的生成角色和提示词见 listing_agents"},
          {"step_zh": "生成 Amazon 美国站 Listing（英语）", "agent": "ops_amazon", "kb_zh": "注入 amazon_us 规则摘要"},
          {"step_zh": "生成 TikTok 墨西哥种草脚本（西语）", "agent": "ops_tiktok", "kb_zh": "注入 tiktok_mx 规则摘要"},
          {"step_zh": "规则校验 + 模型审核（按平台分别进行）", "agent": "compliance"},
@@ -77,6 +80,13 @@ def main():
                         prompt_file=f"prompts/{a['prompt']}.md",
                         prompt_text=(ROOT / "prompts" / f"{a['prompt']}.md").read_text(encoding="utf-8"))
                    for a in AGENTS],
+        "listing_agents": [{"platform": pid, "platform_name": c["name"], "role": c["role"], "role_zh": ROLES[c["role"]],
+                            "default_language": c["default_language"],
+                            "rules": [r["id"] for r in kb.rules_for(pid)],
+                            "prompt_file": f"prompts/{c['prompt']}.md",
+                            "prompt_text": (ROOT / "prompts" / f"{c['prompt']}.md").read_text(encoding="utf-8")}
+                           for pid, c in LISTING_PLATFORMS.items()],
+        "listing_languages": {k: v["name"] for k, v in LANGUAGES.items()},
         "workflows": WORKFLOWS,
         "platforms": PLATFORM_NAMES,
         "knowledge_base": {
