@@ -12,6 +12,8 @@
 - **红队测试**：往审核结果里注入编造的模型提示（不存在的规则编号、原文里没有的话、不适用的规则、空引用），出处守卫逐条拦下并说明原因；评测页上可以自己改 JSON 再试。
 - **降本测算**：评测页里列出替换掉的工作、实测的模型费用和耗时（从仓库记录算出，写明出处），以及可改的示例假设（询盘量、人工用时、时薪、外包单价），按算式给出每月测算。人工节省没有实测，页面上写明了。
 - **工作流串联**：询盘回复结果下方一键带着同一份产品资料去生成上架文案，上架结果再写进商品看板。
+- **六个市场**：除美国、墨西哥外，示例询盘还覆盖欧盟（德国，德语）、日本（日语）、哈萨克斯坦（欧亚经济联盟，俄语）、尼日利亚（英语）。市场按询盘标注的国家判断，各市场的认证要求（CE / RoHS、PSE、EAC、SONCAP）写在 `app/data/markets.json`，只并入该市场的提示词和代码校验，美国、墨西哥的请求一字不变（有测试用录好的缓存逐条回放来保证）。
+- **语音输入**：询盘原文和中文意图、修改意见旁边有麦克风按钮，由浏览器把语音转成文字（Chrome / Edge，需联网，音频发到浏览器的语音服务，不经过模型）。
 - **自动演示**：右上角一键播放 12 步带字幕的走查，`#tour=loop` 可在摊位循环播放。
 - **游园会找茬**：`python3 server.py --lan` 后手机扫码答题，答案由代码规则计算；局域网访问只开放找茬页面，其余接口一律 403。
 - **工作流 C · 商品看板**：所有产品 × 主图 / Amazon / TikTok 的最新状态一屏看清；一键批量生成上品，导出 CSV。主图按 Amazon 美国站的 10 条要求检查：尺寸、白底、产品占比、是否贴边由代码测量，文字、徽章、道具、是否实拍由模型看图判断。
@@ -66,7 +68,7 @@ LLM_MODEL=claude-opus-5-5
 cd app
 TRADEDESK_MODE=record python3 tools/record_demo.py   # 把固定演示输入跑一遍并缓存
 TRADEDESK_MODE=replay python3 server.py              # 断网也能演示
-python3 -m unittest discover -s tests -v             # 测试（60 项）
+python3 -m unittest discover -s tests -v             # 测试（67 项）
 python3 tools/cost_report.py                         # 每条询盘的调用成本（先跑 record_demo 生成日志）
 TRADEDESK_MODE=replay python3 tools/run_baseline.py  # 对照实验（缓存齐全时不联网）
 TRADEDESK_MODE=replay python3 server.py --lan        # 游园会：手机扫码访问 /play，大屏打开 /play#screen
@@ -90,10 +92,10 @@ app/
   tradedesk/cost.py      从调用日志统计每条询盘的 token 与费用
   data/redteam.json      红队测试的注入样例
   prompts/*.md           各角色提示词（含主图审核员、对照组的通用助手）
-  kb/rules.json          规则知识库（38 条，每条带原文摘录与来源 URL）
+  kb/rules.json          规则知识库（45 条，每条带原文摘录与来源 URL）
   config/check_map.json  内置检查 → 依据的知识库规则
   config/agents.json     平台配置导出
-  data/                  示例工厂、4 个产品、8 条询盘、3 道找茬题（虚构）
+  data/                  示例工厂、4 个产品、12 条询盘、各市场认证状态、3 道找茬题（虚构）
   static/samples/        示例主图（示意图，不是实拍照片）
   static/                网页界面（设计规范移植自 shadcn/ui，图标 Lucide，全部本地文件）
   tests/                 单元测试
