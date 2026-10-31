@@ -36,7 +36,7 @@ LLM_MODEL=...
 
 任何 OpenAI 兼容的 Chat Completions 接口都可以用。赛事赞助的 Tokenhub 填到 `/v1` 即可，程序会补上 `/chat/completions`。模型名因 key 而异，用"模型设置"里的「查可用模型」从列表里选（等同于调用 `/v1/models`）。
 
-现场用的就是这条路：赛事发的 Tokenhub key 属于 Codex 周卡分组，`/v1/models` 里只有 GPT 系列。2026-10-30 用 `gpt-5.5` 实测跑通工作流 A（3 次调用，共 22.3 秒）。
+现场用的就是这条路：赛事发的 Tokenhub key 属于 Codex 周卡分组，`/v1/models` 里只有 GPT 系列。2026-10-30 用 `gpt-5.5` 实测跑通工作流 A（3 次调用，共 22.3 秒，记录见 `docs/demo-runs/live-gpt-5.5-INQ-US-01.json`）。
 
 也可以用 Claude（Anthropic 官方 SDK，`pip install anthropic`）：
 
