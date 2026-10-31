@@ -60,7 +60,7 @@ LLM_MODEL=claude-opus-5-5
 cd app
 TRADEDESK_MODE=record python3 tools/record_demo.py   # 把固定演示输入跑一遍并缓存
 TRADEDESK_MODE=replay python3 server.py              # 断网也能演示
-python3 -m unittest discover -s tests -v             # 测试（55 项）
+python3 -m unittest discover -s tests -v             # 测试（56 项）
 python3 tools/cost_report.py                         # 每条询盘的调用成本（先跑 record_demo 生成日志）
 TRADEDESK_MODE=replay python3 tools/run_baseline.py  # 对照实验（缓存齐全时不联网）
 TRADEDESK_MODE=replay python3 server.py --lan        # 游园会：手机扫码访问 /play，大屏打开 /play#screen

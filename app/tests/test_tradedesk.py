@@ -527,6 +527,33 @@ class SettingsTests(unittest.TestCase):
         v = self.s.save({"endpoint": "https://api.tokenhubcloud.net/v1/chat/completions/", "model": "m2"}, self.env)
         self.assertEqual(v["api_key"], "sk-test-1234567890abcd")    # same address written differently
 
+    def test_saving_one_interface_keeps_the_other_ones_key(self):
+        # 2026-10-31: saving the OpenAI settings from the page deleted the owner's Claude key line
+        self.env.write_text("# my note\nLLM_PROVIDER=anthropic\nANTHROPIC_API_KEY=sk-ant-mine-0000000001\n", encoding="utf-8")
+        self.s.save({"provider": "openai", "endpoint": "https://api.tokenhubcloud.net/v1", "model": "gpt-5.5",
+                     "api_key": "hub-key-0000000002", "mode": "live"}, self.env)
+        text = self.env.read_text(encoding="utf-8")
+        self.assertIn("ANTHROPIC_API_KEY=sk-ant-mine-0000000001", text)
+        self.assertIn("LLM_API_KEY=hub-key-0000000002", text)
+        self.assertEqual(text.count("LLM_PROVIDER="), 1)
+        self.assertEqual(self.s.public_view(self.env)["saved"]["anthropic"]["key_hint"], "…0001")
+        self.assertNotIn("sk-ant-mine", json.dumps(self.s.public_view(self.env)))
+        # back to the recorded Claude replay with the key field empty: the Claude key is still there
+        v = self.s.save({"provider": "anthropic", "endpoint": "https://api.anthropic.com", "model": "claude-opus-5-5",
+                         "mode": "replay"}, self.env)
+        self.assertEqual(v["api_key"], "sk-ant-mine-0000000001")
+        text = self.env.read_text(encoding="utf-8")
+        self.assertIn("LLM_API_KEY=hub-key-0000000002", text)
+        self.assertEqual(text.count("模型设置"), 1)                  # the header is not stacked up
+        # and forward to Tokenhub again with only the type picked: its own key, and not the Claude model name
+        v = self.s.save({"provider": "openai", "endpoint": "https://api.tokenhubcloud.net/v1", "mode": "replay"}, self.env)
+        self.assertEqual((v["model"], v["api_key"]), ("gpt-5.5", "hub-key-0000000002"))
+        # and a key still never follows a new address, whichever type it belongs to
+        v = self.s.save({"provider": "openai", "endpoint": "https://evil.example/v1", "model": "m", "mode": "replay"}, self.env)
+        self.assertEqual(v["api_key"], "")
+        self.assertNotIn("hub-key", self.env.read_text(encoding="utf-8"))
+        self.assertIn("sk-ant-mine-0000000001", self.env.read_text(encoding="utf-8"))
+
 
 class GatewayTests(unittest.TestCase):
     """The event's Tokenhub, played by a local stub: guide base URL, Bearer key, /v1/models."""

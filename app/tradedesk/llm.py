@@ -23,7 +23,7 @@ CACHE_DIR = ROOT / "cache"
 
 # The event's Tokenhub (api.tokenhubcloud.net). Model names depend on the key: list them with /v1/models.
 DEFAULT_ENDPOINT = "https://api.tokenhubcloud.net/v1/chat/completions"
-DEFAULT_MODEL = "deepseek/deepseek-flash"
+DEFAULT_MODEL = "gpt-5.5"   # the event's Codex card only has GPT models (checked 2026-10-30)
 # Tokenhub sits behind Cloudflare, which answers urllib's default "Python-urllib/3.x" with 403 "error code: 1010"
 # (checked 2026-10-30, with a real token and a made-up one alike). Any other name gets through.
 USER_AGENT = "TradeDesk/1.0"

@@ -877,7 +877,7 @@ async function renderLogs() {
 // ------------------------------------------------------------------ model settings
 const MODE_ZH = { live: "实时调用", record: "实时 + 录制缓存", replay: "回放（不联网）" };
 const PROVIDER_ZH = { openai: "OpenAI 兼容（赛事 Tokenhub）", anthropic: "Claude（官方或 Tokenhub）" };
-const DEFAULTS = { openai: { endpoint: "https://api.tokenhubcloud.net/v1", model: "" }, anthropic: { endpoint: "https://api.anthropic.com", model: "claude-opus-5-5" } };
+const DEFAULTS = { openai: { endpoint: "https://api.tokenhubcloud.net/v1", model: "gpt-5.5" }, anthropic: { endpoint: "https://api.anthropic.com", model: "claude-opus-5-5" } };
 const ENDPOINT_HINT = {
   openai: "赛事 Tokenhub 填 https://api.tokenhubcloud.net/v1（使用指南「速查卡」里的 OpenAI 兼容 Base URL）",
   anthropic: "官方填 https://api.anthropic.com；走赛事 Tokenhub 填 https://api.tokenhubcloud.net",
@@ -886,16 +886,19 @@ const ENDPOINT_HINT = {
 async function openSettings() {
   const cfg = await api("/api/settings");
   let provider = cfg.provider;
+  // Each interface type keeps its own address and key in app/.env; switching shows that type's saved ones.
+  const saved = (p) => (cfg.saved && cfg.saved[p]) || {};
+  const hint = () => (cfg.provider === provider ? (cfg.key_set && cfg.key_hint) : saved(provider).key_hint);
   const body = () => `
     <div class="callout" style="margin:0">${ic("shield-check")}<div>key 只保存在这台电脑的 <code>app/.env</code>（不会提交），保存后页面不会再显示完整 key。<b>不要在微信或群里发 key。</b></div></div>
     ${cfg.env_overrides.length ? `<div class="callout warn" style="margin:0">${ic("triangle-alert")}<div>启动命令里设置了 ${esc(cfg.env_overrides.join("、"))}；保存后以这里的设置为准，重启服务时又会回到启动命令的设置。</div></div>` : ""}
     <div class="card"><div class="card-b">
       <label class="field">接口类型<div class="seg" id="set-prov">${Object.entries(PROVIDER_ZH).map(([k, v]) => `<button data-p="${k}" class="${k === provider ? "on" : ""}">${esc(v)}</button>`).join("")}</div></label>
-      <label class="field">接口地址 <span class="muted" style="font-weight:400">${esc(ENDPOINT_HINT[provider])}</span><input type="text" id="set-endpoint" value="${esc(cfg.provider === provider ? cfg.endpoint : DEFAULTS[provider].endpoint)}" placeholder="${esc(DEFAULTS[provider].endpoint || "https://…/v1")}"></label>
+      <label class="field">接口地址 <span class="muted" style="font-weight:400">${esc(ENDPOINT_HINT[provider])}</span><input type="text" id="set-endpoint" value="${esc(cfg.provider === provider ? cfg.endpoint : saved(provider).endpoint || DEFAULTS[provider].endpoint)}" placeholder="${esc(DEFAULTS[provider].endpoint || "https://…/v1")}"></label>
       <label class="field">模型名 <span class="muted" style="font-weight:400">不同 key 能用的模型不一样，点「查可用模型」从列表里选</span><input type="text" id="set-model" value="${esc(cfg.provider === provider ? cfg.model : DEFAULTS[provider].model)}" placeholder="点「查可用模型」后选择"></label>
       <div><button class="btn sm" id="set-list">${ic("search", "sm")}查可用模型</button><div class="chips" id="set-models" style="margin-top:8px"></div></div>
-      <label class="field">API key <span class="muted" style="font-weight:400">${cfg.key_set && cfg.provider === provider ? `已保存 ${esc(cfg.key_hint)}，留空表示不修改` : "还没有保存 key"}</span>
-        <input type="password" id="set-key" autocomplete="off" spellcheck="false" placeholder="${cfg.key_set && cfg.provider === provider ? "留空 = 不修改" : "粘贴 key"}"></label>
+      <label class="field">API key <span class="muted" style="font-weight:400">${hint() ? `已保存 ${esc(hint())}，留空表示不修改` : "还没有保存 key"}</span>
+        <input type="password" id="set-key" autocomplete="off" spellcheck="false" placeholder="${hint() ? "留空 = 不修改" : "粘贴 key"}"></label>
       <label class="field">模式<select id="set-mode">${Object.entries(MODE_ZH).map(([k, v]) => `<option value="${k}" ${k === cfg.mode ? "selected" : ""}>${esc(v)}</option>`).join("")}</select></label>
       <p class="small muted" style="margin:0">实时：每次点击都调用模型。录制：实时调用并存下结果，供断网时回放。回放：只用存下的结果，不联网、不需要 key。换了接口或模型后，回放缓存要重新录制（运行 <code>python3 tools/record_demo.py</code>）。</p>
     </div></div>
