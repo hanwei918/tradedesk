@@ -20,7 +20,7 @@ from pathlib import Path
 
 from tradedesk.kb import KnowledgeBase, PLATFORM_NAMES
 from tradedesk.llm import LLM, LLMError
-from tradedesk import checks, settings
+from tradedesk import checks, settings, savings
 from tradedesk.board import Board, CHANNELS
 from tradedesk.evaluate import evaluate, LABEL_ZH
 from tradedesk.inbox import TASK_STATUS
@@ -132,6 +132,10 @@ class App:
         return dict(data, label_names_zh=names)
 
     # ---------------------------------------------------------- red team (citation guard, no model call)
+    def savings_view(self, payload=None):
+        """Measured model cost and latency from the repo's records, plus editable example assumptions."""
+        return savings.view((payload or {}).get("assumptions"))
+
     def redteam_preset(self):
         data = json.loads((ROOT / "data" / "redteam.json").read_text(encoding="utf-8"))
         offered = self.kb.rules_for(data["platform"], kinds=["llm"], market=data["market"])
@@ -315,7 +319,7 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json(200, play[url.path]())
         routes = {"/api/meta": APP.meta, "/api/kb": APP.kb_rules, "/api/logs": APP.logs, "/api/board": APP.board_view,
                   "/api/inbox": APP.inbox_view, "/api/eval": APP.eval_view, "/api/settings": APP.settings_view,
-                  "/api/redteam": APP.redteam_preset}
+                  "/api/redteam": APP.redteam_preset, "/api/savings": APP.savings_view}
         if url.path in routes:
             return self._json(200, routes[url.path]())
         if url.path == "/api/baseline":
@@ -360,7 +364,7 @@ class Handler(SimpleHTTPRequestHandler):
                   "/api/settings/models": APP.settings_models,
                   "/api/redteam": APP.redteam_run,"/api/inquiry": APP.runner.inquiry, "/api/listing": APP.runner.listing,
                   "/api/check": APP.runner.check_text, "/api/image-check": APP.runner.image_check,
-                  "/api/board/mark": APP.board_mark}
+                  "/api/board/mark": APP.board_mark, "/api/savings": APP.savings_view}
         fn = routes.get(self.path)
         if not fn:
             return self._json(404, {"error": "not found"})

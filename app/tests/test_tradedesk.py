@@ -750,5 +750,74 @@ class DiffTests(unittest.TestCase):
         self.assertEqual("".join(o["text"] for o in ops if o["op"] != "insert"), "UL listed kettle")
 
 
+class SavingsTests(unittest.TestCase):
+    """The savings page: measured numbers come from files, assumptions are editable and labelled apart."""
+
+    def fixture(self, t):
+        t = Path(t)
+        price = {"input": 4.0, "output": 20.0}
+        (t / "cost_run.json").write_text(json.dumps({"prices_usd_per_mtok": {"m-1": price}, "summary": {
+            "inquiries": 3, "inquiries_with_revision": 2, "usd_round1_plus_revision": {"median": 0.5}}}), encoding="utf-8")
+        cache = t / "cache"
+        cache.mkdir()
+        calls = [("你是熟悉 Amazon US 的运营", 1000, 1000), ("你是熟悉 Amazon US 的运营", 3000, 1000),   # 0.024 / 0.032
+                 ("你是做 TikTok Shop 墨西哥", 2000, 500),                                              # 0.018
+                 ("你是外贸合规审核员。", 1000, 100), ("你是外贸合规审核员。", 1000, 300), ("你是外贸合规审核员。", 5000, 0),  # 0.006 / 0.01 / 0.02
+                 ("你是宁波一家小家电工厂", 9000, 9000)]                                                 # not part of a listing
+        for i, (system, tin, tout) in enumerate(calls):
+            (cache / f"{i}.json").write_text(json.dumps({"request": {"model": "m-1", "system": system}, "content": "{}",
+                                                         "usage": {"input_tokens": tin, "output_tokens": tout}}), encoding="utf-8")
+        (cache / "other.json").write_text(json.dumps({"request": {"model": "m-2", "system": "你是做 TikTok Shop"}, "content": "{}",
+                                                      "usage": {"input_tokens": 10 ** 6, "output_tokens": 0}}), encoding="utf-8")
+        (t / "live.json").write_text(json.dumps({"records": [{"meta": {"seconds": 8.25, "model": "g-1"}}, {"meta": {"seconds": 4.5, "model": "g-1"}},
+                                                             {"findings": [], "risk": "green"}]}), encoding="utf-8")
+        return t / "cost_run.json", cache, t / "live.json"
+
+    def test_measured_numbers_are_read_from_the_records(self):
+        from tradedesk import savings
+        with tempfile.TemporaryDirectory() as t:
+            m = savings.measured(*self.fixture(t))
+        self.assertEqual(m["usd_per_inquiry"]["value"], 0.5)
+        # Amazon median of 0.024 and 0.032 is 0.028; TikTok 0.018; review median 0.01, counted twice; other models ignored
+        self.assertAlmostEqual(m["usd_per_listing"]["value"], 0.028 + 0.018 + 2 * 0.01, places=6)
+        self.assertEqual(m["live_seconds_per_inquiry"]["value"], 12.8)  # 12.75 rounded; the review record has no timing
+        self.assertIn("g-1", m["live_seconds_per_inquiry"]["source"])
+        self.assertIn("2 条", m["usd_per_inquiry"]["source"])  # the revision median covers 2 inquiries, not 3
+
+    def test_estimate_is_the_stated_arithmetic(self):
+        from tradedesk import savings
+        m = {"usd_per_inquiry": {"value": 0.5}, "usd_per_listing": {"value": 0.25}}
+        a = savings.validate({"inquiries_per_day": 10, "workdays_per_month": 20, "manual_minutes_per_reply": 18,
+                              "review_minutes_per_reply": 6, "hourly_wage_cny": 50, "listings_per_month": 4,
+                              "outsourcing_cny_per_listing": 200, "usd_to_cny": 7})
+        e = savings.estimate(a, m)
+        self.assertEqual(e["replies_per_month"], 200)
+        self.assertEqual(e["hours_saved"], 40.0)          # 200 × (18 − 6) ÷ 60
+        self.assertEqual(e["labor_cny"], 2000)            # 40 h × 50
+        self.assertEqual(e["outsourcing_cny"], 800)       # 4 × 200
+        self.assertEqual(e["model_cny"], 707)             # (200 × 0.5 + 4 × 0.25) × 7
+        self.assertEqual(e["net_cny"], 2093)
+        # a review that takes longer than writing by hand is shown as a loss, not hidden
+        worse = savings.estimate(dict(a, review_minutes_per_reply=30), m)
+        self.assertLess(worse["hours_saved"], 0)
+
+    def test_assumptions_are_checked_and_default_to_the_examples(self):
+        from tradedesk import savings
+        self.assertEqual(savings.validate({})["inquiries_per_day"], savings.ASSUMPTIONS["inquiries_per_day"][2])
+        self.assertEqual(savings.validate({"hourly_wage_cny": "60"})["hourly_wage_cny"], 60.0)
+        for bad in ({"hourly_wage_cny": -1}, {"hourly_wage_cny": "abc"}, {"inquiries_per_day": 10 ** 6}, {"profit_margin": 3}):
+            with self.assertRaises(ValueError, msg=bad):
+                savings.validate(bad)
+
+    def test_page_keeps_measured_and_assumed_apart(self):
+        from tradedesk import savings
+        v = savings.view({"inquiries_per_day": 5})
+        self.assertEqual(set(v["measured"]), {"usd_per_inquiry", "usd_per_listing", "live_seconds_per_inquiry"})
+        self.assertTrue(all(x["source"] for x in v["measured"].values()))
+        self.assertEqual({a["key"] for a in v["assumptions"]}, set(savings.ASSUMPTIONS))
+        self.assertEqual(next(a for a in v["assumptions"] if a["key"] == "inquiries_per_day")["value"], 5)
+        self.assertIn("没有实测", v["unmeasured"])
+
+
 if __name__ == "__main__":
     unittest.main()

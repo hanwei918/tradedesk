@@ -337,6 +337,21 @@ function tasksCard(r) {
     <div class="card-b grid g3">${r.tasks.map((t) => `<div class="task"><div class="row"><span class="badge brand">${esc(t.role_zh)}</span>${t.priority === "high" ? '<span class="badge red">急</span>' : ""}</div><div style="margin-top:6px">${esc(t.task_zh)}</div><div class="q">“${esc(t.quote)}”</div></div>`).join("")}</div></div>`;
 }
 
+// The reply and the listing are two steps of one job: same product card, same factory, no re-typing.
+function journeyCard() {
+  const p = META.products.find((x) => x.id === $("#inq-product").value);
+  return `<div class="card journey"><div class="card-b"><span class="ji">${ic("git-compare-arrows")}</span>
+    <div class="jt"><b>下一步：同一个产品去上架</b><span>这条回复用的是「${esc(p ? p.name_zh : "")}」的资料卡，上架文案用同一份资料，不用重新录入</span></div>
+    <button class="btn sm" data-go-tasks>${ic("history", "sm")}看派发的任务</button>
+    <button class="btn sm primary" id="inq-next-listing">${ic("store", "sm")}为这个产品生成上架文案</button></div></div>`;
+}
+function listingFromInquiry(pid) {
+  go("listing"); pickProduct(pid);
+  $("#lst-bench").classList.remove("collapsed");
+  const p = META.products.find((x) => x.id === pid);
+  toast(`已选好「${p ? p.name_zh : pid}」的资料卡，点“生成 → 校验”`, "ok");
+}
+
 function renderInquiry() {
   const st = state.inq;
   $("#inq-rounds").innerHTML = roundsHtml(st, "inq");
@@ -365,6 +380,7 @@ function renderInquiry() {
       </div>
       <div class="card">${riskPanel(r)}</div>
     </div>
+    ${latest ? journeyCard() : ""}
     ${tasksCard(r)}
     ${analysisCard(st.history[0].understanding)}
     ${latest ? composer("inq", ["按风险提示全部修改", "语气更热情一点，强调可以寄样", "把定金改成 50%", "再简短一点"], st.history.length + 1) : ""}`;
@@ -374,6 +390,7 @@ function renderInquiry() {
   }));
   wireLinks($("#inq-out")); wireEdit($("#inq-out"));
   $$("#inq-out [data-go-tasks]").forEach((b) => b.addEventListener("click", () => { go("inbox"); showInboxTab("tasks"); }));
+  $("#inq-next-listing")?.addEventListener("click", () => listingFromInquiry($("#inq-product").value));
   if (latest) wireComposer("inq", reviseInquiry);
 }
 
@@ -471,12 +488,16 @@ function renderListing() {
   $("#lst-out").innerHTML = `<div class="card"><div class="steps-wrap">${stepsBar(names, r.trace, false)}${editBtn("lst-bench")}</div>
       ${!latest ? `<div class="callout" style="margin:12px 16px">${ic("info")}<div>正在查看第 ${st.view + 1} 轮（历史）。</div></div>` : ""}</div>
     <div class="grid ${Object.keys(r.platforms).length > 1 ? "g2" : ""}" style="margin-top:16px;align-items:start">${cards}</div>
+    ${latest ? `<div class="card journey"><div class="card-b"><span class="ji">${ic("package")}</span>
+      <div class="jt"><b>结果已写进商品看板</b><span>看板上这个产品的 Amazon 和 TikTok 格子已经更新，主图检查也在那里</span></div>
+      <button class="btn sm primary" data-go-board>${ic("package", "sm")}去商品看板</button></div></div>` : ""}
     ${latest ? composer("lst", ["按风险提示全部修改", "标题再短一点，突出 304 不锈钢", "TikTok 开头更抓人一点"], st.history.length + 1) : ""}`;
   $$("#lst-out [data-plat]").forEach((card) => $$(".seg button", card).forEach((b) => b.addEventListener("click", () => {
     $$(".seg button", card).forEach((x) => x.classList.toggle("on", x === b));
     $$("[data-view]", card).forEach((v) => (v.hidden = v.dataset.view !== b.dataset.v));
   })));
   wireLinks($("#lst-out")); wireEdit($("#lst-out"));
+  $$("#lst-out [data-go-board]").forEach((b) => b.addEventListener("click", () => go("board")));
   if (latest) wireComposer("lst", reviseListing);
 }
 
@@ -811,8 +832,8 @@ let evalTab = "compare";
 function showEvalTab(v) {
   evalTab = v;
   $$("#eval-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
-  ["compare", "rules", "redteam"].forEach((k) => ($(`#eval-${k}`).hidden = k !== v));
-  return ({ compare: renderCompare, rules: renderEval, redteam: renderRedteam })[v]();
+  ["compare", "rules", "redteam", "savings"].forEach((k) => ($(`#eval-${k}`).hidden = k !== v));
+  return ({ compare: renderCompare, rules: renderEval, redteam: renderRedteam, savings: renderSavings })[v]();
 }
 
 let BASE = null;
@@ -860,6 +881,54 @@ function compareTakeaway(S) {
     : `不给工厂资料，通用 AI ${p.replies_with_red}/${p.replies} 条回复带红色问题；附上资料后还有 ${f.replies_with_red} 条。`;
   return `<div class="callout" style="margin:16px 0 0">${ic("scan-search")}<div><b>怎么读这个结果：</b>${facts}
     TradeDesk 做的是把资料自动带进每一次回复，不靠业务员记得粘贴；需人工确认的黄色从 ${f.amber} 条降到 ${t.amber} 条，改一轮后 ${x.amber} 条，可直接发的回复从 ${f.replies_green} 条到 ${x.replies_green} 条，每条提示都挂出处。</div></div>`;
+}
+
+// ------------------------------------------------------------------ savings
+// Measured numbers (from the repo's records) and example assumptions are shown apart; the arithmetic is printed out.
+const cny = (n) => `¥${Math.round(n).toLocaleString("zh-CN")}`;
+let SV = null, svTimer = null;
+async function renderSavings() {
+  SV = SV || (await api("/api/savings"));
+  const m = SV.measured;
+  const meas = (k, v) => `<div class="sv-m"><div class="v">${v}</div><b>${esc(m[k].label)}</b><span>${esc(m[k].source)}</span></div>`;
+  $("#eval-savings").innerHTML = `
+    <div class="callout" style="margin:0 0 16px">${ic("info")}<div><b>两类数字分开标。</b><span class="badge brand">实测</span> 来自仓库里的记录，写明了出处；
+      <span class="badge">假设</span> 是示例值，请按自己工厂的情况改。${esc(SV.unmeasured)}</div></div>
+    <div class="grid g3" style="align-items:start">
+      <div class="card"><div class="card-h"><div><h3>${ic("zap")}替换掉什么</h3><p>省下的是这三块</p></div></div>
+        <div class="card-b"><ol class="sv-list">${SV.replaces.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>
+          <div class="note" style="margin-top:12px">${ic("shield-check", "sm")}<span><b>不替换：</b>${esc(SV.not_replaced)}</span></div></div></div>
+      <div class="card"><div class="card-h"><div><h3>${ic("database")}实测</h3><p>从记录里算出来，不是估计</p></div><span class="badge brand">实测</span></div>
+        <div class="card-b sv-meas">${meas("usd_per_inquiry", `$${m.usd_per_inquiry.value}`)}${meas("usd_per_listing", `$${m.usd_per_listing.value}`)}${meas("live_seconds_per_inquiry", `${m.live_seconds_per_inquiry.value} 秒`)}</div></div>
+      <div class="card"><div class="card-h"><div><h3>${ic("cpu")}假设（可改）</h3><p>示例值，按你的工厂填</p></div><span class="badge">假设</span></div>
+        <div class="card-b sv-in">${SV.assumptions.map((a) => `<label><span>${esc(a.label)}</span><span class="f"><input type="number" min="0" step="any" data-k="${a.key}" value="${a.value}">${a.unit ? `<em>${esc(a.unit)}</em>` : ""}</span></label>`).join("")}</div></div>
+    </div>
+    <div class="card" id="sv-out" style="margin-top:16px"></div>`;
+  $$("#eval-savings [data-k]").forEach((i) => i.addEventListener("input", () => { clearTimeout(svTimer); svTimer = setTimeout(updateSavings, 250); }));
+  savingsResult(SV);
+}
+async function updateSavings() {
+  const values = Object.fromEntries($$("#eval-savings [data-k]").map((i) => [i.dataset.k, i.value]));
+  try { SV = await api("/api/savings", { assumptions: values }); savingsResult(SV); $$("#eval-savings [data-k]").forEach((i) => i.classList.remove("bad")); }
+  catch (e) { toast(e.message); $$("#eval-savings [data-k]").forEach((i) => i.classList.toggle("bad", e.message.includes(SV.assumptions.find((a) => a.key === i.dataset.k).label))); }
+}
+function savingsResult(v) {
+  const a = Object.fromEntries(v.assumptions.map((x) => [x.key, x.value])), e = v.estimate, m = v.measured;
+  const tile = (k, val, d, cls = "") => `<div class="sv-k ${cls}"><span>${esc(k)}</span><b>${val}</b><small>${d}</small></div>`;
+  $("#sv-out").innerHTML = `<div class="card-h"><div><h3>${ic("scan-search")}每月测算</h3><p>用上面的实测单价和你填的假设算出来；每一行都写出了算式</p></div></div>
+    <div class="card-b"><div class="sv-tiles">
+      ${tile("省下的人工", `${e.hours_saved} 小时`, `${e.replies_per_month} 条询盘`)}
+      ${tile("人工成本", cny(e.labor_cny), "按假设时薪")}
+      ${tile("外包费用", cny(e.outsourcing_cny), `${a.listings_per_month} 个产品`)}
+      ${tile("模型费用", "−" + cny(e.model_cny), "实测单价")}
+      ${tile("每月净节省", cny(e.net_cny), "人工 + 外包 − 模型", e.net_cny >= 0 ? "pos" : "neg")}</div>
+      <div class="sv-f">
+        <div><span>人工</span><code>${a.inquiries_per_day} 条/天 × ${a.workdays_per_month} 天 × (${a.manual_minutes_per_reply} − ${a.review_minutes_per_reply}) 分钟 ÷ 60 = ${e.hours_saved} 小时；× ${a.hourly_wage_cny} 元 = ${cny(e.labor_cny)}</code></div>
+        <div><span>外包</span><code>${a.listings_per_month} 个 × ${a.outsourcing_cny_per_listing} 元 = ${cny(e.outsourcing_cny)}</code></div>
+        <div><span>模型</span><code>(${e.replies_per_month} 条 × $${m.usd_per_inquiry.value} + ${a.listings_per_month} 个 × $${m.usd_per_listing.value}) × ${a.usd_to_cny} = ${cny(e.model_cny)}</code></div>
+        <div><span>净节省</span><code>${cny(e.labor_cny)} + ${cny(e.outsourcing_cny)} − ${cny(e.model_cny)} = ${cny(e.net_cny)}</code></div>
+      </div>
+      <p class="small muted" style="margin:12px 0 0">模型单价按录制时用的 claude-opus-5-5 官方价；现场 Tokenhub 上 gpt-5.5 的价格不同，没有换算。复核时间和外包是否全部省掉，要在工厂试用时确认。</p></div>`;
 }
 
 let RT = null;
@@ -1173,7 +1242,7 @@ async function runDemoFromHash() {
   } else if (p === "check") {
     await runCheck();
   } else if (p === "eval") {
-    const tab = ({ "1": "rules", "2": "redteam" })[idx] || "compare";
+    const tab = ({ "1": "rules", "2": "redteam", "3": "savings" })[idx] || "compare";
     await showEvalTab(tab);
     if (tab === "redteam") await runRedteam();
   } else if (p === "inbox") {
