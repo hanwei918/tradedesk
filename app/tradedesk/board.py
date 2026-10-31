@@ -90,6 +90,16 @@ class Board:
                          "cells": {c: cells.get(c) or {"status": "未生成", "risk": None} for c in CHANNELS}})
         return rows
 
+    def forget(self, product_id):
+        """Drop every cell, result and image of one product (used when a product added in the app is deleted)."""
+        with self.lock:
+            data = self._read()
+            if data.pop(product_id, None) is not None:
+                self._write(data)
+            for pattern in (f"results/{product_id}__*.json", f"images/{product_id}.*"):
+                for f in self.dir.glob(pattern):
+                    f.unlink()
+
     def reset(self):
         with self.lock:
             if self.path.exists():

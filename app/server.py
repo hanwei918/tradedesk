@@ -24,6 +24,7 @@ from tradedesk import checks, settings, savings, selfcheck, sources
 from tradedesk import handoff as handoff_check
 from tradedesk.config_export import build as build_config
 from tradedesk.importer import ImportStore, parse as parse_csv
+from tradedesk.catalog_edit import CustomProducts, KNOWN_NOT_HELD, MATERIALS, validate as validate_product
 from tradedesk.board import Board, CHANNELS
 from tradedesk.evaluate import evaluate, LABEL_ZH
 from tradedesk.inbox import TASK_STATUS
@@ -46,6 +47,9 @@ class App:
         self.runner = Runner(self.llm, self.kb, board=self.board)
         self.imports = ImportStore(STATE / "imported_inquiries.json")
         self.kb.inquiries.extend(self.imports.load())
+        self.custom = CustomProducts(STATE / "custom_products.json")
+        for p in self.custom.load():
+            self.kb.products[p["id"]] = p
         self.play_lock = threading.Lock()
         self.lan_url = None
 
@@ -59,6 +63,8 @@ class App:
             "other_factories": list(self.kb.other_factories.values()),
             "check_samples": json.loads((ROOT / "data" / "check_samples.json").read_text(encoding="utf-8"))["samples"],
             "products": list(self.kb.products.values()),
+            "custom_product_ids": [p["id"] for p in self.custom.load()],
+            "product_form": {"known_not_held": KNOWN_NOT_HELD, "materials": MATERIALS},
             "inquiries": self.kb.inquiries,
             "platforms": PLATFORM_NAMES,
             "listing_catalog": public_catalog(),
@@ -94,6 +100,26 @@ class App:
             raise ValueError("缺少上架文案")
         return {"platforms": {pl: handoff_check.consistency(str(payload.get("reply") or ""), fields, product, self.kb)
                               for pl, fields in listing.items() if isinstance(fields, dict)}}
+
+    # ---------------------------------------------------------- products added in the app
+    def product_save(self, payload):
+        product = validate_product(payload.get("product"), self.kb)
+        pid = payload.get("id") or None
+        if pid and pid in self.kb.products and pid not in {p["id"] for p in self.custom.load()}:
+            raise ValueError("示例商品不能改（录好的结果要保持能回放）：用“从现有商品复制”新建一个")
+        saved = self.custom.save(product, pid)
+        self.kb.products[saved["id"]] = saved
+        return {"product": saved}
+
+    def product_delete(self, payload):
+        pid = payload.get("id")
+        used = [q["id"] for q in self.kb.inquiries if q.get("product_id") == pid]
+        if used:
+            raise ValueError(f"还有询盘用着这个商品：{', '.join(used[:5])}，先清除导入的询盘")
+        self.custom.delete(pid)
+        self.kb.products.pop(pid, None)
+        self.board.forget(pid)  # ids are reused, so a later product must not inherit this one's results
+        return {"ok": True}
 
     # ---------------------------------------------------------- CSV import
     def import_inquiries(self, payload):
@@ -414,7 +440,8 @@ class Handler(SimpleHTTPRequestHandler):
                   "/api/board/mark": APP.board_mark, "/api/savings": APP.savings_view,
                   "/api/handoff": APP.handoff_view, "/api/selfcheck/warm": APP.selfcheck_warm,
                   "/api/kb/source-check": APP.source_check, "/api/inbox/import": APP.import_inquiries,
-                  "/api/inbox/import/clear": APP.clear_imports}
+                  "/api/inbox/import/clear": APP.clear_imports,
+                  "/api/products/save": APP.product_save, "/api/products/delete": APP.product_delete}
         fn = routes.get(self.path)
         if not fn:
             return self._json(404, {"error": "not found"})

@@ -515,9 +515,11 @@ async function reviseInquiry() {
 
 // ------------------------------------------------------------------ B: listing
 function renderProducts() {
-  $("#lst-products").innerHTML = META.products.map((p) => `<button class="product" data-id="${p.id}"><b>${esc(p.name_zh)}</b><span>${factoryOf(p) ? `另一家工厂：${esc(factoryOf(p).name_zh)} · ` : ""}MOQ ${p.moq_units} · ${esc(p.certifications_held.join(" / "))}</span></button>`).join("");
-  $$("#lst-products .product").forEach((b) => b.addEventListener("click", () => pickProduct(b.dataset.id)));
-  pickProduct(META.products[0].id);
+  $("#lst-products").innerHTML = META.products.map((p) => `<button class="product" data-id="${p.id}"><b>${esc(p.name_zh)}${isCustom(p) ? ' <span class="badge brand">新增</span>' : ""}</b><span>${factoryOf(p) ? `另一家工厂：${esc(factoryOf(p).name_zh)} · ` : ""}MOQ ${p.moq_units} · ${esc(p.certifications_held.join(" / "))}</span></button>`).join("")
+    + `<button class="product add" id="lst-add">${ic("package", "sm")}<b>新增商品</b><span>填资料卡，生成要在实时模式下</span></button>`;
+  $$("#lst-products .product[data-id]").forEach((b) => b.addEventListener("click", () => pickProduct(b.dataset.id)));
+  $("#lst-add").addEventListener("click", () => openProductForm());
+  pickProduct(META.products.some((p) => p.id === state.lstProduct) ? state.lstProduct : META.products[0].id);
 }
 function renderListingOptions() {
   const { platforms, languages } = META.listing_catalog;
@@ -723,10 +725,11 @@ async function renderBoard() {
       return `<button class="cell ${cls}" data-cell="${key}"><span class="st"><i></i>${esc(c.status)}</span><span class="meta">${counts || '<span class="badge green">0 风险</span>'}<span>${esc((c.updated || "").slice(5))}</span></span></button>`;
     };
     return `<tr class="${boardState.selected.has(r.product_id) ? "sel" : ""}"><td><input type="checkbox" class="ck" data-sel="${r.product_id}" ${boardState.selected.has(r.product_id) ? "checked" : ""}></td>
-      <td><div class="prod"><div class="thumb">${thumb}</div><div><b>${esc(p.name_zh)}</b><span>${esc(p.id)} · ${esc(p.name_en)}</span><span>MOQ ${p.moq_units} · ${esc(priceRange(p))}</span></div></div></td>
+      <td><div class="prod"><div class="thumb">${thumb}</div><div><b>${esc(p.name_zh)}${isCustom(p) ? ` <button class="btn sm ghost" data-edit="${esc(p.id)}">${ic("file-text", "sm")}编辑</button>` : ""}</b><span>${esc(p.id)} · ${esc(p.name_en)}</span><span>MOQ ${p.moq_units} · ${esc(priceRange(p))}</span></div></div></td>
       <td>${cellHtml("image")}</td><td>${cellHtml("amazon_us")}</td><td>${cellHtml("tiktok_mx")}</td></tr>`;
   }).join("");
   $$("#board-body [data-cell]").forEach((b) => b.addEventListener("click", () => { const [pid, ch] = b.dataset.cell.split(":"); openCell(pid, ch); }));
+  $$("#board-body [data-edit]").forEach((b) => b.addEventListener("click", () => openProductForm(b.dataset.edit)));
   $$("#board-body [data-sel]").forEach((c) => c.addEventListener("change", () => {
     c.checked ? boardState.selected.add(c.dataset.sel) : boardState.selected.delete(c.dataset.sel); renderBoard();
   }));
@@ -1232,7 +1235,72 @@ async function testModel() {
 }
 
 // ------------------------------------------------------------------ CSV import
-async function reloadMeta() { META = await api("/api/meta"); renderSamples(); }
+async function reloadMeta() {
+  META = await api("/api/meta");
+  renderSamples();
+  $$(".product-select").forEach((s) => { const v = s.value; s.innerHTML = META.products.map((p) => `<option value="${p.id}">${esc(prodLabel(p))}</option>`).join(""); if (META.products.some((p) => p.id === v)) s.value = v; });
+  renderProducts();
+}
+
+// ------------------------------------------------------------------ products added in the app (新增商品)
+const isCustom = (p) => (META.custom_product_ids || []).includes(p.id);
+const linesOf = (o) => Object.entries(o || {}).map(([k, v]) => `${k}: ${v}`).join("\n");
+function openProductForm(editId) {
+  const editing = editId && META.products.find((p) => p.id === editId);
+  const F = META.product_form, base = editing || null;
+  const factories = [["", META.factory.name_zh], ...(META.other_factories || []).map((f) => [f.id, f.name_zh])];
+  const body = `<div class="stack pform">
+    ${META.llm.mode === "replay" ? `<div class="callout">${ic("info")}<div>现在是回放模式。新商品没有录好的结果：保存后，生成上架文案、检查主图要切到实时模式（左下角模型卡片，需要联网和 key）。文案体检里的代码规则不用模型，回放模式也能出结果。</div></div>` : ""}
+    ${editing ? "" : `<label><span class="fieldlab">从现有商品复制（可选）</span><select id="pf-copy"><option value="">不复制，从空白开始</option>${META.products.map((p) => `<option value="${p.id}">${esc(prodLabel(p))}</option>`).join("")}</select></label>`}
+    <div class="grid g2"><label><span class="fieldlab">中文名 *</span><input type="text" id="pf-name-zh" maxlength="40" placeholder="例如：1.5L 玻璃电热水壶"></label>
+      <label><span class="fieldlab">英文名 *</span><input type="text" id="pf-name-en" maxlength="80" placeholder="1.5L Glass Electric Kettle"></label></div>
+    <div class="grid g2"><label><span class="fieldlab">属于哪家工厂</span><select id="pf-factory">${factories.map(([id, n]) => `<option value="${id}">${esc(n)}</option>`).join("")}</select></label>
+      <label><span class="fieldlab">MOQ（台 / 件）*</span><input type="text" id="pf-moq" inputmode="numeric" placeholder="500"></label></div>
+    <label><span class="fieldlab">FOB 宁波价格阶梯（美元）*，每行“数量区间: 单价”</span><textarea id="pf-price" rows="3" placeholder="500-1999: 9.8\n2000+: 9.2"></textarea></label>
+    <label><span class="fieldlab">规格，每行“名称: 内容”</span><textarea id="pf-specs" rows="4" placeholder="容量: 1.5L\n电压: 120V 60Hz\n材质: 高硼硅玻璃 + 304 不锈钢"></textarea></label>
+    <label><span class="fieldlab">卖点，每行一条</span><textarea id="pf-points" rows="3" placeholder="蓝色 LED 灯，烧水看得见\n干烧自动断电"></textarea></label>
+    <label><span class="fieldlab">已有的认证，每行一条</span><textarea id="pf-held" rows="2" placeholder="CE (LVD/EMC)\nCB report (IEC 60335-2-15)"></textarea></label>
+    <div><span class="fieldlab">没有的认证：文案里写成“有”，代码会标红</span><div class="pf-checks">${F.known_not_held.map((c) => `<label><input type="checkbox" data-nh="${esc(c)}">${esc(c)}</label>`).join("")}</div>
+      <input type="text" id="pf-nh-other" placeholder="其他没有的认证，逗号分隔（只交给模型审核参考）" style="margin-top:6px"></div>
+    <div><span class="fieldlab">没有成品检测报告的材料宣称：写了就表示“不能宣称”，文案出现 ${esc(F.materials.join(" / "))} free 会被标出</span>
+      <div class="grid g3">${F.materials.map((m) => `<label class="pf-mat"><span>${esc(m)}</span><input type="text" data-mat="${esc(m)}" placeholder="例如：未做检测 / 只有供应商声明"></label>`).join("")}</div></div>
+    <label><span class="fieldlab">包装</span><input type="text" id="pf-pack" maxlength="80" placeholder="color box, 6 units per carton"></label>
+    <div id="pf-err"></div></div>`;
+  openSheet(`<div class="thumb" style="width:40px;height:40px">${ic("package")}</div><div><h3>${editing ? `编辑商品 · ${esc(editing.id)}` : "新增商品"}</h3><p>资料卡就是工厂的事实来源：生成和检查都按这张卡核对</p></div>`, body,
+    `${editing ? `<button class="btn ghost" id="pf-del">删除这个商品</button>` : ""}<div style="flex:1"></div><button class="btn primary" id="pf-save">${ic("circle-check-big", "sm")}保存</button>`);
+  const fill = (p) => {
+    $("#pf-name-zh").value = p ? (editing ? p.name_zh : `${p.name_zh}（复制）`) : ""; $("#pf-name-en").value = p ? p.name_en : "";
+    $("#pf-factory").value = p?.factory_id || ""; $("#pf-moq").value = p ? p.moq_units : "";
+    $("#pf-price").value = linesOf(p?.fob_ningbo_usd); $("#pf-specs").value = Object.entries(p?.specs || {}).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`).join("\n");
+    $("#pf-points").value = (p?.selling_points_zh || []).join("\n"); $("#pf-held").value = (p?.certifications_held || []).join("\n");
+    const nh = p?.certifications_not_held || [];
+    $$("[data-nh]").forEach((c) => (c.checked = nh.includes(c.dataset.nh)));
+    $("#pf-nh-other").value = nh.filter((c) => !F.known_not_held.includes(c)).join(", ");
+    $$("[data-mat]").forEach((i) => (i.value = (p?.material_tests || {})[i.dataset.mat] || ""));
+    $("#pf-pack").value = p?.packaging || "";
+  };
+  fill(base);
+  $("#pf-copy")?.addEventListener("change", (e) => fill(META.products.find((p) => p.id === e.target.value) || null));
+  $("#pf-save").addEventListener("click", async () => {
+    const product = {
+      name_zh: $("#pf-name-zh").value, name_en: $("#pf-name-en").value, factory_id: $("#pf-factory").value,
+      moq_units: $("#pf-moq").value, fob_ningbo_usd: $("#pf-price").value, specs: $("#pf-specs").value,
+      selling_points_zh: $("#pf-points").value, certifications_held: $("#pf-held").value,
+      certifications_not_held: [...$$("[data-nh]").filter((c) => c.checked).map((c) => c.dataset.nh), ...$("#pf-nh-other").value.split(/[,，]/)],
+      material_tests: Object.fromEntries($$("[data-mat]").map((i) => [i.dataset.mat, i.value])), packaging: $("#pf-pack").value,
+    };
+    busy($("#pf-save"), true, "保存中…");
+    try {
+      const r = await api("/api/products/save", { product, id: editing ? editing.id : null });
+      await reloadMeta(); closeSheet(); if (page === "board") renderBoard();
+      toast(`已保存：${r.product.name_zh}（${r.product.id}）。生成上架文案、检查主图要在实时模式下`, "ok");
+    } catch (e) { $("#pf-err").innerHTML = `<div class="callout" style="border-color:hsl(var(--red) / .4)">${ic("triangle-alert")}<div>${esc(e.message)}</div></div>`; busy($("#pf-save"), false); }
+  });
+  $("#pf-del")?.addEventListener("click", async () => {
+    try { await api("/api/products/delete", { id: editing.id }); await reloadMeta(); closeSheet(); if (page === "board") renderBoard(); toast("已删除", "ok"); }
+    catch (e) { $("#pf-err").innerHTML = `<div class="callout">${ic("triangle-alert")}<div>${esc(e.message)}</div></div>`; }
+  });
+}
 function openImport() {
   openSheet(`<div class="thumb" style="width:40px;height:40px">${ic("database")}</div><div><h3>导入询盘（CSV）</h3><p>任何能另存为 CSV 的询盘列表都可以</p></div>`,
     `<div class="stack imp">
@@ -1601,6 +1669,7 @@ async function boot() {
   $("#chk-run").addEventListener("click", runCheck);
   $("#log-refresh").addEventListener("click", renderLogs);
   $("#board-batch").addEventListener("click", runBatch);
+  $("#board-add").addEventListener("click", () => openProductForm());
   $("#tour-btn").addEventListener("click", () => startTour(false));
   $("#role-btn").addEventListener("click", showRolePicker);
   addEventListener("keydown", (e) => { if (e.key === "Escape" && tourState.on) tourState.on = false; });

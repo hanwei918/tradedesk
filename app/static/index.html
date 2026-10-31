@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=26">
+<link rel="stylesheet" href="style.css?v=27">
 <script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 </head>
 <body>
@@ -86,6 +86,7 @@
         <div class="page-head">
           <div><h1>商品看板</h1><p>所有产品在每个渠道的最新状态：主图、Amazon 美国站、TikTok 墨西哥。运营每天从这里开始。</p></div>
           <div class="row">
+            <button class="btn" id="board-add" title="填一张新的商品资料卡"><svg class="ic"><use href="#i-package"/></svg>新增商品</button>
             <a class="btn" href="/api/board/export.csv"><svg class="ic"><use href="#i-file-text"/></svg>导出 CSV</a>
             <button class="btn primary" id="board-batch"><svg class="ic"><use href="#i-zap"/></svg><span id="board-batch-label">批量生成全部 Listing</span></button>
           </div>
@@ -218,6 +219,6 @@
 <aside class="sheet" id="sheet" aria-hidden="true"><div class="sheet-h" id="sheet-h"></div><div class="sheet-b" id="sheet-b"></div><div class="sheet-f" id="sheet-f"></div></aside>
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
-<script src="app.js?v=28"></script>
+<script src="app.js?v=29"></script>
 </body>
 </html>

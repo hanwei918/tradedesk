@@ -1252,5 +1252,71 @@ class ConfigExportTests(unittest.TestCase):
         self.assertEqual(saved, json.loads(json.dumps(out)), "config/agents.json is stale: run python3 tools/export_config.py")
 
 
+class CustomProductTests(unittest.TestCase):
+    """新增商品: a card filled in on the board is validated, stored and checked like a demo card."""
+
+    FORM = {"name_zh": "1.5L 玻璃电热水壶", "name_en": "1.5L Glass Electric Kettle", "moq_units": "1,000",
+            "fob_ningbo_usd": "1000-2999: 8.5\n3000+: 7.9", "specs": "容量: 1.5L\n电压: 120V 60Hz",
+            "selling_points_zh": "蓝色 LED\n干烧断电", "certifications_held": "CE (LVD/EMC)",
+            "certifications_not_held": ["UL", "ETL"], "material_tests": {"BPA": "未做检测", "PTFE": ""}, "packaging": "color box"}
+
+    def setUp(self):
+        from tradedesk import catalog_edit
+        self.ce = catalog_edit
+        self.kb = KnowledgeBase()
+
+    def test_form_becomes_a_card_the_code_rules_use(self):
+        card = self.ce.validate(self.FORM, self.kb)
+        self.assertEqual((card["moq_units"], card["fob_ningbo_usd"], card["specs"]["容量"], card["material_tests"]),
+                         (1000, {"1000-2999": 8.5, "3000+": 7.9}, "1.5L", {"BPA": "未做检测"}))
+        card["id"] = "MY-001"
+        fs = checks.run_rule_checks({"reply": "UL listed and BPA free, USD 7.20 per unit, MOQ 500."}, card, self.kb, "alibaba_rfq")
+        self.assertEqual(sorted({f["check"] for f in fs}), ["fact_cert", "fact_material", "fact_moq", "fact_price"])
+
+    def test_bad_input_is_refused_with_a_reason(self):
+        for change, word in [({"name_zh": ""}, "中文名"), ({"moq_units": "abc"}, "MOQ"), ({"fob_ningbo_usd": ""}, "FOB"),
+                             ({"fob_ningbo_usd": "500+: cheap"}, "价格"), ({"specs": "no colon here"}, "规格"),
+                             ({"certifications_held": "UL"}, "既"), ({"material_tests": {"LEAD": "x"}}, "材料"),
+                             ({"factory_id": "NOPE"}, "工厂")]:
+            with self.assertRaises(ValueError) as cm:
+                self.ce.validate(dict(self.FORM, **change), self.kb)
+            self.assertIn(word, str(cm.exception))
+
+    def test_store_numbers_edits_and_deletes_only_its_own_cards(self):
+        with tempfile.TemporaryDirectory() as t:
+            store = self.ce.CustomProducts(Path(t) / "c.json")
+            a = store.save(self.ce.validate(self.FORM, self.kb))
+            b = store.save(self.ce.validate(dict(self.FORM, name_zh="第二个"), self.kb))
+            self.assertEqual((a["id"], b["id"]), ("MY-001", "MY-002"))
+            store.save(self.ce.validate(dict(self.FORM, name_zh="改过"), self.kb), "MY-001")
+            self.assertEqual([p["name_zh"] for p in store.load()], ["改过", "第二个"])
+            with self.assertRaisesRegex(ValueError, "只能编辑自己新增的商品"):
+                store.save(self.ce.validate(self.FORM, self.kb), "KET-17S")
+            with self.assertRaisesRegex(ValueError, "只能删除自己新增的商品"):
+                store.delete("KET-17S")
+            store.delete("MY-002")
+            self.assertEqual([p["id"] for p in store.load()], ["MY-001"])
+
+    def test_forget_clears_a_deleted_products_board_cells(self):
+        with tempfile.TemporaryDirectory() as t:
+            board = Board(Path(t) / "state")
+            for pid in ("MY-001", "KET-17S"):
+                board.record(pid, "amazon_us", {"risk": "green", "findings": []}, "r1")
+                board.save_image(pid, "image/png", b"x")
+            board.forget("MY-001")
+            snap = {r["product_id"]: r["cells"]["amazon_us"]["risk"] for r in board.snapshot(["MY-001", "KET-17S"])}
+            self.assertEqual(snap, {"MY-001": None, "KET-17S": "green"})
+            self.assertIsNone(board.image_path("MY-001"))
+            self.assertIsNone(board.result("MY-001", "amazon_us"))
+            self.assertIsNotNone(board.image_path("KET-17S"))
+
+    def test_self_check_ignores_cards_added_in_the_app(self):
+        from tradedesk import selfcheck
+        card = dict(self.ce.validate(dict(self.FORM, factory_id="NH-CUP"), self.kb), id="MY-001")
+        self.kb.products["MY-001"] = card
+        names = [step for _, step, _ in selfcheck.steps(self.kb)]
+        self.assertFalse(any(card["name_zh"] in n for n in names))
+
+
 if __name__ == "__main__":
     unittest.main()

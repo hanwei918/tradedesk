@@ -59,8 +59,9 @@ def steps(kb):
             return [r.image_check({"product_id": pid, "image": url, "name": name})]
         return fn
 
-    default = next(p for p, card in kb.products.items() if "factory_id" not in card)
-    other = [p for p, card in kb.products.items() if "factory_id" in card]
+    demo = {card["id"]: card for card in kb.catalog.get("products", [])}  # products added in the app have no recordings
+    default = next(p for p, card in demo.items() if "factory_id" not in card)
+    other = [p for p, card in demo.items() if "factory_id" in card]
     out = [
         ("商户线", "收件箱排优先级（全部示例询盘）",
          lambda r: [r.triage({"inquiry_ids": [q["id"] for q in kb.inquiries if not q.get("imported")]})]),
