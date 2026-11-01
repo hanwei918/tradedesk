@@ -106,6 +106,46 @@ function riskPanel(r) {
     ${dropped}`;
 }
 
+// The product card as the evidence the code checks read: fields a finding cites light up,
+// and hovering a finding or a field highlights its partner, so "why is this wrong" is visible.
+const factKey = (path) => ((path || "").match(/(?:products\[[^\]]+\]|factory)\.(\w+)/) || [])[1] || null;
+function factsCard(pid, findings) {
+  const p = META.products.find((x) => x.id === pid);
+  if (!p) return "";
+  const f = factoryOf(p) || META.factory;
+  const list = (o, fmt) => Object.entries(o || {}).map(([k, v]) => fmt(k, v)).join(" · ");
+  const rows = [
+    ["certifications_held", "已有认证", (p.certifications_held || []).join("、") || "无"],
+    ["certifications_not_held", "没有的认证", (p.certifications_not_held || []).join("、") || "无"],
+    ["material_tests", "没检测、不能宣称", list(p.material_tests, (k, v) => `${k}：${v}`) || "无"],
+    ["moq_units", "起订量 MOQ", `${p.moq_units}`],
+    ["fob_ningbo_usd", "FOB 宁波阶梯价", list(p.fob_ningbo_usd, (k, v) => `${k}：$${v}`)],
+    ["standard_lead_time_days", "标准交期", `${f.standard_lead_time_days} 天`],
+    ["payment_terms_accepted", "接受的付款方式", (f.payment_terms_accepted || []).join(" / ")],
+  ];
+  const cites = {};
+  findings.forEach((x, i) => { const k = x.source?.type === "product_card" ? factKey(x.source.path) : null; if (k) (cites[k] = cites[k] || []).push(i); });
+  const sev = (k) => (cites[k].some((i) => findings[i].severity === "red") ? "red" : "amber");
+  return `<div class="card facts" data-facts><div class="card-h"><div><h3>${ic("package")}工厂资料卡 · 事实来源</h3><p>${esc(f.name_zh)} · ${esc(p.name_zh)}。代码按这张卡核对，标亮的字段就是风险提示的依据</p></div></div>
+    <div class="facts-b">${rows.map(([k, label, v]) => `<div class="fact${cites[k] ? ` hit ${sev(k)}` : ""}" data-fact="${k}" data-cites="${(cites[k] || []).join(",")}"><span>${label}</span><b>${esc(v)}</b>${cites[k] ? `<em>${cites[k].map((i) => `#${i + 1}`).join(" ")}</em>` : ""}</div>`).join("")}</div></div>`;
+}
+function wireFacts(root) {
+  const facts = $("[data-facts]", root);
+  if (!facts) return;
+  const rowsFor = (i) => $$(".fact[data-cites]", facts).filter((r) => r.dataset.cites.split(",").includes(String(i)));
+  $$(".finding[data-f]", root).forEach((card) => {
+    const on = (v) => rowsFor(card.dataset.f).forEach((r) => r.classList.toggle("pulse", v));
+    card.addEventListener("mouseenter", () => on(true)); card.addEventListener("mouseleave", () => on(false));
+    card.addEventListener("click", () => { const r = rowsFor(card.dataset.f)[0]; if (r) { r.classList.remove("flash"); void r.offsetWidth; r.classList.add("flash"); } });
+  });
+  $$(".fact.hit", facts).forEach((row) => {
+    const cards = () => row.dataset.cites.split(",").map((i) => $(`.finding[data-f="${i}"]`, root)).filter(Boolean);
+    row.addEventListener("mouseenter", () => cards().forEach((c) => c.classList.add("hot")));
+    row.addEventListener("mouseleave", () => cards().forEach((c) => c.classList.remove("hot")));
+    row.addEventListener("click", () => cards()[0]?.scrollIntoView({ block: "center", behavior: "smooth" }));
+  });
+}
+
 function wireLinks(root) {
   $$("mark[data-f]", root).forEach((m) => {
     const scope = m.closest("[data-scope]") || root;
@@ -454,7 +494,7 @@ function renderInquiry() {
       ${!latest ? `<div class="callout" style="margin:12px 16px">${ic("info")}<div>正在查看第 ${st.view + 1} 轮（历史）。修改会基于最新一轮。</div></div>` : ""}
     </div>
     <div class="result" style="margin-top:16px" data-scope>
-      <div class="card"><div class="tabs" id="inq-tabs">
+      <div class="stack"><div class="card"><div class="tabs" id="inq-tabs">
           <button class="on" data-t="reply">${ic("send", "sm")}发给买家 <span class="badge">${flagOf(r)} ${esc(r.language)}</span></button>
           <button data-t="brief">${ic("building-2", "sm")}内部备忘 <span class="badge">中文</span></button>
           <button data-t="diff" ${r.diff ? "" : "disabled"}>${ic("git-compare-arrows", "sm")}与上一轮对比</button>
@@ -463,7 +503,7 @@ function renderInquiry() {
         <div data-pane="brief" class="brief" hidden>${esc(r.internal_brief_zh)}</div>
         <div data-pane="diff" class="doc diff" hidden>${diffHtml(r.diff)}</div>
         ${r.notes_zh ? `<div class="card-b small muted" style="border-top:1px solid hsl(var(--border))">${ic("sparkles", "sm")} 写法：${esc(r.notes_zh)}</div>` : ""}
-      </div>
+      </div>${factsCard($("#inq-product").value, r.findings)}</div>
       <div class="card">${riskPanel(r)}</div>
     </div>
     ${latest ? journeyCard() : ""}
@@ -474,7 +514,7 @@ function renderInquiry() {
     $$("#inq-tabs button").forEach((x) => x.classList.toggle("on", x === b));
     $$("#inq-out [data-pane]").forEach((p) => (p.hidden = p.dataset.pane !== b.dataset.t));
   }));
-  wireLinks($("#inq-out")); wireEdit($("#inq-out"));
+  wireLinks($("#inq-out")); wireEdit($("#inq-out")); wireFacts($("#inq-out"));
   $$("#inq-out [data-go-tasks]").forEach((b) => b.addEventListener("click", () => { go("inbox"); showInboxTab("tasks"); }));
   $("#inq-next-listing")?.addEventListener("click", () => listingFromInquiry($("#inq-product").value));
   if (latest) wireComposer("inq", reviseInquiry);
@@ -683,9 +723,9 @@ async function runCheck() {
   try {
     const r = await api("/api/check", { platform: state.chkPlatform, product_id: $("#chk-product").value, text: $("#chk-text").value });
     $("#chk-bench").classList.add("collapsed");
-    $("#chk-out").innerHTML = `<div class="result" data-scope><div class="card"><div class="card-h"><h3>${ic("file-text")}待检查文案</h3><div class="row"><span class="badge">${esc(META.platforms[state.chkPlatform])}</span>${editBtn("chk-bench")}</div></div>
-      <div class="doc">${highlight(r.fields.text, r.findings, "text")}</div></div><div class="card">${riskPanel(r)}</div></div>`;
-    wireLinks($("#chk-out")); wireEdit($("#chk-out"));
+    $("#chk-out").innerHTML = `<div class="result" data-scope><div class="stack"><div class="card"><div class="card-h"><h3>${ic("file-text")}待检查文案</h3><div class="row"><span class="badge">${esc(META.platforms[state.chkPlatform])}</span>${editBtn("chk-bench")}</div></div>
+      <div class="doc">${highlight(r.fields.text, r.findings, "text")}</div></div>${factsCard($("#chk-product").value, r.findings)}</div><div class="card">${riskPanel(r)}</div></div>`;
+    wireLinks($("#chk-out")); wireEdit($("#chk-out")); wireFacts($("#chk-out"));
   } catch (e) { toast(e.message); }
   busy(btn, false);
 }
@@ -1639,7 +1679,7 @@ const ROLE_LANES = {
   },
 };
 const ROLE_ORDER = Object.keys(ROLE_LANES);
-let role = null, roleStep = 0, roleBusy = false;
+let role = null, roleStep = 0, roleBusy = false, roleDone = false;
 
 function showRolePicker() {
   let el = $("#rolepick");
@@ -1660,7 +1700,7 @@ function showRolePicker() {
 
 function setRole(key) {
   role = ROLE_LANES[key] ? key : null;
-  roleStep = 0; taskInquiry = null; state.handoff = null; state.handoffHtml = "";
+  roleStep = 0; roleDone = false; taskInquiry = null; state.handoff = null; state.handoffHtml = "";
   $("#rolepick")?.setAttribute("hidden", "");
   document.body.classList.toggle("role-mode", !!role);
   document.body.classList.toggle("buyer-view", role === "consumer");
@@ -1683,21 +1723,26 @@ function renderRoleGuide() {
     <ol class="rg-steps">${lane.steps.map((s, i) => `<li class="${i < roleStep ? "done" : i === roleStep ? "now" : ""}"><button data-step="${i}"><i>${i < roleStep ? "✓" : i + 1}</i>${esc(s.t)}</button></li>`).join("")}</ol>
     <div class="rg-acts">${last ? `<button class="btn sm primary" id="rg-nextlane">下一条线：${esc(ROLE_LANES[next].name)}${ic("arrow-right", "sm")}</button>`
         : `<button class="btn sm primary" id="rg-next">下一步：${esc(lane.steps[roleStep + 1].t)}${ic("arrow-right", "sm")}</button>`}
+      ${roleDone ? `<button class="btn sm" id="rg-again">${ic("history", "sm")}重新体验</button>` : ""}
       <button class="btn sm ghost" id="rg-switch">换个角色</button></div>
+    ${roleDone ? `<div class="rg-celebrate" aria-live="polite"><i>${ic("circle-check-big")}</i><b>${esc(lane.name)}这条线走完了</b><span>${lane.steps.length} 步都是真实操作 · 换下一位评委点“重新体验”</span>${"<s></s>".repeat(12)}</div>` : ""}
     <p class="rg-desc"><b>第 ${roleStep + 1} 步 · ${esc(st.t)}</b>${esc(st.d)}${last ? `<span class="rg-done">走完了 · 产出：${esc(lane.out)}</span>` : ""}</p>`;
   $$("#roleguide [data-step]").forEach((b) => b.addEventListener("click", () => runRoleStep(+b.dataset.step)));
   $("#rg-next")?.addEventListener("click", () => runRoleStep(roleStep + 1));
   $("#rg-nextlane")?.addEventListener("click", () => setRole(next));
+  $("#rg-again")?.addEventListener("click", () => setRole(role));
   $("#rg-switch").addEventListener("click", showRolePicker);
 }
 
 async function runRoleStep(i) {
   const lane = role && ROLE_LANES[role];
   if (!lane || roleBusy || i < 0 || i >= lane.steps.length) return;
-  roleStep = i; renderRoleGuide();
+  roleStep = i; roleDone = false; renderRoleGuide();
   roleBusy = true; $("#roleguide").classList.add("busy");
-  try { await lane.steps[i].run(); } catch (e) { toast(e.message); }
+  let ok = true;
+  try { await lane.steps[i].run(); } catch (e) { ok = false; toast(e.message); }
   roleBusy = false; $("#roleguide").classList.remove("busy");
+  if (ok && i === lane.steps.length - 1) { roleDone = true; renderRoleGuide(); }
 }
 
 // ------------------------------------------------------------------ boot
