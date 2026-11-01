@@ -865,3 +865,22 @@ html.flow-on body::before{display:none}
 :root[data-theme="light"] .stat::before,:root[data-theme="light"] .kpi::before{height:3px}
 /* laptops with display scaling (e.g. 1333 px wide at 150%): stack the hero so the three proof cards get a full row */
 @media (max-width:1440px){.ov-hero{grid-template-columns:1fr;gap:20px}.ov-hero p{max-width:none}}
+/* short screens (laptops with display scaling): the rail scrolls on its own and tightens up, so the model card and theme toggle stay reachable */
+.sidebar{overflow-y:auto;scrollbar-width:thin}
+@media (max-height:860px){
+  .sidebar{padding:12px 12px 10px}
+  .brand{padding:2px 8px 10px}
+  .nav-label{padding:9px 10px 4px}
+  .nav button,.nav-link{padding:6px 10px}
+  .side-foot{gap:6px;padding-top:8px}
+  .model-card{padding:8px 10px}
+}
+@media (max-height:700px){.nav button .kbd{display:none}.nav button,.nav-link{padding:5px 10px}.nav-label{padding:6px 10px 3px}}
+/* rule base: the update date stands out */
+#kb-note{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.kb-updated{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-weight:700;font-size:13px;color:#fff;
+  background:linear-gradient(120deg,#0e7490,#2563eb 55%,#7c3aed);box-shadow:0 6px 16px -8px rgba(37,99,235,.8)}
+.kb-updated .ic{color:#fff}
+/* the model card and theme toggle stay pinned to the bottom of the rail; the menu scrolls behind them */
+.side-foot{position:sticky;bottom:-12px;z-index:1;margin-bottom:-12px;padding:14px 0 12px;background:linear-gradient(hsl(var(--sidebar) / 0),hsl(var(--sidebar)) 14px)}
+@media (max-height:860px){.side-foot{bottom:-10px;margin-bottom:-10px;padding-bottom:10px}}

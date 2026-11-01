@@ -1233,7 +1233,8 @@ async function renderKB() {
   KB = KB || (await api("/api/kb"));
   const CAT = catNames();
   const verified = KB.rules.filter((r) => r.verified).length;
-  $("#kb-note").textContent = `${verified}/${KB.rules.length} 条已对照原文逐字核实 · 最近更新 ${KB.version} · 未核实的规则不参与检查`;
+  const refs = KB.rules.filter((r) => r.check?.kind === "reference").length;
+  $("#kb-note").innerHTML = `<span class="kb-updated">${ic("history", "sm")}规则库更新于 ${esc(KB.version)}</span>${verified}/${KB.rules.length} 条已对照原文逐字核实 · ${KB.rules.length - refs} 条参与自动检查${refs ? ` · ${refs} 条参考（原文已核对，暂未接入检查）` : ""} · 未核实的规则不参与检查`;
   const SC = KB.source_check, scBy = Object.fromEntries((SC?.results || []).map((x) => [x.id, x]));
   $("#kb-src").innerHTML = SC ? `${ic("globe", "sm")}<span><b>出处自检 ${esc(SC.checked_at)}</b>：程序重新抓取 ${SC.total} 条规则的官方页面 ·
       <span class="hf-ok">${SC.summary.found} 条原文仍在</span> · ${SC.summary.browser} 条${esc(SC.status_zh.browser)}（${esc(SC.detail_zh.browser)}） ·
@@ -1249,8 +1250,8 @@ async function renderKB() {
   const rows = KB.rules.filter((r) => (kbCat === "all" || r.category === kbCat) && (!q || JSON.stringify(r).toLowerCase().includes(q)));
   $("#kb-body").innerHTML = rows.map((r) => `<tr data-id="${esc(r.id)}"><td><span class="badge brand mono">${esc(r.id)}</span></td><td><b>${esc(r.title_zh)}</b><div class="small muted">${esc(r.summary_zh)}</div></td>
       <td><span class="badge">${esc(CAT[r.category] || r.category)}</span></td>
-      <td>${r.check && r.check.kind === "llm" ? `<span class="badge">${ic("sparkles", "sm")}模型判断</span>` : `<span class="badge">${ic("cpu", "sm")}代码</span>`}</td>
-      <td class="small"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(host(r.url))}</a><div class="muted">${esc(r.source_type)}</div></td>
+      <td>${r.check?.kind === "reference" ? `<span class="badge amber" title="${esc(r.check.note_zh || "")}">${ic("book-open-check", "sm")}参考</span>` : r.check && r.check.kind === "llm" ? `<span class="badge">${ic("sparkles", "sm")}模型判断</span>` : `<span class="badge">${ic("cpu", "sm")}代码</span>`}</td>
+      <td class="small"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(host(r.url))}</a><div class="muted">${esc(r.source_type)}${r.fetched ? ` · 抓取 ${esc(r.fetched)}` : ""}</div></td>
       <td>${r.verified ? `<span class="badge green">${ic("circle-check-big", "sm")}已核实</span>` : `<span class="badge amber">未核实</span>`}${scBy[r.id] ? `<div class="small ${scBy[r.id].status === "found" ? "hf-ok" : scBy[r.id].status === "missing" ? "hf-bad" : "muted"}" style="margin-top:4px">${esc(SC.status_zh[scBy[r.id].status])}</div>` : ""}</td></tr>
     <tr class="detail" data-for="${esc(r.id)}" hidden><td></td><td colspan="5"><div class="src" style="border:0;margin:0;padding:0"><blockquote>“${esc(r.excerpt)}”</blockquote>
       <div>${r.check ? `<code>${esc(JSON.stringify(r.check))}</code>` : ""}</div></div></td></tr>`).join("") || `<tr><td colspan="6"><div class="empty">没有匹配的规则</div></td></tr>`;

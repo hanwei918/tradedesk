@@ -98,7 +98,10 @@ class KnowledgeBase:
             market_ok = market is None or "ALL" in markets or market in markets
             if not (platform_ok and market_ok):
                 continue
-            if kinds and (r.get("check") or {}).get("kind") not in kinds:
+            kind = (r.get("check") or {}).get("kind")
+            if kinds and kind not in kinds:
+                continue
+            if not kinds and kind == "reference":  # shown in the rule base with its source, never checked
                 continue
             out.append(r)
         return sorted(out, key=lambda r: r["id"])

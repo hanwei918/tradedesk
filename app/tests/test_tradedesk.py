@@ -1424,6 +1424,29 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class ReferenceRuleTests(unittest.TestCase):
+    """Reference rules are shown with their source but never reach a check or a model prompt,
+    so adding them cannot change a recorded request (the replay cache stays valid)."""
+
+    def test_reference_rules_are_sourced_and_kept_out_of_every_check(self):
+        from tradedesk.listing_catalog import LISTING_PLATFORMS
+        from tradedesk.config_export import build
+        kb = KnowledgeBase()
+        refs = [r for r in kb.all_rules if (r.get("check") or {}).get("kind") == "reference"]
+        self.assertGreaterEqual(len(refs), 7)
+        for r in refs:
+            self.assertTrue(r["verified"] and r["excerpt"] and r["url"].startswith("https://") and r["fetched"], r["id"])
+        ids = {r["id"] for r in refs}
+        kinds = [["regex", "length", "llm"], ["llm"], ["regex", "length"], ["image", "vision"]]
+        for platform in list(LISTING_PLATFORMS) + ["alibaba_rfq"]:
+            for market in (None, "US", "MX", "EU", "JP", "EAEU", "NG"):
+                for k in kinds:
+                    self.assertFalse(ids & {r["id"] for r in kb.rules_for(platform, kinds=k, market=market)}, (platform, market, k))
+        exported = json.dumps(build(kb, LLM(api_key="", mode="replay", provider="openai")))
+        self.assertFalse([i for i in ids if f'"{i}"' in exported])
+        self.assertEqual(len([r for r in kb.all_rules if r["category"] == "compliance_eu"]), 2 + len([r for r in refs if r["category"] == "compliance_eu"]))
+
+
 class SourceRefreshTests(unittest.TestCase):
     RULES = [{"id": "R-1", "url": "https://example.test/a", "excerpt": "the rule text here"},
              {"id": "R-2", "url": "https://example.test/b", "excerpt": "another rule text"}]

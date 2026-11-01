@@ -62,6 +62,11 @@ Seven rules for four markets, all `kind: llm` and limited to `alibaba_rfq` repli
 |---|---|---|---|
 | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32014L0035 | browser | OK; Directive 2014/35/EU (LVD), Art. 17(1) | EU-01 |
 | https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32011L0065 | browser | OK; Directive 2011/65/EU (RoHS), Art. 4(1) and Annex II as published (later amendments not checked) | EU-02 |
+| https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32005L0029 | browser (2026-11-01; curl gets HTTP 202 with an empty body) | OK; Directive 2005/29/EC (UCPD), Annex I points 2 and 4 | EU-03, EU-04 (reference) |
+| https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825 | browser (2026-11-01) | OK; Directive (EU) 2024/825, new Annex I point 4a; Art. 4: applies from 27 September 2026 | EU-05 (reference) |
+| https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32023R0988 | browser (2026-11-01) | OK; Regulation (EU) 2023/988 (GPSR), Art. 19 | EU-06 (reference) |
+| https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32004R1935 | browser (2026-11-01) | OK; Regulation (EC) 1935/2004, Art. 3(1) and Art. 15(1)(a) (original text) | EU-07, EU-08 (reference) |
+| https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32012L0019 | browser (2026-11-01) | OK; Directive 2012/19/EU (WEEE), Art. 14(4); Art. 3(1)(f)(iv) makes third-country distance sellers "producers" | EU-09 (reference) |
 | https://www.meti.go.jp/english/policy/economy/consumer/pse/ | curl | OK; METI page, "Last updated: 2023-04-13"; does not list air fryers by name | JP-01, JP-02 |
 | https://eec.eaeunion.org/upload/medialibrary/269/TR-TS-Downvolt.pdf | curl + pdftotext | OK; TR CU 004/2011, Art. 3(3) and Art. 4(5), linked from the EEC page on the regulation | EA-01, EA-02 |
 | https://son.gov.ng/soncap-faq/ (from https://son.gov.ng/?p=1000) | curl | OK; SON "SONCAP FAQ" page | NG-01 |
@@ -100,3 +105,4 @@ Research for eBay, Etsy, Shopify, Walmart, Mercado Libre and AliExpress was done
 - Mercado Libre "60 caracteres" as prose: found only on the Chile site, so ML-01 cites the category API instead.
 - AliExpress 128-character title maximum: often cited, not found on an official page. The quality-score rule (titles of 15 characters or fewer lose points) was found but not added, because it is a score penalty, not a publishing rule.
 - Amazon UK: no UK-specific compliance rule (UKCA) was added.
+- EU-03..09 (added 2026-11-01 after a visitor in EU trade asked for more EU coverage) are reference rules: `check.kind = "reference"`. They are shown in the rule base with their verbatim excerpt but `rules_for` never returns them, so no check and no model prompt changes and recorded replays still match (a test pins this). Wiring them into the review would change the amazon_de / alibaba_rfq EU prompts and needs a re-recording.

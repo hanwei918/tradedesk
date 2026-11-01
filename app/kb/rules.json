@@ -1,5 +1,5 @@
 {
- "version": "2026-10-31",
+ "version": "2026-11-01",
  "note": "Rules knowledge base for the exporter-assistant demo (1.7 L stainless-steel kettle with plastic handle/lid; US + MX). Every excerpt is a verbatim quote from the page at `url`, fetched 2026-10-26; summary_zh is a paraphrase. Not legal advice. Prop 65 text comes from Cornell LII's copy of 27 CCR (official OEHHA site blocked automated access), so it is marked secondary. Culture rules are secondary sources. Regex patterns use Python `re` syntax (inline (?i) flag). See SOURCES.md.",
  "rules": [
   {
@@ -954,6 +954,160 @@
    "check": {
     "kind": "llm",
     "question_zh": "回复是否在工厂没有 RoHS 检测报告的情况下声称产品“符合 RoHS / RoHS compliant / RoHS-konform”？"
+   }
+  },
+  {
+   "id": "EU-03",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq",
+    "amazon_de"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "欧盟：谎称产品获得认证或批准，属于一律禁止的不正当商业行为",
+   "summary_zh": "不正当商业行为指令 2005/29/EC 附件一第 4 项（“在任何情况下都视为不公平”的黑名单）：声称经营者或产品已获公共或私人机构批准、认可或授权而实际没有，或不按批准条件使用这种声明，一律属于误导性商业行为。资料卡没有的认证（如 UL、GS、TÜV）不能在面向欧盟消费者的文案里写成“已认证”。",
+   "excerpt": "Claiming that a trader (including his commercial practices) or a product has been approved, endorsed or authorised by a public or private body when he/it has not or making such a claim without complying with the terms of the approval, endorsement or authorisation.",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32005L0029",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-11-01",
+   "check": {
+    "kind": "reference",
+    "note_zh": "参考规则：原文已逐字核对，暂未接入自动检查（接入会改变德国站的审核提示，录好的回放需要重新录制）"
+   }
+  },
+  {
+   "id": "EU-04",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq",
+    "amazon_de"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "欧盟：未经授权展示信任标志、质量标志，属于一律禁止的行为",
+   "summary_zh": "不正当商业行为指令 2005/29/EC 附件一第 2 项：没有取得必要授权就展示信任标志、质量标志或同等标志，一律属于误导性商业行为。主图、包装图和 Listing 里不能放工厂没有取得的认证标志。",
+   "excerpt": "Displaying a trust mark, quality mark or equivalent without having obtained the necessary authorisation.",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32005L0029",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-11-01",
+   "check": {
+    "kind": "reference",
+    "note_zh": "参考规则：原文已逐字核对，暂未接入自动检查（接入会改变德国站的审核提示，录好的回放需要重新录制）"
+   }
+  },
+  {
+   "id": "EU-05",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq",
+    "amazon_de"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "欧盟：自 2026-09-27 起，禁止无法证明的笼统环保宣称",
+   "summary_zh": "指令 (EU) 2024/825 在不正当商业行为黑名单里新增第 4a 项：经营者无法证明具有与宣称相关的、公认的卓越环境表现时，不得做笼统的环保宣称（如“eco-friendly”“umweltfreundlich”“green”）。该指令第 4 条要求成员国自 2026 年 9 月 27 日起适用。",
+   "excerpt": "Making a generic environmental claim for which the trader is not able to demonstrate recognised excellent environmental performance relevant to the claim.",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024L0825",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-11-01",
+   "check": {
+    "kind": "reference",
+    "note_zh": "参考规则：原文已逐字核对，暂未接入自动检查（接入会改变德国站的审核提示，录好的回放需要重新录制）"
+   }
+  },
+  {
+   "id": "EU-06",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq",
+    "amazon_de"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "欧盟：网上销售的商品页必须标明制造商和欧盟境内负责人",
+   "summary_zh": "通用产品安全法规 (EU) 2023/988 第 19 条：网上或其他远程方式销售的产品，商品页必须清楚、醒目地标明至少：(a) 制造商名称及邮寄、电子联系地址；(b) 制造商不在欧盟境内时，欧盟境内负责人的名称及邮寄、电子地址；(c) 用于识别产品的信息等。宁波工厂直接在 Amazon 德国站卖货，要先有欧盟境内负责人。",
+   "excerpt": "Where economic operators make products available on the market online or through other means of distance sales, the offer of those products shall clearly and visibly indicate at least the following information:",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32023R0988",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-11-01",
+   "check": {
+    "kind": "reference",
+    "note_zh": "参考规则：原文已逐字核对，暂未接入自动检查（接入会改变德国站的审核提示，录好的回放需要重新录制）"
+   }
+  },
+  {
+   "id": "EU-07",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq",
+    "amazon_de"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "欧盟：食品接触材料须标“for food contact”或杯叉标志",
+   "summary_zh": "食品接触材料法规 (EC) 1935/2004 第 15 条：尚未接触食品就投放市场的材料和制品，须附有“for food contact”字样、具体用途说明（如咖啡机）或附件二的杯叉标志，必要时附安全使用说明，并标明制造商等的名称和地址。电热水壶内胆、空气炸锅炸篮等接触食品的部件适用。",
+   "excerpt": "materials and articles, which are not yet in contact with food when placed on the market, shall be accompanied by: (a) the words ‘for food contact’, or a specific indication as to their use, such as coffee machine, wine bottle, soup spoon, or the symbol reproduced in Annex II",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32004R1935",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-11-01",
+   "check": {
+    "kind": "reference",
+    "note_zh": "参考规则：原文已逐字核对，暂未接入自动检查（接入会改变德国站的审核提示，录好的回放需要重新录制）"
+   }
+  },
+  {
+   "id": "EU-08",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq",
+    "amazon_de"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "欧盟：食品接触材料不得向食品迁移危害健康的成分",
+   "summary_zh": "食品接触材料法规 (EC) 1935/2004 第 3 条：食品接触材料须按良好生产规范制造，在正常或可预见的使用条件下，不得向食品迁移足以危害人体健康、使食品成分发生不可接受变化或使感官特性变差的成分。回复里说“食品级”“不含有害物质”，要有对应的检测报告支撑；资料卡没有就写待确认。",
+   "excerpt": "they do not transfer their constituents to food in quantities which could: (a) endanger human health; or (b) bring about an unacceptable change in the composition of the food; or (c) bring about a deterioration in the organoleptic characteristics thereof.",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32004R1935",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-11-01",
+   "check": {
+    "kind": "reference",
+    "note_zh": "参考规则：原文已逐字核对，暂未接入自动检查（接入会改变德国站的审核提示，录好的回放需要重新录制）"
+   }
+  },
+  {
+   "id": "EU-09",
+   "category": "compliance_eu",
+   "platforms": [
+    "alibaba_rfq",
+    "amazon_de"
+   ],
+   "markets": [
+    "EU"
+   ],
+   "title_zh": "欧盟：电器须加贴“打叉垃圾桶”WEEE 标志",
+   "summary_zh": "废弃电子电气设备指令 2012/19/EU 第 14 条第 4 款：生产者须在投放市场的电器上加贴附件九的标志（打叉的带轮垃圾桶，最好按 EN 50419）；因尺寸或功能所限时，印在包装、说明书和保修卡上。按该指令第 3 条，从第三国通过远程方式直接卖给欧盟用户的卖家也属于“生产者”。",
+   "excerpt": "Member States shall ensure that producers appropriately mark — preferably in accordance with the European standard EN 50419 (25) — EEE placed on the market with the symbol shown in Annex IX.",
+   "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32012L0019",
+   "source_type": "primary",
+   "verified": true,
+   "fetched": "2026-11-01",
+   "check": {
+    "kind": "reference",
+    "note_zh": "参考规则：原文已逐字核对，暂未接入自动检查（接入会改变德国站的审核提示，录好的回放需要重新录制）"
    }
   },
   {

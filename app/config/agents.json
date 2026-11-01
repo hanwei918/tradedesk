@@ -439,9 +439,9 @@
   },
   "knowledge_base": {
     "file": "kb/rules.json",
-    "version": "2026-10-31",
-    "rules_total": 61,
-    "rules_verified": 61,
+    "version": "2026-11-01",
+    "rules_total": 68,
+    "rules_verified": 68,
     "by_category": {
       "platform_amazon": {
         "verified": 9,
@@ -476,8 +476,8 @@
         "total": 10
       },
       "compliance_eu": {
-        "verified": 2,
-        "total": 2
+        "verified": 9,
+        "total": 9
       },
       "compliance_jp": {
         "verified": 2,
