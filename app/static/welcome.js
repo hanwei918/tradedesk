@@ -34,6 +34,17 @@
       </div>
     </div>
   </main>
+  <div class="gt-sea" aria-hidden="true">
+    <div class="gt-wave w3"></div>
+    <div class="gt-boat"><span class="gt-wake"></span><svg class="gt-ship" viewBox="0 0 240 96">
+      <rect x="30" y="18" width="26" height="30" rx="2" fill="#e2e8f0"/><rect x="34" y="23" width="18" height="5" rx="1" fill="#0f172a"/><rect x="40" y="6" width="6" height="14" fill="#94a3b8"/>
+      <g><rect x="64" y="30" width="24" height="18" rx="1.5" fill="#48e2db"/><rect x="90" y="30" width="24" height="18" rx="1.5" fill="#74a0ff"/><rect x="116" y="30" width="24" height="18" rx="1.5" fill="#b795ff"/><rect x="142" y="30" width="24" height="18" rx="1.5" fill="#48e2db"/><rect x="168" y="30" width="24" height="18" rx="1.5" fill="#74a0ff"/>
+        <rect x="77" y="12" width="24" height="18" rx="1.5" fill="#74a0ff"/><rect x="103" y="12" width="24" height="18" rx="1.5" fill="#48e2db"/><rect x="129" y="12" width="24" height="18" rx="1.5" fill="#b795ff"/><rect x="155" y="12" width="24" height="18" rx="1.5" fill="#74a0ff"/></g>
+      <path d="M6 48 H222 L238 48 L210 80 H22 Z" fill="#1e3a8a"/><path d="M6 48 H238 L233 56 H9 Z" fill="#f87171"/><path d="M22 80 H210 L206 86 H26 Z" fill="#0b1437"/>
+    </svg></div>
+    <div class="gt-wave w2"></div>
+    <div class="gt-wave w1"></div>
+  </div>
   <footer class="gt-foot"><b>由 TEAM HE 开发 · Harvey 周翰维 · Ellie 桑睿哲 · 致敬宁波出海企业</b><span>示例工厂、客户和回复均为虚构；数字来自实测：对照实验、盲测集、红队测试。</span></footer>
   <div class="gt-scan" aria-hidden="true"><i></i><p><b>Secure Environment Initialized…</b><span>正在初始化安全环境：载入资料卡 · 61 条带出处规则 · 出处守卫</span></p></div>`;
 

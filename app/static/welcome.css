@@ -72,3 +72,21 @@ body.gt-lock{overflow:hidden}
 @media (max-width:640px){.gt-choices{grid-template-columns:1fr}.gt-event{display:none}.gt-top{padding:16px}}
 @media (prefers-reduced-motion:reduce){.gate,.gate::before,.gt-hint,.gt-knob::after,.gt-choices,.gt-scan i{animation:none}.gt-scan{display:none}}
 @media (max-height:820px){.gt-top{padding:14px 24px}.gate h1{font-size:clamp(30px,3.8vw,48px);margin:12px 0 8px}.gt-pos{margin-top:10px}.gt-tags{margin-top:16px}.gt-proof{margin-top:14px}.gt-stage{margin-top:20px}.gt-foot{padding:10px 24px 16px}}
+/* the sea: a container ship holds its course while three layers of waves run backwards (parallax) */
+.gt-top,.gt-main,.gt-foot{position:relative;z-index:1}
+.gt-sea{position:fixed;left:0;right:0;bottom:0;height:150px;pointer-events:none;z-index:0;overflow:hidden}
+.gt-wave{position:absolute;left:0;right:0;bottom:0;background-repeat:repeat-x;animation:gtWave linear infinite}
+.gt-wave.w3{height:96px;bottom:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='90' viewBox='0 0 600 90'%3E%3Cpath d='M0 40 C75 10 150 10 225 40 S375 70 450 40 S562 10 600 40 V90 H0Z' fill='%2348e2db' fill-opacity='.10'/%3E%3C/svg%3E");background-size:700px 96px;animation-duration:16s;opacity:.9}
+.gt-wave.w2{height:84px;bottom:12px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='90' viewBox='0 0 600 90'%3E%3Cpath d='M0 40 C75 10 150 10 225 40 S375 70 450 40 S562 10 600 40 V90 H0Z' fill='%2374a0ff' fill-opacity='.16'/%3E%3C/svg%3E");background-size:560px 84px;animation-duration:10s}
+.gt-wave.w1{height:70px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='90' viewBox='0 0 600 90'%3E%3Cpath d='M0 40 C75 10 150 10 225 40 S375 70 450 40 S562 10 600 40 V90 H0Z' fill='%23101a3d' fill-opacity='.95'/%3E%3C/svg%3E");background-size:460px 70px;animation-duration:6.5s}
+@keyframes gtWave{from{background-position-x:0}to{background-position-x:-1400px}}
+.gt-wave.w2{animation-name:gtWave2}.gt-wave.w1{animation-name:gtWave1}
+@keyframes gtWave2{to{background-position-x:-1120px}}
+@keyframes gtWave1{to{background-position-x:-920px}}
+.gt-boat{position:absolute;left:74%;bottom:40px;width:200px;animation:gtBob 3.2s ease-in-out infinite;transform-origin:50% 90%}
+.gt-ship{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 14px rgba(72,226,219,.25))}
+@keyframes gtBob{0%,100%{transform:translateY(0) rotate(-1.2deg)}50%{transform:translateY(-6px) rotate(1.2deg)}}
+.gt-wake{position:absolute;right:88%;bottom:8px;width:260px;height:10px;border-radius:999px;background:linear-gradient(90deg,transparent,rgba(226,232,240,.35));filter:blur(2px);animation:gtWake 1.6s ease-in-out infinite}
+@keyframes gtWake{0%,100%{opacity:.55;transform:scaleX(.9)}50%{opacity:.95;transform:scaleX(1.05)}}
+@media (max-width:900px){.gt-boat{display:none}}
+@media (prefers-reduced-motion:reduce){.gt-wave,.gt-boat,.gt-wake{animation:none}}
