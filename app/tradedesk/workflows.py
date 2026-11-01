@@ -110,15 +110,17 @@ class Runner:
             facts["market"] = profile
         return facts
 
-    def review(self, trace, run_id, workflow, platform, fields, product, trigger, market=None):
-        """Rule checks + model review with the citation guard."""
+    def review(self, trace, run_id, workflow, platform, fields, product, trigger, market=None, rules_only=False):
+        """Rule checks + model review with the citation guard (rules_only: code rules only, no model call)."""
         profile = self.kb.market_profile(market, product["id"]) if market else None
         if profile:  # certifications this market needs and the factory lacks count as "not held" for the code checks
             product = dict(product, certifications_not_held=product.get("certifications_not_held", []) + profile["certifications_not_held"])
         findings = checks.run_rule_checks(fields, product, self.kb, platform, market)
         llm_rules = self.kb.rules_for(platform, kinds=["llm"], market=market)
         dropped, skipped = [], None
-        if llm_rules:
+        if llm_rules and rules_only:
+            skipped = {"reason_zh": "只跑了代码规则，模型审核没有运行", "rules": [r["id"] for r in llm_rules]}
+        elif llm_rules:
             rules_for_model = [{"rule_id": r["id"], "title_zh": r.get("title_zh"),
                                 "excerpt": r.get("excerpt"), "question_zh": r["check"].get("question_zh")}
                                for r in llm_rules]
@@ -372,7 +374,8 @@ class Runner:
         product = self.kb.product(payload["product_id"])
         platform = payload["platform"]
         fields = payload.get("fields") or {"text": payload.get("text", "")}
-        review = self.review(trace, run_id, "已有文案检查", platform, fields, product, "粘贴已有文案")
+        review = self.review(trace, run_id, "已有文案检查", platform, fields, product, "粘贴已有文案",
+                             market=payload.get("market"), rules_only=bool(payload.get("rules_only")))
         return {"run_id": run_id, "fields": fields, "trace": trace, **review}
 
 

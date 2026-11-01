@@ -358,6 +358,26 @@ class ReviewFallbackTests(unittest.TestCase):
             clean = runner.check_text({"platform": "amazon_us", "product_id": "KET-17S", "text": "Kettle"})
             self.assertEqual((clean["findings"], clean["risk"]), ([], "amber"))
 
+    def test_rules_only_never_calls_the_model_and_is_never_green(self):
+        with tempfile.TemporaryDirectory() as t:
+            kb = make_kb(t)
+            transport = FakeTransport({})  # any model call would raise "unexpected prompt"
+            llm = LLM(api_key="k", mode="live", cache_dir=t, transport=transport, provider="openai")
+            runner = Runner(llm, kb, log_path=Path(t) / "calls.jsonl", board=Board(Path(t) / "state"))
+            r = runner.check_text({"platform": "amazon_us", "product_id": "KET-17S", "text": "Kettle", "rules_only": True})
+            self.assertEqual(transport.calls, [])
+            self.assertEqual((r["findings"], r["risk"]), ([], "amber"))
+            self.assertEqual(r["review_skipped"]["rules"], ["US-01"])
+
+    def test_market_adds_its_missing_certifications_to_the_code_checks(self):
+        with tempfile.TemporaryDirectory() as t:
+            runner = Runner(LLM(api_key="", mode="replay", cache_dir=t, provider="openai"), KnowledgeBase(),
+                            log_path=Path(t) / "calls.jsonl", board=Board(Path(t) / "state"))
+            ask = {"platform": "alibaba_rfq", "product_id": "AF-45D", "text": "Our air fryer is PSE certified.", "rules_only": True}
+            self.assertEqual(runner.check_text(ask)["findings"], [])
+            jp = runner.check_text(dict(ask, market="JP"))["findings"]
+            self.assertEqual([(f["check"], f["severity"]) for f in jp], [("fact_cert", "red")])
+
 
 def png(size, bg, box=None, color=(20, 20, 20)):
     """A test image: solid background with an optional dark rectangle (x0, y0, x1, y1)."""
@@ -1424,13 +1444,28 @@ class SandboxTests(unittest.TestCase):
         # safeListingCards writes these four features into the EN / ES copy
         self.assertEqual(set(self.product["specs"]["features"]),
                          {"8 presets", "digital touch panel", "60-min timer", "dishwasher-safe basket"})
-        self.assertIn("60-minute timer", self.js)
+        self.assertIn("temporizador de 60 min", self.js)
         # the Japan finding cites markets.json: 120V only, no PSE; Mexico and the EU have no AF-45D notes
         jp = self.kb.market_profile("JP", "AF-45D")
         self.assertIn("PSE", jp["certifications_not_held"])
         self.assertIn("120V", jp["notes_zh"])
         self.assertIsNone(self.kb.markets["EU"]["products"].get("AF-45D"))
         self.assertNotIn("MX", self.kb.markets)
+
+    def test_cited_rules_and_market_notes_match_the_knowledge_base(self):
+        block = self.js.split("const RULES = {", 1)[1].split("\n  };", 1)[0]
+        cited = re.findall(r'"([A-Z]+-\d+)": \{ title: "([^"]+)", quote: "((?:[^"\\]|\\.)*)", url: "([^"]+)" \}', block)
+        self.assertGreaterEqual(len(cited), 8)
+        for rule_id, title, quote, url in cited:
+            rule = self.kb.rule(rule_id)
+            self.assertIsNotNone(rule, rule_id)
+            self.assertEqual((rule["title_zh"], rule["url"]), (title, url), rule_id)
+            self.assertIn(quote, rule["excerpt"], rule_id)
+        for rule_id in set(re.findall(r'rule: "([A-Z]+-\d+)"', self.js)):
+            self.assertIn(f'"{rule_id}": {{ title:', block, f"{rule_id} is used but not listed in RULES")
+        self.assertIn(f'power: "{self.kb.markets["EU"]["power"]}"', self.js)
+        self.assertIn(f'power: "{self.kb.markets["JP"]["power"]}"', self.js)
+        self.assertIn(f'note: "{self.kb.markets["JP"]["products"]["AF-45D"]["notes_zh"]}"', self.js)
 
     def test_sandbox_loads_the_same_stylesheet_version_as_the_workbench(self):
         def version(name):
