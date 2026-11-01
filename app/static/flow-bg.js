@@ -19,14 +19,14 @@ float n(vec2 p){const float K1=.366025404,K2=.211324865;vec2 i=floor(p+(p.x+p.y)
   vec3 h=max(.5-vec3(dot(a,a),dot(b,b),dot(c,c)),0.);vec3 q=h*h*h*h*vec3(dot(a,g(i)),dot(b,g(i+o)),dot(c,g(i+1.)));
   return dot(q,vec3(70.));}
 void main(){
-  vec2 uv=gl_FragCoord.xy/r;vec2 p=uv*vec2(r.x/r.y,1.)*1.3;float s=t*.03;
+  vec2 uv=gl_FragCoord.xy/r;vec2 p=uv*vec2(r.x/r.y,1.)*.9;float s=t*.025;
   vec2 q=vec2(n(p+vec2(0.,s)),n(p+vec2(5.2,1.3-s)));
-  vec2 w=vec2(n(p+1.6*q+vec2(1.7,9.2)+s*.7),n(p+1.6*q+vec2(8.3,2.8)-s*.6));
-  float f=smoothstep(-.4,.9,n(p+1.5*w));
+  vec2 w=vec2(n(p+1.1*q+vec2(1.7,9.2)+s*.7),n(p+1.1*q+vec2(8.3,2.8)-s*.6));
+  float f=smoothstep(-.5,1.,n(p+1.*w));
   vec3 cyan=vec3(.282,.886,.859),blue=vec3(.455,.627,1.),violet=vec3(.718,.584,1.);
   vec3 tint=mix(mix(cyan,blue,smoothstep(-.6,.6,w.x)),violet,smoothstep(-.1,.9,w.y));
   vec3 navy=vec3(.027,.055,.145),paper=vec3(.957,.965,.984);
-  vec3 col=dark>.5?navy+tint*(.03+.19*f):mix(paper,tint,.04+.16*f);
+  vec3 col=dark>.5?navy+tint*(.02+.11*f):mix(paper,tint,.02+.07*f);
   gl_FragColor=vec4(col,1.);
 }`;
 
