@@ -850,3 +850,16 @@ html.flow-on body::before{display:none}
 .nav button.on{box-shadow:inset 0 0 0 1px hsl(221 90% 66% / .28),0 6px 18px -10px hsl(221 90% 60% / .8)}
 *{scrollbar-width:thin;scrollbar-color:hsl(var(--border)) transparent}
 @media (prefers-reduced-motion:reduce){.stat:hover,.kpi:hover{transform:none}}
+/* fresh install: the offline warm-up offered where the numbers would be */
+.ov-empty{display:flex;align-items:center;gap:14px;margin-bottom:16px;padding:16px 18px;border-radius:14px;border:1px solid hsl(var(--brand) / .4);
+  background:linear-gradient(120deg,hsl(var(--brand-soft)),hsl(var(--card) / .6));box-shadow:0 14px 34px -24px rgba(37,99,235,.6);animation:fade .3s ease}
+.ov-empty[hidden]{display:none}
+.ov-empty>div{flex:1;display:flex;flex-direction:column;gap:3px}
+.ov-empty b{font-size:15px}.ov-empty>div span{font-size:13px;color:hsl(var(--muted-foreground))}
+.ov-empty-ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none;color:#fff;background:linear-gradient(140deg,#0e7490,#2563eb 55%,#7c3aed)}
+.ov-empty-ic .ic{width:22px;height:22px}
+/* products without a main image yet: a gradient tile with the product's first character */
+.thumb-ph{width:100%;height:100%;display:grid;place-items:center;font-size:20px;font-weight:800;color:#fff;background:linear-gradient(140deg,#0e7490,#2563eb 55%,#7c3aed)}
+/* light theme: a little more depth so the glass cards do not read as flat white boxes */
+:root[data-theme="light"] .card{box-shadow:inset 0 1px 0 #fff,0 12px 30px -22px rgba(37,99,235,.38)}
+:root[data-theme="light"] .stat::before,:root[data-theme="light"] .kpi::before{height:3px}

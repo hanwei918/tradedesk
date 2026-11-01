@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=36">
+<link rel="stylesheet" href="style.css?v=37">
 <link rel="stylesheet" href="welcome.css?v=6">
 <script>/* dark (the poster palette) unless this browser chose light */ try{document.documentElement.dataset.theme=localStorage.getItem("td-theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 </head>
@@ -74,6 +74,7 @@
             <button class="ov-link" data-go="eval">同样 8 条询盘、同一套检查 · 看对照实验<svg class="ic sm"><use href="#i-chevron-right"/></svg></button>
           </div>
         </div>
+        <div class="ov-empty" id="ov-empty" hidden></div>
         <div class="grid g4" id="ov-stats"></div>
         <div class="dash">
           <div class="card span-8"><div class="card-h"><div><h3><svg class="ic"><use href="#i-store"/></svg>渠道健康</h3><p id="ov-chan-note">商品看板里每个产品在每个渠道的最新检查结果</p></div><button class="btn sm ghost" data-go="board">看板<svg class="ic sm"><use href="#i-chevron-right"/></svg></button></div>
@@ -109,6 +110,7 @@
             <button class="btn primary" id="board-batch"><svg class="ic"><use href="#i-zap"/></svg><span id="board-batch-label">批量生成全部 Listing</span></button>
           </div>
         </div>
+        <div class="ov-empty" id="board-empty" hidden></div>
         <div class="grid g5" id="board-stats"></div>
         <div id="board-progress"></div>
         <div class="card" style="margin-top:16px"><div class="board-wrap"><table class="board">
@@ -239,7 +241,7 @@
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
 <script src="flow-bg.js?v=2"></script>
-<script src="app.js?v=36"></script>
+<script src="app.js?v=37"></script>
 <script src="welcome.js?v=8"></script>
 </body>
 </html>

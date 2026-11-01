@@ -306,11 +306,39 @@ const cellState = (c) => (c.listed ? "listed" : c.risk || "none");
 const WF_SHORT = { "A 询盘回复": "询盘", "B 多平台上架": "上架", "C 主图检查": "主图", "收件箱整理": "收件箱", "已有文案检查": "体检" };
 const WF_ICON = { "收件箱整理": "history", "已有文案检查": "scan-search" };
 
+// A fresh install has no runs yet: offer the offline warm-up right where the empty numbers would be.
+function demoEmpty(el, empty) {
+  if (!el) return;
+  el.hidden = !empty;
+  if (!empty) return;
+  el.innerHTML = `<span class="ov-empty-ic">${ic("zap", "lg")}</span><div><b>还没有演示数据</b><span>新装的工作台是空的。点右边按钮，把 13 步演示路径离线回放进看板、收件箱和调用日志：不调用模型，不花额度，约 1 秒。</span></div><button class="btn primary" type="button">${ic("play", "sm")}载入演示数据</button>`;
+  el.querySelector("button").addEventListener("click", async (e) => {
+    busy(e.currentTarget, true, "回放中…");
+    try { const r = await api("/api/selfcheck/warm", {}); KB = null; toast(`已回放 ${r.warmed} / ${r.total} 步：概览、看板、收件箱现在有数据了`, "ok"); }
+    catch (err) { toast(err.message); }
+    go(page);
+  });
+}
+
+// Overview numbers roll up from zero when the page opens (skipped under reduced motion).
+function countUp(root) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  root.querySelectorAll(".kpi .v").forEach((v) => {
+    const node = v.firstChild, end = node && node.nodeType === 3 ? parseInt(node.textContent, 10) : NaN;
+    if (!(end > 0)) return;
+    const t0 = performance.now();
+    const step = (t) => { const k = Math.min(1, (t - t0) / 650); node.textContent = String(Math.round(end * (1 - (1 - k) ** 3))); if (k < 1) requestAnimationFrame(step); };
+    node.textContent = "0";
+    requestAnimationFrame(step);
+  });
+}
+
 async function renderOverview() {
   const [{ entries }, kb, board] = await Promise.all([api("/api/logs"), KB ? KB : api("/api/kb"), api("/api/board").catch(() => null)]);
   KB = kb;
   if (META) $("#ov-eyebrow").innerHTML = `${ic("building-2", "sm")}${esc(META.factory.name_zh)} ·`;
   const runs = groupRuns(entries);
+  demoEmpty($("#ov-empty"), !runs.length);
   const reviews = entries.filter((e) => e.findings);
   const all = reviews.flatMap((e) => e.findings);
   const reds = all.filter((f) => f.severity === "red").length;
@@ -335,6 +363,8 @@ async function renderOverview() {
       sbar([{ n: reds, cls: "s-red", label: "红色 · 不能发" }, { n: all.length - reds, cls: "s-amber", label: "黄色 · 需人工确认" }]),
       swatch("s-red", "红色", reds) + swatch("s-amber", "黄色", all.length - reds)) +
     kpi("green", "ban", "丢弃的无出处提示", dropped, `<div class="pills"><span>出处守卫 · 代码执行</span></div>`, dropped ? "模型说不出依据，没有展示给用户" : "0 表示模型这几次都给出了出处；编造的提示见评测页红队测试（5 条全部拦下）");
+
+  countUp($("#ov-stats"));
 
   // channel health, from the product board
   if (board) {
@@ -745,6 +775,7 @@ async function renderBoard() {
   const rows = boardState.data.rows;
   const cells = rows.flatMap((r) => Object.values(r.cells));
   const n = (f) => cells.filter(f).length;
+  demoEmpty($("#board-empty"), cells.every((c) => !c.risk && !c.listed));
   // Numbers that changed since the last render get a +N / −N chip and a pulse, so a new product or a fresh check is visible at a glance.
   const vals = { products: rows.length, ok: n((c) => c.risk === "green" || c.listed), amber: n((c) => c.risk === "amber" && !c.listed),
     red: n((c) => c.risk === "red"), none: n((c) => !c.risk) };
@@ -760,7 +791,8 @@ async function renderBoard() {
     stat("none", "未生成 / 未上传", "circle-dot", vals.none, "点格子开始");
   $("#board-body").innerHTML = rows.map((r) => {
     const p = META.products.find((x) => x.id === r.product_id);
-    const thumb = r.has_image ? `<img src="/api/image/${r.product_id}?t=${Date.now()}" alt="">` : ic("package", "lg");
+    const thumb = r.has_image ? `<img src="/api/image/${r.product_id}?t=${Date.now()}" alt="">`
+      : `<span class="thumb-ph" title="还没有主图">${esc((p?.name_zh || r.product_id).replace(/^[\d.]+\s*\w*\s*/, "").slice(0, 1))}</span>`;
     const cellHtml = (ch) => {
       const c = r.cells[ch];
       const key = `${r.product_id}:${ch}`;
