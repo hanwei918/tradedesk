@@ -1205,8 +1205,9 @@ async function renderKB() {
   const SC = KB.source_check, scBy = Object.fromEntries((SC?.results || []).map((x) => [x.id, x]));
   $("#kb-src").innerHTML = SC ? `${ic("globe", "sm")}<span><b>出处自检 ${esc(SC.checked_at)}</b>：程序重新抓取 ${SC.total} 条规则的官方页面 ·
       <span class="hf-ok">${SC.summary.found} 条原文仍在</span> · ${SC.summary.browser} 条${esc(SC.status_zh.browser)}（${esc(SC.detail_zh.browser)}） ·
-      ${SC.summary.blocked} 条${esc(SC.status_zh.blocked)} · <span class="${SC.summary.missing ? "hf-bad" : ""}">${SC.summary.missing} 条没找到</span>${SC.summary.error ? ` · ${SC.summary.error} 条抓取失败` : ""}</span>`
+      ${SC.summary.blocked} 条${esc(SC.status_zh.blocked)} · <span class="${SC.summary.missing ? "hf-bad" : ""}">${SC.summary.missing} 条没找到</span>${SC.summary.error ? ` · ${SC.summary.error} 条抓取失败${SC.reason_zh ? `（${esc(Object.values(SC.reason_zh).join("、"))}）` : ""}` : ""}</span>`
     : `${ic("globe", "sm")}<span>还没跑过出处自检：点右边按钮，程序会重新抓取每条规则的官方页面，看原文还在不在（需联网，约 30 秒）</span>`;
+  if (kbAttempt) $("#kb-src").innerHTML += `<div class="hf-bad small" style="flex-basis:100%;margin-top:6px">${esc(kbAttempt.checked_at)} 重新抓取：${kbAttempt.total} 条一个页面都没打开（${esc(kbAttempt.reason_zh)}）。${kbAttempt.kept ? "已保留上面这次的结果，没有覆盖。" : ""}修法：${esc(kbAttempt.hint_zh)}</div>`;
   const counts = {};
   KB.rules.forEach((r) => (counts[r.category] = (counts[r.category] || 0) + 1));
   $("#kb-cats").innerHTML = [["all", "全部", KB.rules.length], ...Object.entries(counts).map(([c, n]) => [c, CAT[c] || c, n])]
@@ -1228,9 +1229,14 @@ async function renderKB() {
 }
 
 // ------------------------------------------------------------------ logs
+let kbAttempt = null;  // a re-fetch that reached no page: shown under the last saved report
 async function recheckSources() {
   const btn = $("#kb-recheck"); busy(btn, true, "抓取中…");
-  try { const r = await api("/api/kb/source-check", {}); KB = null; toast(`出处自检完成：${r.summary.found} 条原文仍在，${r.summary.missing} 条没找到`, "ok"); }
+  try {
+    const r = await api("/api/kb/source-check", {}); KB = null; kbAttempt = r.attempt ? { ...r.attempt, kept: r.kept } : null;
+    if (kbAttempt) toast(`没有连上任何官方页面（${kbAttempt.reason_zh}）${kbAttempt.kept ? "，已保留上次结果" : ""}`);
+    else toast(`出处自检完成：${r.summary.found} 条原文仍在，${r.summary.missing} 条没找到${r.summary.error ? `，${r.summary.error} 条抓取失败` : ""}`, "ok");
+  }
   catch (e) { toast(e.message); }
   busy(btn, false); renderKB();
 }

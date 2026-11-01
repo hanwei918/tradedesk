@@ -83,7 +83,7 @@ class App:
 
     def source_check(self, payload=None):
         """Re-fetch every rule's source page (needs internet, no model call)."""
-        return sources.save(sources.check_all(self.kb.all_rules))
+        return sources.refresh(self.kb.all_rules)
 
     # ---------------------------------------------------------- agents, booth self-check, hand-off
     def agents_view(self):

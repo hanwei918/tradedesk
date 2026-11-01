@@ -832,3 +832,4 @@ a.rp-all{display:inline}
 /* WebGL flowing background (flow-bg.js) takes over from the CSS aurora when it runs */
 #flow-bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;display:block}
 html.flow-on body::before{display:none}
+.kb-src{flex-wrap:wrap}.kb-src>span{flex:1 1 0;min-width:0}

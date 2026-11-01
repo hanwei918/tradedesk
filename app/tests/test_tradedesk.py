@@ -1424,6 +1424,44 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class SourceRefreshTests(unittest.TestCase):
+    RULES = [{"id": "R-1", "url": "https://example.test/a", "excerpt": "the rule text here"},
+             {"id": "R-2", "url": "https://example.test/b", "excerpt": "another rule text"}]
+
+    @staticmethod
+    def failing(message):
+        def fetch(url, timeout):
+            raise OSError(message)
+        return fetch
+
+    def test_a_run_that_reaches_no_page_keeps_the_last_report_and_says_why(self):
+        from tradedesk import sources
+        with tempfile.TemporaryDirectory() as t:
+            path = Path(t) / "source_check.json"
+            path.write_text(json.dumps({"checked_at": "2026-10-31 18:59", "summary": {"found": 2}}), encoding="utf-8")
+            before = path.read_text(encoding="utf-8")
+            r = sources.refresh(self.RULES, fetch=self.failing("[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed"), path=path)
+            self.assertEqual(path.read_text(encoding="utf-8"), before)
+            self.assertEqual((r["checked_at"], r["kept"], r["attempt"]["reason"]), ("2026-10-31 18:59", True, "cert"))
+            self.assertIn("Install Certificates", r["attempt"]["hint_zh"])
+            none = sources.refresh(self.RULES, fetch=self.failing("gaierror nodename nor servname provided"), path=Path(t) / "new.json")
+            self.assertEqual((none["kept"], none["attempt"]["reason"]), (False, "dns"))
+            self.assertFalse((Path(t) / "new.json").exists())
+
+    def test_a_partly_failed_run_is_saved_with_its_reasons(self):
+        from tradedesk import sources
+
+        def fetch(url, timeout):
+            if url.endswith("/a"):
+                return 200, "text/html", ("<p>the rule text here</p>" + "x" * 500).encode()
+            raise OSError("timed out")
+        with tempfile.TemporaryDirectory() as t:
+            path = Path(t) / "source_check.json"
+            r = sources.refresh(self.RULES, fetch=fetch, path=path)
+            self.assertEqual((r["summary"]["found"], r["summary"]["error"], r["reasons"]), (1, 1, {"timeout": 1}))
+            self.assertEqual(json.loads(path.read_text(encoding="utf-8"))["summary"], r["summary"])
+
+
 class ContactRegexTests(unittest.TestCase):
     """AMZ-06 / TT-03 catch phone numbers, links and emails, not standard numbers such as IEC 60335-2-9."""
 
