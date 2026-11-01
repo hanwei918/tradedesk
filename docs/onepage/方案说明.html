@@ -71,7 +71,7 @@ img.shot{width:100%;border:1px solid #dfe4ee;border-radius:6px;display:block;mar
    ├ 主图：像素测量（代码）→ 主图审核员（编号 + 看到的内容）
    └ 反馈：高亮批注 · 红黄绿 · 逐词对比 · 任务 · 调用日志
    ▼
-kb/rules.json（61 条）  data/products.json（两家工厂资料卡）
+kb/rules.json（61 条检查 + 7 条参考）  data/products.json（两家工厂资料卡）
 config/agents.json（配置导出）  cache/（回放）  state/（看板、收件箱）</pre>
 
 <h2>平台调用方式与智能体配置</h2>
@@ -83,7 +83,7 @@ config/agents.json（配置导出）  cache/（回放）  state/（看板、收�
 <tr><td>合规审核员</td><td>按“模型判断”类规则审核，须带编号和原文</td><td>每次生成后</td></tr>
 <tr><td>主图审核员</td><td>看图判断文字、徽章、道具、是否实拍</td><td>上传主图后</td></tr>
 </table>
-<p class="muted">现场经赛事 Tokenhub 调用 gpt-5.5（OpenAI 兼容接口），也支持 Claude。温度 0、只输出 JSON。三种模式：实时 / 录制 / 回放（断网演示）。界面“智能体配置”页和 app/config/agents.json 是同一份配置（附录 A）。一条询盘回复加改一轮的模型费约 0.24 美元（实测用量 × 官方价，是模型成本，不是节省金额；人工用时在“降本测算 → 现场实测”里计时记录）。114 项自动化测试。</p>
+<p class="muted">现场经赛事 Tokenhub 调用 gpt-5.5（OpenAI 兼容接口），也支持 Claude。温度 0、只输出 JSON。三种模式：实时 / 录制 / 回放（断网演示）。界面“智能体配置”页和 app/config/agents.json 是同一份配置（附录 A）。一条询盘回复加改一轮的模型费约 0.24 美元（实测用量 × 官方价，是模型成本，不是节省金额；人工用时在“降本测算 → 现场实测”里计时记录）。117 项自动化测试。</p>
 
 <h2>反馈方式</h2>
 <p>① 原文高亮批注，点高亮跳到依据 ② 红 / 黄 / 绿风险等级 ③ 与上一轮的逐词对比 ④ 派给采购 / 生产 / 美工的任务 ⑤ 模型审核没跑成时明确提示，风险等级不会显示绿色。系统不自动发送，红黄提示必须人看过。</p>
@@ -132,7 +132,7 @@ config/agents.json（配置导出）  cache/（回放）  state/（看板、收�
 <tr><td>大屏（可选第二块屏）</td><td>循环播放自动演示（#tour=loop）；或放“AI 找茬”二维码和排行榜，手机只能访问找茬页面</td></tr>
 <tr><td>赛事 Tokenhub · gpt-5.5</td><td>询盘理解、回复生成、上架文案生成、合规审核、主图看图审核（实时模式）</td></tr>
 <tr><td>回放缓存 app/cache/（179 条）</td><td>录好的真实模型返回；回放模式断网也能完整演示，结果一秒出来</td></tr>
-<tr><td>规则知识库 app/kb/rules.json（61 条）</td><td>生成时注入规则摘要，审核时作为唯一依据；每条附原文和链接</td></tr>
+<tr><td>规则知识库 app/kb/rules.json（61 条参与检查 + 7 条参考）</td><td>生成时注入规则摘要，审核时作为唯一依据；每条附原文和链接</td></tr>
 <tr><td>资料卡 app/data/products.json（两家示例工厂、5 个产品）</td><td>认证、价格阶梯、MOQ、交期、付款方式；代码用它核对数字和认证</td></tr>
 <tr><td>示例询盘 app/data/inquiries.json（13 条，6 个市场）</td><td>固定演示输入（虚构），保证现场可重复；也可从 CSV 导入新询盘（要实时模式处理）</td></tr>
 <tr><td>示例主图 app/static/samples/</td><td>主图检查演示（示意图，不是实拍）</td></tr>
@@ -145,7 +145,7 @@ config/agents.json（配置导出）  cache/（回放）  state/（看板、收�
 <li>新解压的包先点“一键预热”：把演示路径回放进看板、收件箱和调用日志，概览页才有数据。</li>
 <li>要演示实时调用：左下角模型卡片填 Tokenhub 的 key，切到实时模式；在开摊自检页“实时验证”里随机生成一条没录过的询盘，实时跑一遍（3 次调用，约 20 秒，结果留记录）。</li>
 <li>笔记本打开 <code>#roles</code> 给评委选角色；大屏打开 <code>#tour=loop</code> 循环播放；需要找茬游戏时用 <code>--lan</code> 启动。</li>
-<li>浏览器全屏，宽度不小于 1280 像素；运行一次 <code>python3 -m unittest discover -s tests</code>，确认 114 项通过。</li>
+<li>浏览器全屏，宽度不小于 1280 像素；运行一次 <code>python3 -m unittest discover -s tests</code>，确认 117 项通过。</li>
 </ol>
 
 <h2>B3 · 恢复步骤</h2>
@@ -159,6 +159,14 @@ config/agents.json（配置导出）  cache/（回放）  state/（看板、收�
 <tr><td>来不及手动操作</td><td>点右上角“自动演示”，跟着字幕讲；Esc 退出</td></tr>
 </table>
 <p class="muted" style="margin-top:6px">模型审核失败时，代码规则的结果仍然显示，风险等级不会是绿色；系统不自动发送任何内容。</p>
+
+<h2>B4 · 11-01 按游园会现场反馈当天做的更新</h2>
+<table>
+<tr><th>谁提的</th><th>我们做了什么</th></tr>
+<tr><td>做欧盟外贸的观众：欧盟规则太少，想看到规则库更新时间</td><td>规则库页醒目标出“规则库更新于 2026-11-01”；欧盟规则从 2 条扩到 9 条（新增 7 条参考规则，原文逐字取自 EUR-Lex，暂未接入自动检查）</td></tr>
+<tr><td>用 WhatsApp / Facebook 沟通的观众：把回复导进工作台太麻烦</td><td>浏览器插件原型（仓库 extension/）：网页里选中回复，右键“TradeDesk 发出前检查”；只检查不发送，配对码见开摊自检页</td></tr>
+<tr><td>主办方：想看完整工作流的模拟演练</td><td>Sandbox 演练和进门页：4 个通关任务，标“代码复核”的提示来自真实规则引擎</td></tr>
+</table>
 </section>
 
 </body>
