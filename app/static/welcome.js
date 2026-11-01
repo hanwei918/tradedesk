@@ -67,7 +67,8 @@
     document.body.classList.add("gt-lock");
     const knob = gate.querySelector(".gt-knob"), track = gate.querySelector(".gt-track");
     let start = 0, x = 0, max = 0, dragging = false, unlocked = false;
-    const place = (v) => { x = v; knob.style.transform = `translateX(${v}px)`; track.style.setProperty("--p", max ? v / max : 0); };
+    // the slider drives the ship: it sails forward and the waves run back as the knob moves
+    const place = (v) => { x = v; knob.style.transform = `translateX(${v}px)`; const r = max ? v / max : 0; track.style.setProperty("--p", r); gate.style.setProperty("--sail", r); };
 
     function unlock() {
       if (unlocked) return;
@@ -75,7 +76,7 @@
       max = track.clientWidth - knob.offsetWidth - 8;
       place(max);
       track.classList.add("done");
-      gate.classList.add("gt-scanning");
+      gate.classList.add("gt-sailing", "gt-scanning");
       setTimeout(() => {
         gate.classList.remove("gt-scanning");
         track.hidden = true;
@@ -96,7 +97,7 @@
     const release = () => {
       if (!dragging) return;
       dragging = false; track.classList.remove("drag");
-      if (!unlocked) { knob.classList.add("back"); place(0); setTimeout(() => knob.classList.remove("back"), 300); }
+      if (!unlocked) { knob.classList.add("back"); gate.classList.add("gt-return"); place(0); setTimeout(() => { knob.classList.remove("back"); gate.classList.remove("gt-return"); }, 300); }
     };
     knob.addEventListener("pointerup", release);
     knob.addEventListener("pointercancel", release);
