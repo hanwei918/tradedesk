@@ -952,6 +952,7 @@ async function openImageCell(p, row, cell) {
 
 // ------------------------------------------------------------------ inbox & tasks
 let inboxTab = "list", taskRole = "全部", taskInquiry = null;
+const taskOpen = new Set();  // task groups the user opened ("_" marks that they chose)
 function showInboxTab(v) {
   inboxTab = v;
   $$("#inbox-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
@@ -982,16 +983,32 @@ async function renderInbox() {
   }));
   const roles = ["全部", ...new Set(data.tasks.map((t) => t.role_zh))];
   const tasks = data.tasks.filter((t) => (taskRole === "全部" || t.role_zh === taskRole) && (!taskInquiry || t.inquiry_id === taskInquiry));
-  const col = (st) => `<div class="col"><h4><span>${st}</span><span class="muted">${tasks.filter((t) => t.status === st).length}</span></h4>${tasks.filter((t) => t.status === st).map((t) => {
-    const i = data.task_status.indexOf(st);
-    return `<div class="task"><div class="row"><span class="badge brand">${esc(t.role_zh)}</span>${t.priority === "high" ? '<span class="badge red">急</span>' : ""}<span class="small muted" style="margin-left:auto">${esc(t.inquiry_id)}</span></div>
-      <div style="margin-top:6px">${esc(t.task_zh)}</div><div class="q">“${esc(t.quote)}”</div>
-      <div class="acts"><button class="btn sm ghost" data-mv="${t.id}:${i - 1}" ${i === 0 ? "disabled" : ""}>←</button><span class="small muted">${esc(t.inquiry_label_zh)}</span><button class="btn sm ghost" data-mv="${t.id}:${i + 1}" ${i === 2 ? "disabled" : ""}>→</button></div></div>`;
-  }).join("") || '<div class="small muted" style="padding:6px">空</div>'}</div>`;
+  // Each column groups its tasks by inquiry; groups fold so a long "to do" column stays readable.
+  const card = (t) => {
+    const i = data.task_status.indexOf(t.status);
+    return `<div class="task"><div class="tk-top"><span class="badge brand">${esc(t.role_zh)}</span>${t.priority === "high" ? '<span class="badge red">急</span>' : ""}
+      <span class="tk-mv"><button class="btn sm ghost icon" title="退回上一列" data-mv="${t.id}:${i - 1}" ${i === 0 ? "disabled" : ""}>←</button><button class="btn sm ghost icon" title="推进到下一列" data-mv="${t.id}:${i + 1}" ${i === 2 ? "disabled" : ""}>→</button></span></div>
+      <div class="tk-text">${esc(t.task_zh)}</div><div class="q" title="${esc(t.quote)}">“${esc(t.quote)}”</div></div>`;
+  };
+  const col = (st, ci) => {
+    const list = tasks.filter((t) => t.status === st);
+    const groups = {};
+    list.forEach((t) => (groups[t.inquiry_id] ||= []).push(t));
+    const body = Object.entries(groups).map(([qid, ts], gi) => {
+      const key = `${st}:${qid}`;
+      const open = taskInquiry ? taskInquiry === qid : taskOpen.has(key) || (!taskOpen.size && ci === 0 && gi === 0) || ci > 0;
+      const urgent = ts.filter((t) => t.priority === "high").length;
+      return `<details class="tgroup" data-key="${esc(key)}" ${open ? "open" : ""}><summary><b>${esc(qid)}</b><span>${esc(ts[0].inquiry_label_zh)}</span>${urgent ? `<span class="badge red">急 ${urgent}</span>` : ""}<em>${ts.length}</em></summary>${ts.map(card).join("")}</details>`;
+    }).join("") || `<div class="tk-empty">${ci === 0 ? "没有待处理的任务" : "点任务上的 → 推进到这里"}</div>`;
+    return `<div class="col st-${ci}"><h4><span><i></i>${st}</span><span class="muted">${list.length}</span></h4>${body}</div>`;
+  };
+  const urgentAll = tasks.filter((t) => t.priority === "high").length;
+  const summary = `<div class="tk-sum">共 <b>${tasks.length}</b> 条任务 · ${data.task_status.map((st) => `${st} <b>${tasks.filter((t) => t.status === st).length}</b>`).join(" · ")}${urgentAll ? ` · <span class="badge red">急 ${urgentAll}</span>` : ""}<span class="muted">按询盘分组，点组头展开</span></div>`;
   $("#inbox-tasks").innerHTML = data.tasks.length ? `<div class="chips" style="margin-bottom:12px">${roles.map((r) => `<button class="chip ${r === taskRole ? "on" : ""}" data-role="${esc(r)}">${esc(r)}</button>`).join("")}${taskInquiry ? `<span class="chip on">只看 ${esc(taskInquiry)} 的任务</span><button class="chip" id="task-all">显示全部询盘</button>` : ""}</div>
-    <div class="kanban">${data.task_status.map(col).join("")}</div>`
+    ${summary}<div class="kanban">${data.task_status.map(col).join("")}</div>`
     : emptyCard("building-2", "还没有任务", ["处理询盘时，系统会把需要采购、生产、美工跟进的事拆成任务，每条都挂着询盘原文。"]);
   $$("#inbox-tasks [data-role]").forEach((b) => b.addEventListener("click", () => { taskRole = b.dataset.role; renderInbox(); }));
+  $$("#inbox-tasks .tgroup").forEach((d) => d.addEventListener("toggle", () => { taskOpen.add("_"); if (d.open) taskOpen.add(d.dataset.key); else taskOpen.delete(d.dataset.key); }));
   $("#task-all")?.addEventListener("click", () => { taskInquiry = null; renderInbox(); });
   $$("#inbox-tasks [data-mv]").forEach((b) => b.addEventListener("click", async () => {
     const [id, i] = b.dataset.mv.split(":");
