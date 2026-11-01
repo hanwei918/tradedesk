@@ -98,13 +98,20 @@
       node.classList.add("sb-hit");
     });
   }
+  const TASKS = { listing: "查一遍上架文案", risk: "询盘排雷", market: "换个国家", rewrite: "改稿并模拟发送" };
   function markTask(key) {
     if (state.tasks.has(key)) return;
     state.tasks.add(key);
     $(`[data-task="${key}"]`)?.classList.add("done");
     $("#sb-progress-fill").style.width = `${state.tasks.size * 25}%`;
     $("#sb-progress-label").textContent = `${state.tasks.size} / 4 已完成`;
+    if (state.tasks.size === 4 && !state.finished) {  // any order: the finale opens once all four are done
+      state.finished = true;
+      $("#sb-final-open").hidden = false;
+      setTimeout(() => { if (state.finished) showFinal(); }, calm() ? 0 : 1400);
+    }
   }
+  function remaining() { return Object.keys(TASKS).filter((k) => !state.tasks.has(k)).map((k) => TASKS[k]); }
   function highlight(text, marks) {
     let html = esc(text);
     marks.forEach((m) => { html = html.replace(esc(m), `<mark class="sb-wave">${esc(m)}</mark>`); });
@@ -383,12 +390,7 @@
     await sleep(calm() ? 0 : 1600);
     reply.innerHTML = `<span class="sb-message-label">虚构的客户回复 · 不代表真实成交</span>Thanks for the clear answer on MOQ and certifications. We can review a ${fmt(state.product.moq_units)}-unit trial order on sea-freight terms. Please send the PI.`;
     markTask("rewrite");
-    if (state.tasks.size < 4) {
-      $("#sb-inquiry-state").textContent = `还差 ${4 - state.tasks.size} 个任务`;
-      return;
-    }
-    await sleep(calm() ? 0 : 1200);
-    showFinal();
+    if (state.tasks.size < 4) $("#sb-inquiry-state").textContent = `还差：${remaining().join("、")}（做完自动结算）`;
   }
 
   // ---------------------------------------------------------------- finale
@@ -418,6 +420,7 @@
     $$("[data-final]").forEach((b) => b.classList.toggle("on", b.dataset.final === view));
     $("#sb-final-body").innerHTML = finalBody(view);
   }
+  function hideFinal() { $("#sb-final").classList.remove("on"); $("#sb-final").hidden = true; }
   function showFinal() {
     confetti();
     setFinalView(state.view);
@@ -439,7 +442,8 @@
   function reset() {
     state.run++;
     clearInterval(state.terminalTimer);
-    Object.assign(state, { market: "US", listing: null, audit: false, code: null, shown: new Set(), seen: new Set(), blocked: [], rewritten: false, sent: false });
+    Object.assign(state, { market: "US", listing: null, audit: false, code: null, shown: new Set(), seen: new Set(), blocked: [], rewritten: false, sent: false, finished: false });
+    $("#sb-final-open").hidden = true;
     state.tasks.clear();
     $$("#sb-task-list li").forEach((li) => li.classList.remove("done"));
     $("#sb-progress-fill").style.width = "0%";
@@ -483,6 +487,8 @@
   $("#sb-simulate-send").addEventListener("click", simulateSend);
   $("#sb-reset").addEventListener("click", reset);
   $("#sb-final-reset").addEventListener("click", reset);
+  $("#sb-final-close").addEventListener("click", hideFinal);
+  $("#sb-final-open").addEventListener("click", showFinal);
   $$("[data-final]").forEach((b) => b.addEventListener("click", () => setFinalView(b.dataset.final)));
   $("#sb-team-open").addEventListener("click", () => $("#sb-team").showModal());
   $("#sb-team-close").addEventListener("click", () => $("#sb-team").close());
@@ -492,7 +498,7 @@
     event.currentTarget.setAttribute("aria-expanded", String(!collapsed));
     event.currentTarget.textContent = collapsed ? "展开" : "收起";
   });
-  document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !$("#sb-final").hidden) reset(); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape" && !$("#sb-final").hidden) hideFinal(); });
 
   async function boot() {
     renderDrafts(); renderReply(new Set()); renderMarket(); renderFacts(); renderInsight();

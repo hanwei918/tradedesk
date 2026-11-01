@@ -107,3 +107,7 @@ mark.sb-wave{background:hsl(var(--red) / .12);color:inherit;text-decoration:unde
 .sb-team p{margin:14px 0 0;font-size:13px;color:#94a3b8}
 @media (max-width:820px){.sb-final-grid{grid-template-columns:1fr}.sb-final h2{font-size:26px}}
 @media (prefers-reduced-motion:reduce){.sb-in,.sb-pop,.sb-fact.sb-hit,.sb-scan::after,.sb-dots i,.sb-final-inner,.sb-final-grid>div{animation:none}.sb-bar i{animation:none;width:var(--w)}.sb-plane,.sb-confetti{display:none}}
+.sb-final-open{width:100%;margin-top:10px;animation:sbPop .45s cubic-bezier(.2,1.4,.4,1)}
+.sb-final-open[hidden]{display:none}
+.sb-final-x{position:fixed;top:18px;right:22px;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e2e8f0;font-size:22px;cursor:pointer;z-index:2}
+.sb-final-x:hover{background:rgba(255,255,255,.14)}
