@@ -159,7 +159,7 @@
    "check": {
     "kind": "regex",
     "field": "any",
-    "pattern": "(?i)(https?://|\\bwww\\.|\\b[\\w.+-]+@[\\w-]+\\.[\\w.]+|\\+?\\d[\\d\\s().-]{7,}\\d)",
+    "pattern": "(?i)(https?://|\\bwww\\.|\\b[\\w.+-]+@[\\w-]+\\.[\\w.]+|(?<![\\w.:/-])(?<!IEC )(?<!EN )(?<!ISO )(?<!GB )(?<!UL )\\+?\\d[\\d\\s().-]{7,}\\d)",
     "message_zh": "文案含联系方式或网址，亚马逊详情页不允许，请删除。"
    }
   },
@@ -360,7 +360,7 @@
    "check": {
     "kind": "regex",
     "field": "any",
-    "pattern": "(?i)(https?://|\\bwww\\.|\\b[\\w.+-]+@[\\w-]+\\.[\\w.]+|\\+?\\d[\\d\\s().-]{7,}\\d|whats\\s?app|instagram|facebook|telegram)",
+    "pattern": "(?i)(https?://|\\bwww\\.|\\b[\\w.+-]+@[\\w-]+\\.[\\w.]+|(?<![\\w.:/-])(?<!IEC )(?<!EN )(?<!ISO )(?<!GB )(?<!UL )\\+?\\d[\\d\\s().-]{7,}\\d|whats\\s?app|instagram|facebook|telegram)",
     "message_zh": "含站外联系方式或社媒账号，TikTok Shop 墨西哥禁止引流到站外。"
    }
   },

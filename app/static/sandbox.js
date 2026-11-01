@@ -71,8 +71,6 @@
          { id: "jp-volt", mark: "mkt", sev: "red", title: "电压不对 · 日本 100V", body: () => "日本市电 100V；资料卡只有 120V 美规版本，没有 100V 日本版本。", facts: ["voltage", "market"] },
          { id: "jp-importer", mark: "mkt", sev: "amber", title: "别承诺“工厂办好 PSE”", body: () => "进口电器的 PSE 申报和标识义务由进口商承担；工厂可以配合检测、提供资料。", rule: "JP-02" }]
   };
-  // Certificate names without the standard number: the contact-info regex in the rule base reads "60335-2-9" as a phone number.
-  const certNames = (items) => (items || []).map((c) => c.replace(/\s*\(IEC [^)]*\)/, ""));
   const CODE_LABEL = { fact_cert: "认证", fact_material: "材料宣称", fact_lead: "交期", fact_moq: "起订量", fact_price: "价格" };
 
   const state = { view: "business", scene: "listing", market: "US", tasks: new Set(), product: fallback.product, factory: fallback.factory, metaLoaded: false,
@@ -223,7 +221,7 @@
     renderInsight();
   }
   function safeListing(platform) {
-    const p = state.product, f = state.factory, held = certNames(p.certifications_held);
+    const p = state.product, f = state.factory, held = p.certifications_held || [];
     if (platform === "amazon_us") {
       return `${p.name_en}. Features on the product card: ${(p.specs?.features || []).join(", ")}. Certifications on file: ${held.join(" and ")}. MOQ ${fmt(p.moq_units)} units; standard lead time ${fmt(f.standard_lead_time_days)} days, confirmed per order.`;
     }
@@ -334,8 +332,8 @@
     }, 160);
   }
   const SAFE_REPLY = {
-    US: (p, f) => `Dear John, thank you for your inquiry. Our standard MOQ for this air fryer is ${fmt(p.moq_units)} units, so we cannot confirm 50 units; a ${fmt(p.moq_units)}-unit trial order is the smallest run we can quote. Certifications on file: ${certNames(p.certifications_held).join(" and ")}. UL and ETL are not on file, so we cannot claim them. We quote FOB Ningbo for sea freight; for air freight we can quote FCA. Standard lead time is ${fmt(f.standard_lead_time_days)} days, confirmed against your order. Best regards, Lily`,
-    MX: (p, f) => `Dear Mr. Miller, thank you for your inquiry. Our standard MOQ is ${fmt(p.moq_units)} units, so we cannot confirm 50 units. Certifications on file: ${certNames(p.certifications_held).join(" and ")}; NOM is not on file, so testing to NOM-003-SCFI-2014 would be needed before shipping to Mexico. We quote FOB Ningbo for sea freight, or FCA for air. Standard lead time is ${fmt(f.standard_lead_time_days)} days, confirmed against your order. Best regards, Lily`,
+    US: (p, f) => `Dear John, thank you for your inquiry. Our standard MOQ for this air fryer is ${fmt(p.moq_units)} units, so we cannot confirm 50 units; a ${fmt(p.moq_units)}-unit trial order is the smallest run we can quote. Certifications on file: ${p.certifications_held.join(" and ")}. UL and ETL are not on file, so we cannot claim them. We quote FOB Ningbo for sea freight; for air freight we can quote FCA. Standard lead time is ${fmt(f.standard_lead_time_days)} days, confirmed against your order. Best regards, Lily`,
+    MX: (p, f) => `Dear Mr. Miller, thank you for your inquiry. Our standard MOQ is ${fmt(p.moq_units)} units, so we cannot confirm 50 units. Certifications on file: ${p.certifications_held.join(" and ")}; NOM is not on file, so testing to NOM-003-SCFI-2014 would be needed before shipping to Mexico. We quote FOB Ningbo for sea freight, or FCA for air. Standard lead time is ${fmt(f.standard_lead_time_days)} days, confirmed against your order. Best regards, Lily`,
     EU: (p, f) => `Dear John, thank you for your inquiry. Our standard MOQ is ${fmt(p.moq_units)} units, so we cannot confirm 50 units. The current model is a 120V 60Hz US version; there is no 230V EU version on file yet. Our CE covers the declared LVD/EMC directives, and RoHS testing still needs to be confirmed. We quote FOB Ningbo for sea freight, or FCA for air. Standard lead time is ${fmt(f.standard_lead_time_days)} days once the EU version is confirmed. Best regards, Lily`,
     JP: (p, f) => `Dear John, thank you for your inquiry. Our standard MOQ is ${fmt(p.moq_units)} units, so we cannot confirm 50 units. The current model is a 120V US version without PSE testing, so it cannot be sold in Japan as is. A 100V version and PSE would be needed; the importer handles the PSE notification, and we can support testing and documents. We quote FOB Ningbo for sea freight, or FCA for air. Lead time will be confirmed after the Japanese version is defined. Best regards, Lily`
   };

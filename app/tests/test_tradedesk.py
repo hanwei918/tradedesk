@@ -1424,6 +1424,25 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class ContactRegexTests(unittest.TestCase):
+    """AMZ-06 / TT-03 catch phone numbers, links and emails, not standard numbers such as IEC 60335-2-9."""
+
+    def hits(self, rule_id, text):
+        return re.search(KnowledgeBase().rule(rule_id)["check"]["pattern"], text) is not None
+
+    def test_standard_numbers_are_not_phone_numbers(self):
+        for rule_id in ("AMZ-06", "TT-03"):
+            for text in ("Certifications: CB report (IEC 60335-2-9) and CE (LVD/EMC).", "Tested to IEC 60335-2-15.",
+                         "Meets EN 60335-1:2012 and EN 55014-1.", "Certificado bajo ISO 9001-2015.", "GB 4706.1-2005 compliant"):
+                self.assertFalse(self.hits(rule_id, text), f"{rule_id}: {text}")
+
+    def test_real_contact_details_are_still_caught(self):
+        for rule_id in ("AMZ-06", "TT-03"):
+            for text in ("Call +86 574 8888 6666 today", "Tel: 0574-88886666", "Llama al 55 1234 5678", "Visit www.example.com",
+                         "Email sales@example.com", "https://shop.example.com"):
+                self.assertTrue(self.hits(rule_id, text), f"{rule_id}: {text}")
+
+
 class SandboxTests(unittest.TestCase):
     """The Sandbox page runs a fixed script over the AF-45D card; what it hard-codes must stay true to the data."""
     STATIC = ROOT / "static"
