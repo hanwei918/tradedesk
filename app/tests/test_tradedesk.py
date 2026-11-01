@@ -1439,10 +1439,6 @@ class ProductEditBoardTests(unittest.TestCase):
                 app.product_save({"product": form, "id": "KET-17S"})
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class ReferenceRuleTests(unittest.TestCase):
     """Reference rules are shown with their source but never reach a check or a model prompt,
     so adding them cannot change a recorded request (the replay cache stays valid)."""
@@ -1571,3 +1567,162 @@ class SandboxTests(unittest.TestCase):
             return re.search(r"style\.css\?v=(\d+)", (self.STATIC / name).read_text(encoding="utf-8")).group(1)
         self.assertEqual(version("sandbox.html"), version("index.html"))
         self.assertIn('href="sandbox.html"', (self.STATIC / "index.html").read_text(encoding="utf-8"))
+
+
+class FeedbackTests(unittest.TestCase):
+    """The salesperson's own record of each reply, and the metrics computed from it."""
+
+    def log(self, t):
+        from tradedesk.feedback import FeedbackLog
+        return FeedbackLog(Path(t) / "feedback.json")
+
+    def test_edit_ratio_counts_changed_words_and_cjk_characters(self):
+        from tradedesk.feedback import edit_stats
+        draft = "We can ship 1,200 pcs within 35 days after deposit ."
+        self.assertEqual(edit_stats(draft, draft)["ratio"], 0)
+        one = edit_stats(draft, draft.replace("35", "45"))
+        self.assertEqual((one["draft_tokens"], one["changed_tokens"]), (13, 1))   # 1 , 200 are three tokens
+        ja = edit_stats("納期は35日です", "納期は45日です")
+        self.assertEqual((ja["draft_tokens"], ja["changed_tokens"]), (7, 1))   # one character changed, not the whole sentence
+        self.assertEqual(edit_stats(draft, "Totally different words here")["ratio"], 1.0)
+
+    def test_records_are_validated(self):
+        with tempfile.TemporaryDirectory() as t:
+            log = self.log(t)
+            base = {"outcome": "edited", "draft": "Price is USD 9.80 FOB Ningbo.", "sent": "Price is USD 9.60 FOB Ningbo."}
+            for bad in [dict(base, outcome="sent"), dict(base, draft=""), dict(base, sent=base["draft"]),
+                        dict(base, sent=""), dict(base, missing=["颜色"]), dict(base, minutes=0), dict(base, minutes="abc"),
+                        dict(base, verdicts=[{"key": "AMZ-02", "verdict": "maybe"}]), dict(base, verdicts=[{"verdict": "useful"}])]:
+                with self.assertRaises(ValueError, msg=bad):
+                    log.add(bad)
+            self.assertEqual(log.load(), [])
+            kept = log.add(dict(base, outcome="as_is", sent="ignored"))
+            self.assertEqual((kept["sent"], kept["edit"]), (base["draft"], None))   # as-is means exactly the draft
+            self.assertEqual(log.add(dict(base, outcome="unused"))["sent"], "")
+
+    def test_summary_is_computed_from_records_only(self):
+        with tempfile.TemporaryDirectory() as t:
+            log = self.log(t)
+            empty = log.summary()
+            self.assertEqual((empty["n"], empty["adopted_share"], empty["records"], empty["rules"]), (0, None, [], []))
+            draft = "one two three four five six seven eight nine ten"
+            fa = {"key": "US-01", "label": "环保宣称", "verdict": "false_alarm"}
+            ok = {"key": "fact_cert", "label": "认证", "verdict": "useful", "severity": "red"}
+            log.add({"outcome": "as_is", "draft": draft, "verdicts": [ok], "minutes": 3, "round": 1})
+            log.add({"outcome": "edited", "draft": draft, "sent": draft.replace("ten", "TEN"), "verdicts": [fa, ok],
+                     "missing": ["交期"], "minutes": 6, "round": 2})
+            log.add({"outcome": "edited", "draft": draft, "sent": draft.replace("nine ten", "NINE TEN"), "verdicts": [fa],
+                     "missing": ["交期", "认证"], "round": 3})
+            log.add({"outcome": "unused", "draft": draft, "missing": ["认证", "交期"], "note": "买家要的认证没有"})
+            s = log.summary()
+            self.assertEqual(s["n"], 4)
+            self.assertTrue(s["few"])
+            self.assertEqual(s["adopted_share"], 0.75)
+            self.assertEqual([s["outcomes"][k]["n"] for k in ("as_is", "edited", "unused")], [1, 2, 1])
+            self.assertEqual((s["edit_ratio_median"], s["edit_n"]), (0.15, 2))
+            self.assertEqual((s["minutes_median"], s["minutes_n"]), (4.5, 2))
+            self.assertEqual(s["rounds_median"], 1.5)
+            self.assertEqual((s["findings_judged"], s["findings_useful_rate"]), (4, 0.5))
+            self.assertEqual([(r["key"], r["useful"], r["false_alarm"]) for r in s["rules"]],
+                             [("US-01", 0, 2), ("fact_cert", 2, 0)])            # most false alarms first, not by name
+            self.assertEqual(s["missing"], [{"item": "交期", "n": 3}, {"item": "认证", "n": 2}])
+            self.assertEqual(s["records"][0]["note"], "买家要的认证没有")         # newest first
+            csv_text = log.csv()
+            self.assertIn("误报的提示", csv_text.splitlines()[0])
+            self.assertEqual(len(csv_text.strip().splitlines()), 5)
+            log.delete(0)
+            self.assertEqual(log.summary()["outcomes"]["as_is"]["n"], 0)
+            with self.assertRaises(ValueError):
+                log.delete(9)
+
+    def test_server_routes_and_gate(self):
+        import server
+        src = (ROOT / "server.py").read_text(encoding="utf-8")
+        self.assertIn('"/api/feedback": APP.feedback_view', src)
+        self.assertIn('"/api/feedback": APP.feedback_add', src)
+        h = server.Handler.__new__(server.Handler)
+        h.client_address, h.path, h.command = ("127.0.0.1", 5555), "/api/feedback", "POST"
+        h.headers = {"Host": "127.0.0.1:8765", "Origin": "https://evil.example", "Content-Type": "application/json"}
+        sent = []
+        h._json = lambda code, obj: sent.append(code)
+        self.assertEqual((h._cross_site(), sent), (True, [403]))
+        self.assertEqual(server.App.meta.__code__.co_names.count("MAX_ROUNDS"), 1)
+
+
+class StopConditionTests(unittest.TestCase):
+    """Agents never call each other and a run always ends: fixed steps, a round cap, bounded retries."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.kb = make_kb(self.tmp.name)
+        self.inquiry = self.kb.inquiries[0]
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def runner(self, answers):
+        transport = FakeTransport(answers)
+        llm = LLM(api_key="k", mode="live", cache_dir=self.tmp.name, transport=transport, provider="openai")
+        return Runner(llm, self.kb, log_path=Path(self.tmp.name) / "calls.jsonl",
+                      board=Board(Path(self.tmp.name) / "state")), transport
+
+    def test_one_round_costs_exactly_the_documented_model_calls(self):
+        from tradedesk.workflows import MODEL_CALLS
+        understanding = {"buyer": {"language": "en"}, "requests": [], "signals": [], "conflicts": [], "summary_zh": "x"}
+        runner, transport = self.runner({"询盘分析员": understanding, "外贸业务员": {"reply": "Dear Mark, thanks."},
+                                         "合规审核员": {"findings": []}, "Amazon US": {"title": "Kettle", "bullets": ["a"]},
+                                         "TikTok Shop": {"hook": "h", "script": [], "caption": "c", "hashtags": []}})
+        payload = {"inquiry_text": self.inquiry["text"], "product_id": "KET-17S", "round": 1}
+        r1 = runner.inquiry(payload)
+        self.assertEqual(len(transport.calls), MODEL_CALLS["inquiry_first"])
+        runner.inquiry(dict(payload, understanding=r1["understanding"], previous={"reply": r1["reply"]},
+                            instruction_zh="再简短一点", round=2))
+        self.assertEqual(len(transport.calls), MODEL_CALLS["inquiry_first"] + MODEL_CALLS["inquiry_revision"])
+        before = len(transport.calls)
+        runner.listing({"product_id": "KET-17S", "round": 1})          # amazon_us (has a model rule) + tiktok_mx
+        self.assertLessEqual(len(transport.calls) - before, 2 * MODEL_CALLS["listing_per_platform"])
+        self.assertGreaterEqual(len(transport.calls) - before, 2 + 1)  # two writes, and amazon_us is reviewed
+
+    def test_no_round_past_the_cap_and_no_model_call_for_it(self):
+        from tradedesk.workflows import MAX_ROUNDS
+        runner, transport = self.runner({})
+        with self.assertRaises(ValueError):
+            runner.inquiry({"inquiry_text": self.inquiry["text"], "product_id": "KET-17S", "round": MAX_ROUNDS + 1,
+                            "previous": {"reply": "x"}, "instruction_zh": "再改", "understanding": {}})
+        with self.assertRaises(ValueError):
+            runner.listing({"product_id": "KET-17S", "round": MAX_ROUNDS + 1})
+        with self.assertRaises(ValueError):
+            runner.listing({"product_id": "KET-17S", "round": -1})
+        self.assertEqual(transport.calls, [])
+
+    def test_network_failures_are_tried_a_bounded_number_of_times(self):
+        import urllib.error
+        import urllib.request
+        from unittest import mock
+        from tradedesk import llm as llm_mod
+        tries = []
+
+        def down(req, timeout=None):
+            tries.append(timeout)
+            raise urllib.error.URLError("down")
+        llm = LLM(api_key="k", mode="live", provider="openai", endpoint="https://example.test/v1/chat/completions")
+        with mock.patch.object(urllib.request, "urlopen", down), mock.patch.object(llm_mod.time, "sleep", lambda s: None):
+            with self.assertRaises(LLMError):
+                llm._http({"messages": []})
+        self.assertEqual(tries, [llm_mod.TIMEOUT] * llm_mod.ATTEMPTS)
+
+    def test_exported_stop_rules_quote_the_enforced_numbers(self):
+        from tradedesk.config_export import build
+        from tradedesk.llm import ATTEMPTS, CLAUDE_TIMEOUT, TIMEOUT
+        from tradedesk.workflows import MAX_ROUNDS, MODEL_CALLS
+        o = build(KnowledgeBase(), LLM(api_key="", mode="replay"))["orchestration"]
+        rules = "\n".join(o["stop_rules_zh"])
+        for text in (f"最多 {MAX_ROUNDS} 轮", f"超时 {TIMEOUT} 秒", f"{CLAUDE_TIMEOUT} 秒", f"最多尝试 {ATTEMPTS} 次"):
+            self.assertIn(text, rules)
+        self.assertIn(f"最多 {MODEL_CALLS['inquiry_first']} 次", o["calls_per_round_zh"]["A"])
+        self.assertEqual({w["id"] for w in build(KnowledgeBase(), LLM(api_key="", mode="replay"))["workflows"]},
+                         set(o["calls_per_round_zh"]))
+
+
+if __name__ == "__main__":
+    unittest.main()

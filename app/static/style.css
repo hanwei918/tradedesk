@@ -914,3 +914,30 @@ html.flow-on body::before{display:none}
 .task:hover .tk-text{-webkit-line-clamp:unset}
 .task .q{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tk-empty{padding:18px 10px;text-align:center;font-size:12.5px;color:hsl(var(--muted-foreground));border:1.5px dashed hsl(var(--border));border-radius:10px}
+
+/* Salesperson feedback under an inquiry result, and the 真实使用 tab built from it */
+.fb{margin-top:16px}
+.fb .card-b{display:grid;gap:12px}
+.fb-row{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}
+.fb-row[hidden]{display:none}
+.fb-l{font-size:12.5px;font-weight:600;color:hsl(var(--muted-foreground));padding-top:6px}
+.fb-row textarea,.fb-row input[type=text],.fb-min input{width:100%;box-sizing:border-box;font:inherit;font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid hsl(var(--border));background:hsl(var(--background));color:hsl(var(--foreground))}
+.fb-row textarea{resize:vertical;line-height:1.5}
+.fb-min{display:flex;align-items:center;gap:10px}.fb-min input{width:96px}
+.fb-fs{display:grid;gap:6px}
+.fb-f{display:flex;align-items:center;gap:10px;padding:6px 8px;border:1px solid hsl(var(--border));border-radius:8px}
+.fb-f .num{font:600 11px ui-monospace,Menlo,monospace;color:hsl(var(--muted-foreground))}
+.fb-f .t{flex:1;min-width:0;font-size:13px}
+.fb-f .t small{display:block;color:hsl(var(--muted-foreground));font-size:11px;margin-top:2px}
+.fb .chips{display:flex;flex-wrap:wrap;gap:6px}
+.fb-act{display:flex;justify-content:flex-end}
+.fb .card-b.fb-done{display:flex;align-items:center;gap:10px;color:hsl(var(--green))}
+.fb-done span{flex:1;color:hsl(var(--foreground))}
+.us-bar{display:grid;grid-template-columns:72px 1fr 28px;align-items:center;gap:10px;margin:6px 0;font-size:13px}
+.us-bar i{display:block;height:10px;border-radius:999px;background:hsl(var(--primary) / .75);min-width:4px}
+.us-bar b{text-align:right;font-variant-numeric:tabular-nums}
+.btn.arm{color:hsl(var(--red));border-color:hsl(var(--red) / .5)}
+.ag-stop{margin-bottom:16px}
+.ag-stop-list{margin:0;padding-left:20px;display:grid;gap:6px;font-size:13px;line-height:1.55}
+.ag-calls{display:inline-flex;align-items:center;gap:4px;margin-left:auto}
+@media (max-width:640px){.fb-row{grid-template-columns:1fr;gap:4px}.fb-l{padding-top:0}.ag-calls{margin-left:0}}

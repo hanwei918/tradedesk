@@ -22,6 +22,24 @@ from .llm import LLMError
 
 TEXT_KINDS = ["regex", "length", "llm"]
 
+# Stop conditions. Agents never call each other: the code below calls each one in a fixed order and
+# stops after the last step. A new round starts only when a person sends a revision instruction, and
+# never past MAX_ROUNDS. MODEL_CALLS is the most one round can cost (the review is skipped when no rule needs
+# the model); a test counts the real calls against it.
+MAX_ROUNDS = 5
+MODEL_CALLS = {"inquiry_first": 3,       # understand, write, review
+               "inquiry_revision": 2,    # write, review (the understanding is reused)
+               "listing_per_platform": 2,  # write, review
+               "triage": 1, "image": 1}
+
+
+def check_round(rnd):
+    if rnd < 1:
+        raise ValueError("轮次从 1 开始")
+    if rnd > MAX_ROUNDS:
+        raise ValueError(f"最多改 {MAX_ROUNDS} 轮，到这里系统不再自动重写：请直接手改，"
+                         "或换一条修改意见从第 1 轮重新生成")
+
 ROOT = Path(__file__).resolve().parent.parent
 PROMPTS = ROOT / "prompts"
 LOG_PATH = ROOT / "logs" / "calls.jsonl"
@@ -155,6 +173,7 @@ class Runner:
         previous = payload.get("previous")
         instruction = (payload.get("instruction_zh") or "").strip()
         rnd = int(payload.get("round") or 1)
+        check_round(rnd)
         trigger = "业务员修改意见" if previous else "收到新询盘"
 
         record = next((q for q in self.kb.inquiries if q["id"] == payload.get("inquiry_id")), {})
@@ -286,6 +305,7 @@ class Runner:
         previous = payload.get("previous") or {}
         instruction = (payload.get("instruction_zh") or "").strip()
         rnd = int(payload.get("round") or 1)
+        check_round(rnd)
         trigger = "运营修改意见" if previous else "新品上架"
         out = {"run_id": run_id, "round": rnd, "platforms": {}, "trace": trace,
                "board_channels": []}

@@ -199,6 +199,8 @@ function roundsHtml(st, key) {
 }
 
 function composer(id, chips, round) {
+  const max = META.max_rounds || 5;
+  if (round > max) return `<div class="callout warn" style="margin-top:16px">${ic("ban")}<div><b>已经改到第 ${max} 轮，系统不再自动重写。</b>这是代码里的终止点，免得来回改个没完：请直接手改，或换一条修改意见从第 1 轮重新生成。</div></div>`;
   return `<div class="composer"><div class="chips">${chips.map((c) => `<button class="chip" data-chip="${id}">${esc(c)}</button>`).join("")}</div>
     <div class="in"><textarea id="${id}-ins" rows="1" placeholder="用中文提修改意见，例如：按风险提示全部修改"></textarea>
     <button class="btn icon mic" data-mic="${id}-ins" data-lang="zh-CN" title="${esc(MIC_TIP)}">${ic("mic")}</button>
@@ -206,6 +208,7 @@ function composer(id, chips, round) {
 }
 
 function wireComposer(id, fn) {
+  if (!$(`#${id}-rev`)) return;  // past the round cap there is no composer
   $$(`[data-chip="${id}"]`).forEach((b) => b.addEventListener("click", () => { $(`#${id}-ins`).value = b.textContent; $(`#${id}-ins`).focus(); }));
   $(`#${id}-rev`).addEventListener("click", fn);
   wireMics($(`#${id}-ins`).closest(".composer"));
@@ -464,6 +467,58 @@ function tasksCard(r) {
     <div class="card-b grid g3">${r.tasks.map((t) => `<div class="task"><div class="row"><span class="badge brand">${esc(t.role_zh)}</span>${t.priority === "high" ? '<span class="badge red">急</span>' : ""}</div><div style="margin-top:6px">${esc(t.task_zh)}</div><div class="q">“${esc(t.quote)}”</div></div>`).join("")}</div></div>`;
 }
 
+// What the salesperson really did with the draft. TradeDesk never sends anything; these records are the
+// only input to 评测 → 真实使用, and the timer starts when the first result appears.
+const findingKey = (f) => f.source?.rule_id || f.check || f.source?.label_zh || "资料卡";
+function feedbackCard(r) {
+  const fb = state.inq.fb || {};
+  if (fb.saved === r.run_id) return `<div class="card fb" id="inq-fb"><div class="card-b fb-done">${ic("circle-check-big")}<span>已记录这条回复的处理结果（现在共 ${fb.n} 条）。</span>
+    <button class="btn sm" data-go-usage>${ic("arrow-right", "sm")}看真实使用指标</button></div></div>`;
+  const mins = state.inq.started ? Math.max(0.1, (Date.now() - state.inq.started) / 60000) : null;
+  const fs = r.findings.map((f, i) => `<div class="fb-f"><span class="num">#${i + 1}</span><span class="t">${esc(f.problem_zh)}<small class="mono">${esc(findingKey(f))}</small></span>
+    <span class="seg" data-fv="${i}"><button data-v="useful">有用</button><button data-v="false_alarm">误报</button></span></div>`).join("");
+  return `<div class="card fb" id="inq-fb"><div class="card-h"><div><h3>${ic("message-square-text")}业务员确认：这版最后怎么处理</h3>
+      <p>TradeDesk 不会替你发送。记下实际怎么处理的，会算进「评测 → 真实使用」；不记也不影响使用。</p></div></div>
+    <div class="card-b">
+      <div class="fb-row"><span class="fb-l">处理结果</span><div class="seg" id="fb-outcome"><button data-v="as_is">原样发出</button><button data-v="edited">改后发出</button><button data-v="unused">没用这版</button></div></div>
+      <div class="fb-row" id="fb-sent-row" hidden><span class="fb-l">实际发出的版本</span><textarea id="fb-sent" rows="6">${esc(r.reply)}</textarea></div>
+      ${fs ? `<div class="fb-row"><span class="fb-l">这些提示准不准</span><div class="fb-fs">${fs}</div></div>` : ""}
+      <div class="fb-row"><span class="fb-l">资料卡缺的信息</span><div class="chips" id="fb-missing">${(META.feedback_missing || []).map((m) => `<button class="chip" data-m="${esc(m)}">${esc(m)}</button>`).join("")}</div></div>
+      <div class="fb-row"><span class="fb-l">用时（分钟）</span><div class="fb-min"><input id="fb-min" type="number" min="0.1" max="600" step="0.1" value="${mins ? mins.toFixed(1) : ""}"><small class="muted">从第一次出结果开始自动计时，可以改</small></div></div>
+      <div class="fb-row"><span class="fb-l">备注</span><input id="fb-note" type="text" maxlength="200" placeholder="可选，例如：买家要的认证我们没有"></div>
+      <div class="fb-act"><button class="btn primary" id="fb-save">${ic("circle-check-big", "sm")}记录</button></div>
+    </div></div>`;
+}
+function wireFeedback(r) {
+  const card = $("#inq-fb");
+  if (!card) return;
+  $$("[data-go-usage]", card).forEach((b) => b.addEventListener("click", () => { go("eval"); showEvalTab("usage"); }));
+  if (!$("#fb-save", card)) return;
+  const pick = (seg, b) => { const was = b.classList.contains("on"); $$("button", seg).forEach((x) => x.classList.remove("on")); if (!was) b.classList.add("on"); };
+  $$("#fb-outcome button", card).forEach((b) => b.addEventListener("click", () => {
+    $$("#fb-outcome button", card).forEach((x) => x.classList.toggle("on", x === b));
+    $("#fb-sent-row", card).hidden = b.dataset.v !== "edited";
+  }));
+  $$("[data-fv]", card).forEach((seg) => $$("button", seg).forEach((b) => b.addEventListener("click", () => pick(seg, b))));
+  $$("#fb-missing .chip", card).forEach((b) => b.addEventListener("click", () => b.classList.toggle("on")));
+  $("#fb-save", card).addEventListener("click", async () => {
+    const outcome = $("#fb-outcome button.on", card)?.dataset.v;
+    if (!outcome) return toast("先选处理结果：原样发出、改后发出，还是没用这版");
+    const verdicts = $$("[data-fv]", card).map((seg) => {
+      const on = $("button.on", seg), f = r.findings[+seg.dataset.fv];
+      return on ? { key: findingKey(f), label: f.source?.title_zh || f.problem_zh, verdict: on.dataset.v, severity: f.severity, by: f.by } : null;
+    }).filter(Boolean);
+    try {
+      const res = await api("/api/feedback", { outcome, draft: r.reply, sent: outcome === "edited" ? $("#fb-sent", card).value : "",
+        verdicts, missing: $$("#fb-missing .chip.on", card).map((b) => b.dataset.m), minutes: $("#fb-min", card).value, note: $("#fb-note", card).value,
+        inquiry_id: state.inqId, run_id: r.run_id, round: r.round, product_id: $("#inq-product").value, market: r.market, risk: r.risk });
+      state.inq.fb = { saved: r.run_id, n: res.n };
+      card.outerHTML = feedbackCard(r); wireFeedback(r);
+      toast(`已记录（共 ${res.n} 条）`, "ok");
+    } catch (e) { toast(e.message); }
+  });
+}
+
 // The reply and the listing are two steps of one job: same product card, same factory, no re-typing.
 function journeyCard() {
   const p = META.products.find((x) => x.id === $("#inq-product").value);
@@ -537,6 +592,7 @@ function renderInquiry() {
       </div>${factsCard($("#inq-product").value, r.findings)}</div>
       <div class="card">${riskPanel(r)}</div>
     </div>
+    ${latest ? feedbackCard(r) : ""}
     ${latest ? journeyCard() : ""}
     ${tasksCard(r)}
     ${analysisCard(st.history[0].understanding, flagOf(r))}
@@ -548,7 +604,7 @@ function renderInquiry() {
   wireLinks($("#inq-out")); wireEdit($("#inq-out")); wireFacts($("#inq-out"));
   $$("#inq-out [data-go-tasks]").forEach((b) => b.addEventListener("click", () => { go("inbox"); showInboxTab("tasks"); }));
   $("#inq-next-listing")?.addEventListener("click", () => listingFromInquiry($("#inq-product").value));
-  if (latest) wireComposer("inq", reviseInquiry);
+  if (latest) { wireComposer("inq", reviseInquiry); wireFeedback(r); }
 }
 
 async function runInquiry() {
@@ -559,6 +615,7 @@ async function runInquiry() {
   try {
     const r = await api("/api/inquiry", { inquiry_text: $("#inq-text").value, intent_zh: $("#inq-intent").value, product_id: $("#inq-product").value, round: 1, inquiry_id: state.inqId });
     state.inq.history = [r]; state.inq.view = 0; $("#inq-bench").classList.add("collapsed");
+    state.inq.started = Date.now(); state.inq.fb = null;
   } catch (e) { toast(e.message); }
   state.inq.busy = false; busy(btn, false); renderInquiry();
 }
@@ -1066,13 +1123,56 @@ async function renderEval() {
 }
 
 
+// ------------------------------------------------------------------ eval tab: real use (salesperson records)
+// Every number here comes from records a salesperson saved under an inquiry result. Nothing is seeded.
+async function renderUsage() {
+  const el = $("#eval-usage");
+  let s;
+  try { s = await api("/api/feedback"); } catch (e) { el.innerHTML = emptyCard("triangle-alert", "读不到记录", [e.message]); return; }
+  const pct = (v) => (v == null ? "—" : v > 0 && v < 0.1 ? `${(v * 100).toFixed(1)}%` : `${Math.round(v * 100)}%`);
+  const intro = `<p class="small muted" style="margin:0 0 12px">把业务员的真实操作变成数字：采纳了多少、改了多少、哪些提示是误报、资料卡缺什么。只用询盘结果下方“业务员确认”里记下的真实记录计算，不放示例数据。</p>`;
+  if (!s.n) {
+    el.innerHTML = intro + emptyCard("message-square-text", "还没有业务员记录", ["在询盘回复结果下方的“业务员确认”里记一条，这里才会出现数字。",
+      "让试点工厂的业务员用上一周，就能看到真实的采纳率、误报最多的规则和资料卡最常缺的信息。"]);
+    return;
+  }
+  const o = s.outcomes;
+  const tile = (k, v, d) => `<div class="card stat"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`;
+  const tiles = [
+    tile("记录", `${s.n} <small>条</small>`, s.few ? `少于 ${s.few_threshold} 条，数字只看方向` : "每条都是业务员自己记的"),
+    tile("采纳率", pct(s.adopted_share), `原样发出 ${o.as_is.n} · 改后发出 ${o.edited.n} · 没用 ${o.unused.n}`),
+    tile("改后发出改了多少", pct(s.edit_ratio_median), s.edit_n ? `中位数，${s.edit_n} 条；按词计，中日韩文按字计` : "还没有改后发出的记录"),
+    tile("提示有用率", pct(s.findings_useful_rate), s.findings_judged ? `业务员判了 ${s.findings_judged} 条提示` : "还没有判过提示"),
+    tile("每条用时", s.minutes_median == null ? "—" : `${s.minutes_median} <small>分钟</small>`, s.minutes_n ? `中位数，${s.minutes_n} 条；从出结果到记录` : "还没有填用时"),
+    tile("改了几轮", s.rounds_median ?? "—", "中位数"),
+  ].join("");
+  const rules = s.rules.length ? `<table class="tbl"><thead><tr><th>规则 / 出处</th><th>名称</th><th>有用</th><th>误报</th><th>有用率</th></tr></thead><tbody>${s.rules.map((r) => `<tr><td class="mono small">${esc(r.key)}</td><td>${esc(r.label)}</td><td>${r.useful}</td><td>${r.false_alarm ? `<span class="badge amber">${r.false_alarm}</span>` : 0}</td><td>${pct(r.useful_rate)}</td></tr>`).join("")}</tbody></table>`
+    : `<div class="empty small">还没有判过提示</div>`;
+  const top = Math.max(1, ...s.missing.map((m) => m.n));
+  const missing = s.missing.length ? s.missing.map((m) => `<div class="us-bar"><span>${esc(m.item)}</span><i style="width:${(m.n / top) * 100}%"></i><b>${m.n}</b></div>`).join("")
+    : `<div class="empty small">还没有记过资料卡缺什么</div>`;
+  const recs = s.records.map((e) => `<tr><td class="small">${esc(e.ts)}</td><td class="mono small">${esc(e.inquiry_id || "—")}</td><td>${esc(s.outcome_labels[e.outcome])}</td>
+    <td>${e.edit ? pct(e.edit.ratio) : "—"}</td><td>${e.minutes ?? "—"}</td><td class="small">${esc(e.verdicts.filter((v) => v.verdict === "false_alarm").map((v) => v.key).join("、") || "—")}</td>
+    <td class="small">${esc(e.missing.join("、") || "—")}</td><td class="small">${esc(e.note || "")}</td><td><button class="btn sm" data-del="${e.index}">删除</button></td></tr>`).join("");
+  el.innerHTML = intro + `<div class="grid g3">${tiles}</div>
+    <div class="grid g2" style="margin-top:16px"><div class="card"><div class="card-h"><div><h3>${ic("triangle-alert")}误报最多的规则</h3><p>业务员判为误报的次数从多到少；调规则先看这里</p></div></div><div class="card-b">${rules}</div></div>
+      <div class="card"><div class="card-h"><div><h3>${ic("package")}资料卡最常缺的信息</h3><p>业务员回复时缺、要去问别人的信息；补进资料卡，下次就不用问</p></div></div><div class="card-b">${missing}</div></div></div>
+    <div class="card" style="margin-top:16px"><div class="card-h"><div><h3>${ic("history")}全部记录</h3><p>最新的在上面；草稿和实际发出的全文在导出的 CSV 里</p></div><a class="btn sm" href="/api/feedback/export.csv">${ic("file-text", "sm")}导出 CSV</a></div>
+      <div class="board-wrap"><table class="tbl"><thead><tr><th>时间</th><th>询盘</th><th>处理</th><th>改动</th><th>用时</th><th>误报</th><th>资料卡缺</th><th>备注</th><th></th></tr></thead><tbody>${recs}</tbody></table></div></div>`;
+  // two clicks to delete, no browser dialog
+  $$("[data-del]", el).forEach((b) => b.addEventListener("click", async () => {
+    if (!b.classList.contains("arm")) { b.classList.add("arm"); b.textContent = "确认删除"; return; }
+    try { await api("/api/feedback/delete", { index: +b.dataset.del }); renderUsage(); } catch (e) { toast(e.message); }
+  }));
+}
+
 // ------------------------------------------------------------------ eval tabs: comparison & red team
 let evalTab = "compare";
 function showEvalTab(v) {
   evalTab = v;
   $$("#eval-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
-  ["compare", "rules", "redteam", "savings"].forEach((k) => ($(`#eval-${k}`).hidden = k !== v));
-  return ({ compare: renderCompare, rules: renderEval, redteam: renderRedteam, savings: renderSavings })[v]();
+  ["compare", "rules", "redteam", "savings", "usage"].forEach((k) => ($(`#eval-${k}`).hidden = k !== v));
+  return ({ compare: renderCompare, rules: renderEval, redteam: renderRedteam, savings: renderSavings, usage: renderUsage })[v]();
 }
 
 let BASE = null;
@@ -1322,8 +1422,10 @@ async function renderAgents() {
     <div class="ag-stats"><div><b>${AG.agents.length}</b><span>个智能体</span></div><div><b>${AG.listing_agents.length}</b><span>个上架平台角色</span></div>
       <div><b>${AG.workflows.length}</b><span>条工作流</span></div><div><b>${kb.rules_verified}</b><span>条带出处规则</span></div>
       <div class="ag-model">${ic("cpu", "sm")}<span><b>${esc(m.model)}</b> · temperature ${m.temperature} · seed ${m.seed} · 只输出 JSON · 模式 ${m.modes.join(" / ")}<br><span class="muted">${esc(m.endpoint)} · key 不在这里显示</span></span></div></div>
+    <div class="card ag-stop"><div class="card-h"><div><h3>${ic("shield-check")}编排与终止条件：智能体不会互相打架，也不会停不下来</h3><p>${esc(AG.orchestration.summary_zh)}</p></div></div>
+      <div class="card-b"><ol class="ag-stop-list">${AG.orchestration.stop_rules_zh.map((t) => `<li>${esc(t)}</li>`).join("")}</ol></div></div>
     <div class="card ag-wfs"><div class="card-h"><div><h3>${ic("git-compare-arrows")}工作流：哪一步是模型，哪一步是代码</h3><p>灰色是代码，蓝色是智能体；每个智能体的输出都要过代码护栏</p></div></div>
-      <div class="card-b">${AG.workflows.map((w) => `<div class="ag-wf"><div class="ag-wf-h"><span class="badge solid">${esc(w.id)}</span><b>${esc(w.name_zh)}</b><span class="small muted">触发：${esc(w.trigger_zh)}</span></div>
+      <div class="card-b">${AG.workflows.map((w) => `<div class="ag-wf"><div class="ag-wf-h"><span class="badge solid">${esc(w.id)}</span><b>${esc(w.name_zh)}</b><span class="small muted">触发：${esc(w.trigger_zh)}</span><span class="small muted ag-calls">${ic("cpu", "sm")}${esc(AG.orchestration.calls_per_round_zh[w.id] || "")}</span></div>
         <ol class="ag-steps">${w.steps.map((st) => `<li><span class="badge ${st.agent ? "brand" : ""}">${st.agent ? esc(who(st.agent)) : "代码"}</span><span>${esc(st.step_zh)}${st.guard_zh ? `<small>护栏：${esc(st.guard_zh)}</small>` : ""}${st.detail_zh ? `<small>${esc(st.detail_zh)}</small>` : ""}${st.kb_zh ? `<small>${esc(st.kb_zh)}</small>` : ""}</span></li>`).join("")}</ol></div>`).join("")}</div></div>
     <div class="grid g2" style="margin-top:16px">${AG.agents.map((a) => `<div class="card"><div class="card-h"><div><h3>${ic("sparkles")}${esc(a.role_zh)}</h3><p class="mono">${esc(a.prompt_file)}</p></div></div>
       <div class="card-b"><dl class="ag-dl"><dt>职责</dt><dd>${esc(a.task_zh)}</dd><dt>输入</dt><dd>${esc(a.input_zh || "")}</dd><dt>输出</dt><dd>${esc(a.output_zh || "")}</dd>

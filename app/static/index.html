@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=44">
+<link rel="stylesheet" href="style.css?v=45">
 <link rel="stylesheet" href="welcome.css?v=6">
 <script>/* dark (the poster palette) unless this browser chose light */ try{document.documentElement.dataset.theme=localStorage.getItem("td-theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 </head>
@@ -187,7 +187,7 @@
       <!-- ================= eval ================= -->
       <section class="page" id="page-eval">
         <div class="page-head"><div><h1>评测与对照</h1><p>直接用通用 AI 会踩多少坑？检查器本身准不准？编造的提示能不能混过去？能省多少钱？四件事都用可复现的方式回答。</p></div>
-          <div class="seg" id="eval-tabs"><button class="on" data-v="compare">对照实验</button><button data-v="rules">规则评测</button><button data-v="redteam">红队测试</button><button data-v="savings">降本测算</button></div></div>
+          <div class="seg" id="eval-tabs"><button class="on" data-v="compare">对照实验</button><button data-v="rules">规则评测</button><button data-v="redteam">红队测试</button><button data-v="savings">降本测算</button><button data-v="usage">真实使用</button></div></div>
         <div id="eval-compare"></div>
         <div id="eval-rules" hidden>
           <div class="row" style="justify-content:space-between;margin-bottom:12px"><p class="small muted" style="margin:0">只测代码规则层（不调用模型），结果可以一字不差地复现。开发集是边做边写的，盲测集由没看过代码的人写。</p>
@@ -195,6 +195,7 @@
           <div id="eval-out"></div></div>
         <div id="eval-redteam" hidden></div>
         <div id="eval-savings" hidden></div>
+        <div id="eval-usage" hidden></div>
       </section>
 
       <!-- ================= fair-ground ================= -->
@@ -244,7 +245,7 @@
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
 <script src="flow-bg.js?v=2"></script>
-<script src="app.js?v=40"></script>
+<script src="app.js?v=41"></script>
 <script src="welcome.js?v=8"></script>
 </body>
 </html>

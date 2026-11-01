@@ -27,6 +27,8 @@ DEFAULT_MODEL = "gpt-5.5"   # the event's Codex card only has GPT models (checke
 # Tokenhub sits behind Cloudflare, which answers urllib's default "Python-urllib/3.x" with 403 "error code: 1010"
 # (checked 2026-10-30, with a real token and a made-up one alike). Any other name gets through.
 USER_AGENT = "TradeDesk/1.0"
+TIMEOUT, CLAUDE_TIMEOUT = 120, 300  # seconds per model call; thinking is always on for claude-opus-5-5
+ATTEMPTS = 3  # network errors, rate limits and 5xx are retried up to this many tries in all; a bad answer is not
 # LLM_PROVIDER=anthropic switches to the Claude Messages API (official SDK).
 ANTHROPIC_DEFAULT_MODEL = "claude-opus-5-5"
 ANTHROPIC_DEFAULT_BASE = "https://api.anthropic.com"
@@ -99,7 +101,7 @@ def setting(name, default=None):
 
 class LLM:
     def __init__(self, endpoint=None, model=None, api_key=None, mode=None,
-                 transport=None, cache_dir=None, timeout=120, provider=None):
+                 transport=None, cache_dir=None, timeout=TIMEOUT, provider=None):
         self.provider = provider or setting("LLM_PROVIDER", "openai")
         if self.provider == "anthropic":
             self.endpoint = endpoint or setting("ANTHROPIC_API_BASE", ANTHROPIC_DEFAULT_BASE)
@@ -113,8 +115,8 @@ class LLM:
             default_transport = self._http
         self.endpoint = normalize_endpoint(self.provider, self.endpoint)
         self.effort = setting("LLM_EFFORT", "medium")
-        if self.provider == "anthropic" and timeout == 120:
-            timeout = 300  # thinking is always on for claude-opus-5-5
+        if self.provider == "anthropic" and timeout == TIMEOUT:
+            timeout = CLAUDE_TIMEOUT
         self.mode = mode or setting("TRADEDESK_MODE") or ("live" if self.api_key else "replay")
         self.transport = transport or default_transport
         self._client = None
@@ -212,7 +214,7 @@ class LLM:
             headers={"Content-Type": "application/json", "User-Agent": USER_AGENT,
                      "Authorization": f"Bearer {self.api_key}"})
         last = None
-        for attempt in range(1 if self.timeout <= 20 else 3):  # connection tests try once
+        for attempt in range(1 if self.timeout <= 20 else ATTEMPTS):  # connection tests try once
             try:
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     payload = json.loads(resp.read().decode("utf-8"))
@@ -261,7 +263,7 @@ class LLM:
             # gzip only: some Python installs ship a brotli/zstd decoder the HTTP client can't drive.
             auth = {"api_key": self.api_key} if is_official_anthropic(self.endpoint) else {"auth_token": self.api_key}
             self._client = anthropic.Anthropic(**auth, base_url=self.endpoint,
-                                               timeout=self.timeout, max_retries=2,
+                                               timeout=self.timeout, max_retries=ATTEMPTS - 1,
                                                default_headers={"Accept-Encoding": "gzip"})
         return self._client
 

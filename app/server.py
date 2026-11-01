@@ -21,7 +21,7 @@ from pathlib import Path
 
 from tradedesk.kb import KnowledgeBase, PLATFORM_NAMES
 from tradedesk.llm import LLM, LLMError
-from tradedesk import checks, settings, savings, selfcheck, sources
+from tradedesk import checks, feedback, settings, savings, selfcheck, sources
 from tradedesk import handoff as handoff_check
 from tradedesk.config_export import build as build_config
 from tradedesk.importer import ImportStore, parse as parse_csv
@@ -31,7 +31,7 @@ from tradedesk.board import Board, CHANNELS
 from tradedesk.evaluate import evaluate, LABEL_ZH
 from tradedesk.inbox import TASK_STATUS
 from tradedesk.listing_catalog import public_catalog
-from tradedesk.workflows import Runner, LOG_PATH, ROLES
+from tradedesk.workflows import MAX_ROUNDS, Runner, LOG_PATH, ROLES
 
 ROOT = Path(__file__).resolve().parent
 STATIC = ROOT / "static"
@@ -70,6 +70,7 @@ class App:
         self.custom = CustomProducts(STATE / "custom_products.json")
         self.live_checks = LiveChecks(STATE / "live_checks.json")
         self.timings = savings.TimingLog(STATE / "timings.json")
+        self.feedback = feedback.FeedbackLog(STATE / "feedback.json")
         for p in self.custom.load():
             self.kb.products[p["id"]] = p
         self.play_lock = threading.Lock()
@@ -99,6 +100,8 @@ class App:
             "platforms": PLATFORM_NAMES,
             "listing_catalog": public_catalog(),
             "roles": ROLES,
+            "max_rounds": MAX_ROUNDS,
+            "feedback_missing": feedback.MISSING,
         }
 
     def kb_rules(self):
@@ -261,6 +264,18 @@ class App:
     def timing_delete(self, payload):
         self.timings.delete(payload.get("index"))
         return self.savings_view()
+
+    # ---------------------------------------------------------- salesperson feedback (使用度量)
+    def feedback_view(self):
+        return self.feedback.summary()
+
+    def feedback_add(self, payload):
+        entry = self.feedback.add(payload)
+        return {"saved": entry, "n": len(self.feedback.load())}
+
+    def feedback_delete(self, payload):
+        self.feedback.delete(payload.get("index"))
+        return self.feedback.summary()
 
     def redteam_preset(self):
         data = json.loads((ROOT / "data" / "redteam.json").read_text(encoding="utf-8"))
@@ -451,7 +466,8 @@ class Handler(SimpleHTTPRequestHandler):
                   "/api/inbox": APP.inbox_view, "/api/eval": APP.eval_view, "/api/settings": APP.settings_view,
                   "/api/redteam": APP.redteam_preset, "/api/savings": APP.savings_view,
                   "/api/agents": APP.agents_view, "/api/selfcheck": APP.selfcheck_view,
-                  "/api/plugin/meta": APP.plugin_meta, "/api/plugin/pairing": APP.plugin_pairing}
+                  "/api/plugin/meta": APP.plugin_meta, "/api/plugin/pairing": APP.plugin_pairing,
+                  "/api/feedback": APP.feedback_view}
         if url.path in routes:
             return self._json(200, routes[url.path]())
         if url.path == "/api/baseline":
@@ -464,11 +480,12 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._json(200, APP.board_cell(parse_qs(url.query)))
             except KeyError as exc:
                 return self._json(404, {"error": str(exc)})
-        if url.path == "/api/board/export.csv":
-            raw = ("\ufeff" + APP.board_csv()).encode("utf-8")  # BOM so Excel opens UTF-8 correctly
+        if url.path in ("/api/board/export.csv", "/api/feedback/export.csv"):
+            board = url.path.startswith("/api/board/")
+            raw = ("\ufeff" + (APP.board_csv() if board else APP.feedback.csv())).encode("utf-8")  # BOM so Excel opens UTF-8 correctly
             self.send_response(200)
             self.send_header("Content-Type", "text/csv; charset=utf-8")
-            self.send_header("Content-Disposition", 'attachment; filename="tradedesk-listings.csv"')
+            self.send_header("Content-Disposition", f'attachment; filename="tradedesk-{"listings" if board else "feedback"}.csv"')
             self.send_header("Content-Length", str(len(raw)))
             self.end_headers()
             self.wfile.write(raw)
@@ -502,7 +519,8 @@ class Handler(SimpleHTTPRequestHandler):
                   "/api/inbox/import/clear": APP.clear_imports,
                   "/api/products/save": APP.product_save, "/api/products/delete": APP.product_delete,
                   "/api/selfcheck/live": APP.live_check, "/api/savings/timing": APP.timing_add,
-                  "/api/savings/timing/delete": APP.timing_delete}
+                  "/api/savings/timing/delete": APP.timing_delete,
+                  "/api/feedback": APP.feedback_add, "/api/feedback/delete": APP.feedback_delete}
         fn = routes.get(self.path)
         if not fn:
             return self._json(404, {"error": "not found"})

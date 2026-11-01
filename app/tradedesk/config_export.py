@@ -8,7 +8,8 @@ from pathlib import Path
 
 from .listing_catalog import LANGUAGES, LISTING_PLATFORMS
 from .kb import PLATFORM_NAMES
-from .workflows import ROLES
+from .llm import ATTEMPTS, CLAUDE_TIMEOUT, TIMEOUT
+from .workflows import MAX_ROUNDS, MODEL_CALLS, ROLES
 
 PROMPTS = Path(__file__).resolve().parent.parent / "prompts"
 
@@ -83,6 +84,31 @@ WORKFLOWS = [
 ]
 
 
+def orchestration():
+    """Who calls whom and when everything stops. Every number comes from the code that enforces it."""
+    c = MODEL_CALLS
+    return {
+        "summary_zh": "智能体之间不互相调用，也不互相回话：由代码按固定顺序调用每个智能体，跑完最后一步就停。",
+        "stop_rules_zh": [
+            "每一轮的步骤是固定的，跑完就停；没有“智能体自己决定再跑一次”的分支。",
+            f"下一轮只在人提交修改意见时开始，最多 {MAX_ROUNDS} 轮；超过后代码拒绝再生成，请人直接改。",
+            f"单次模型调用超时 {TIMEOUT} 秒（Claude 开思考时 {CLAUDE_TIMEOUT} 秒）；网络错误、限流、服务端 5xx 最多尝试 {ATTEMPTS} 次。"
+            "模型回答不是合法 JSON 不重试：理解或生成那一步失败，整条请求报错停下；审核那一步失败，保留代码规则的结果并标为需要人工确认。",
+            "每个智能体的输出先过代码护栏：没有出处、规则编号不在白名单、引用的原文对不上，这一条就被丢弃，不回传给模型重写，所以不会来回拉扯。",
+            "风险等级由代码算：模型审核没跑成功时，结果不会显示绿色。",
+        ],
+        "calls_per_round_zh": {
+            "A": f"第 1 轮最多 {c['inquiry_first']} 次模型调用（理解、生成、审核）；之后每轮最多 {c['inquiry_revision']} 次（理解复用第 1 轮）",
+            "B": f"每个选中的平台每轮最多 {c['listing_per_platform']} 次（生成、审核；平台没有需要模型判断的规则时不审核）",
+            "C": f"批量生成 = 每个产品跑一遍 B；每张主图看图审核 {c['image']} 次",
+            "D": f"每条询盘 {c['triage']} 次，和 A 的“理解询盘”共用同一份缓存",
+            "E": "= A + B；交接核对是代码，不调用模型",
+        },
+        "max_rounds": MAX_ROUNDS, "timeout_seconds": {"default": TIMEOUT, "claude": CLAUDE_TIMEOUT},
+        "attempts": ATTEMPTS, "model_calls": MODEL_CALLS,
+    }
+
+
 def build(kb, llm):
     out = {
         "app": "TradeDesk 出海工作台",
@@ -100,6 +126,7 @@ def build(kb, llm):
                            for pid, c in LISTING_PLATFORMS.items()],
         "listing_languages": {k: v["name"] for k, v in LANGUAGES.items()},
         "workflows": WORKFLOWS,
+        "orchestration": orchestration(),
         "platforms": PLATFORM_NAMES,
         "knowledge_base": {
             "file": "kb/rules.json", "version": kb.version,
