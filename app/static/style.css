@@ -829,3 +829,6 @@ body::after{inset:0;opacity:var(--grain);background-size:180px;
 .nav-link:focus-visible{outline:2px solid hsl(207 95% 68%);outline-offset:1px}
 body.role-mode .nav-sandbox{display:none}
 a.rp-all{display:inline}
+/* WebGL flowing background (flow-bg.js) takes over from the CSS aurora when it runs */
+#flow-bg{position:fixed;inset:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;display:block}
+html.flow-on body::before{display:none}
