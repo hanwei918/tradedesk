@@ -882,8 +882,10 @@ html.flow-on body::before{display:none}
   background:linear-gradient(120deg,#0e7490,#2563eb 55%,#7c3aed);box-shadow:0 6px 16px -8px rgba(37,99,235,.8)}
 .kb-updated .ic{color:#fff}
 /* the model card and theme toggle stay pinned to the bottom of the rail; the menu scrolls behind them */
-.side-foot{position:sticky;bottom:-12px;z-index:1;margin-bottom:-12px;padding:14px 0 12px;background:linear-gradient(hsl(var(--sidebar) / 0),hsl(var(--sidebar)) 14px)}
-@media (max-height:860px){.side-foot{bottom:-10px;margin-bottom:-10px;padding-bottom:10px}}
+/* only the menu scrolls; the model card and theme toggle sit below it on the rail's own background */
+.sidebar{overflow:hidden}
+.side-scroll{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;scrollbar-width:thin;margin:0 -12px;padding:0 12px}
+.side-foot{padding-top:10px}
 /* self-check page: the browser extension card */
 .plugin-card{margin-bottom:16px}
 .plugin-code{display:flex;flex-direction:column;align-items:flex-end;gap:2px}

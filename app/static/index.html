@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=42">
+<link rel="stylesheet" href="style.css?v=43">
 <link rel="stylesheet" href="welcome.css?v=6">
 <script>/* dark (the poster palette) unless this browser chose light */ try{document.documentElement.dataset.theme=localStorage.getItem("td-theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 </head>
@@ -15,6 +15,7 @@
       <div class="logo"><svg class="ic lg" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5" fill="#fff"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" fill="#fff" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5" fill="#fff"/></svg></div>
       <div><b>TradeDesk</b><small>出海工作台</small></div>
     </div>
+    <div class="side-scroll">
     <div class="nav-label">工作台</div>
     <nav class="nav" id="nav">
       <button data-page="overview" class="on"><svg class="ic"><use href="#i-layout-dashboard"/></svg><span class="t">概览</span><span class="kbd">1</span></button>
@@ -37,6 +38,7 @@
       <button data-page="selfcheck"><svg class="ic"><use href="#i-circle-check-big"/></svg><span class="t">开摊自检</span></button>
       <button data-page="fair"><svg class="ic"><use href="#i-zap"/></svg><span class="t">游园会找茬</span></button>
     </nav>
+    </div>
     <div class="side-foot">
       <div class="model-card" id="model-card" role="button" tabindex="0" title="模型设置"><div class="skel" style="height:34px"></div></div>
       <button class="btn ghost sm" id="theme-btn" title="切换深浅色"><svg class="ic sm"><use href="#i-moon"/></svg><span>切换深浅色</span></button>
