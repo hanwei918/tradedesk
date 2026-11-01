@@ -28,9 +28,9 @@
         <button class="gt-knob" type="button" aria-label="滑动解锁，或按回车进入">➜</button>
       </div>
       <div class="gt-choices" hidden>
-        <button class="gt-card main" type="button" data-go="sandbox"><b>🚀 启动合规演练</b><small>Launch Sandbox · 模拟情境，4 个通关任务，约 3 分钟</small></button>
-        <button class="gt-card" type="button" data-go="workbench"><b>🧭 进入完整工作台</b><small>Open Workbench · 询盘、上架、看板、规则库，真实工作流</small></button>
-        <div class="gt-links"><button type="button" data-go="roles">按角色体验</button><button type="button" data-go="tech">了解底层机制 · View tech specs</button></div>
+        <button class="gt-card main" type="button" data-gate="sandbox"><b>🚀 启动合规演练</b><small>Launch Sandbox · 模拟情境，4 个通关任务，约 3 分钟</small></button>
+        <button class="gt-card" type="button" data-gate="workbench"><b>🧭 进入完整工作台</b><small>Open Workbench · 询盘、上架、看板、规则库，真实工作流</small></button>
+        <div class="gt-links"><button type="button" data-gate="roles">按角色体验</button><button type="button" data-gate="tech">了解底层机制 · View tech specs</button></div>
       </div>
     </div>
   </main>
@@ -112,8 +112,8 @@
     knob.addEventListener("pointerup", release);
     knob.addEventListener("pointercancel", release);
     knob.addEventListener("keydown", (e) => { if (["Enter", " ", "ArrowRight"].includes(e.key)) { e.preventDefault(); unlock(); } });
-    gate.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => {
-      const go = b.dataset.go;
+    gate.querySelectorAll("[data-gate]").forEach((b) => b.addEventListener("click", () => {
+      const go = b.dataset.gate;
       if (go === "sandbox") { remember(); gate.classList.add("gt-out"); setTimeout(() => { location.href = "sandbox.html"; }, calm() ? 0 : 350); }
       else if (go === "workbench") close(() => window.go?.("overview"));
       else if (go === "roles") close(() => window.showRolePicker?.());
