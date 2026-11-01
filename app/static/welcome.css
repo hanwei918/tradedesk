@@ -1,0 +1,74 @@
+/* Entry gate (welcome.js): dark in both themes, poster palette, the WebGL flow showing through. */
+body.gt-lock{overflow:hidden}
+.gate{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;color:#cbd5e1;overflow:auto;
+  background:radial-gradient(60% 55% at 85% 0%,rgba(59,130,246,.32),transparent 70%),radial-gradient(55% 50% at 0% 100%,rgba(34,211,238,.20),transparent 70%),#050816;
+  animation:gtIn .6s ease both;transition:opacity .45s ease,transform .45s ease}
+.gate.gt-out{opacity:0;transform:scale(1.02);pointer-events:none}
+@keyframes gtIn{from{opacity:0}to{opacity:1}}
+.gate::before{content:"";position:fixed;inset:-20vmax;pointer-events:none;z-index:-1;animation:aurora 40s ease-in-out infinite alternate;
+  background:radial-gradient(30vmax 26vmax at 24% 30%,rgba(72,226,219,.14),transparent 70%),radial-gradient(34vmax 28vmax at 78% 24%,rgba(116,160,255,.18),transparent 70%),radial-gradient(30vmax 26vmax at 60% 86%,rgba(183,149,255,.14),transparent 70%)}
+.gt-top{display:flex;align-items:center;gap:10px;padding:22px 32px;font-size:15px;color:#fff}
+.gt-logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(140deg,hsl(221 83% 58%),hsl(194 92% 44%));box-shadow:0 8px 22px -8px hsl(205 90% 50% / .9)}
+.gt-logo svg{width:20px;height:20px;fill:#fff}
+.gt-event{margin-left:auto;font-size:12px;font-weight:600;letter-spacing:.06em;color:#93c5fd;border:1px solid rgba(147,197,253,.3);border-radius:999px;padding:5px 12px}
+.gt-ghost{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-6deg);width:140vw;text-align:center;pointer-events:none;
+  font:900 clamp(60px,9vw,150px)/1 -apple-system,BlinkMacSystemFont,"SF Pro Display",system-ui,sans-serif;letter-spacing:-.03em;color:rgba(255,255,255,.035);white-space:nowrap}
+.gt-main{position:relative;margin:auto 0;display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 24px 16px}
+.gt-kick{font-size:12px;font-weight:700;letter-spacing:.18em;color:#48e2db;border:1px solid rgba(72,226,219,.4);border-radius:999px;padding:5px 14px;background:rgba(72,226,219,.07)}
+.gate h1{margin:18px 0 10px;font-size:clamp(34px,4.6vw,62px);line-height:1.15;letter-spacing:-.025em;color:#fff;font-weight:800}
+.gate h1 span{background:linear-gradient(90deg,#48e2db,#74a0ff 55%,#b795ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gt-en{margin:0;font-size:clamp(15px,1.5vw,20px);color:#94a3b8;letter-spacing:.01em;font-style:italic}
+.gt-pos{margin:14px 0 0;font-size:15px;color:#cbd5e1}
+.gt-pos i{font-style:normal;margin:0 10px;color:#475569}
+.gt-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:24px}
+.gt-tags span{display:flex;flex-direction:column;gap:2px;padding:10px 16px;border-radius:12px;border:1px solid rgba(148,163,255,.28);background:rgba(255,255,255,.04);font-size:14px;font-weight:600;color:#e2e8f0;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.gt-tags small{font:500 11px ui-monospace,Menlo,monospace;color:#7dd3fc;letter-spacing:.02em}
+.gt-proof{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;margin-top:22px;font-size:13px;color:#94a3b8}
+.gt-proof b{font-size:18px;font-weight:800;margin-right:6px;font-variant-numeric:tabular-nums}
+.gt-proof .r{color:#f87171}.gt-proof .a{color:#fbbf24}.gt-proof .g{color:#4ade80}
+.gt-stage{margin-top:28px;width:min(560px,100%)}
+/* slide to unlock */
+.gt-track{--p:0;position:relative;height:62px;border-radius:999px;border:1px solid rgba(148,163,255,.35);background:rgba(255,255,255,.05);overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 18px 40px -24px rgba(59,130,246,.8)}
+.gt-fill{position:absolute;inset:0 auto 0 0;width:calc(var(--p) * (100% - 62px) + 62px);background:linear-gradient(90deg,rgba(14,116,144,.55),rgba(37,99,235,.55),rgba(124,58,237,.55));border-radius:999px}
+.gt-hint{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#e2e8f0;pointer-events:none;
+  opacity:calc(1 - var(--p) * 1.6);background:linear-gradient(90deg,#64748b 0%,#fff 50%,#64748b 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gtShine 2.4s linear infinite}
+.gt-hint em{font:500 11px ui-monospace,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase}
+@keyframes gtShine{from{background-position:100% 0}to{background-position:-100% 0}}
+.gt-knob{all:unset;box-sizing:border-box;position:absolute;left:4px;top:4px;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;cursor:grab;touch-action:none;z-index:1;
+  font-size:20px;color:#fff;background:linear-gradient(140deg,#0e7490,#2563eb 55%,#7c3aed);box-shadow:0 6px 18px -6px rgba(59,130,246,.9),inset 0 1px 0 rgba(255,255,255,.3)}
+.gt-knob::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(72,226,219,.55);animation:gtPulse 1.8s ease-out infinite}
+@keyframes gtPulse{from{transform:scale(.9);opacity:1}to{transform:scale(1.35);opacity:0}}
+.gt-knob:focus-visible{outline:3px solid #48e2db;outline-offset:3px}
+.gt-track.drag .gt-knob{cursor:grabbing}
+.gt-knob.back{transition:transform .3s cubic-bezier(.2,1.2,.4,1)}
+.gt-track.done .gt-knob{background:linear-gradient(140deg,#16a34a,#22c55e)}
+/* the reveal */
+.gt-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;animation:gtUp .5s cubic-bezier(.2,1.1,.4,1) both}
+.gt-choices[hidden]{display:none}
+@keyframes gtUp{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.gt-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:18px 20px;border-radius:16px;text-align:left;border:1px solid rgba(148,163,255,.3);background:rgba(255,255,255,.05);
+  transition:transform .2s,box-shadow .2s,border-color .2s}
+.gt-card b{font-size:17px;color:#fff}.gt-card small{font-size:12.5px;color:#94a3b8;line-height:1.5}
+.gt-card.main{border-color:transparent;background:linear-gradient(140deg,rgba(14,116,144,.85),rgba(37,99,235,.85) 55%,rgba(124,58,237,.85));box-shadow:0 18px 40px -18px rgba(59,130,246,.9)}
+.gt-card.main small{color:#dbeafe}
+.gt-card:hover,.gt-card:focus-visible{transform:translateY(-3px);border-color:rgba(72,226,219,.6);box-shadow:0 22px 44px -18px rgba(72,226,219,.55)}
+.gt-card:focus-visible{outline:3px solid #48e2db;outline-offset:3px}
+.gt-links{grid-column:1/-1;display:flex;justify-content:center;gap:18px;margin-top:4px}
+.gt-links button{all:unset;cursor:pointer;font-size:13px;color:#93c5fd;text-decoration:underline;text-underline-offset:3px}
+.gt-links button:hover,.gt-links button:focus-visible{color:#fff}
+.gt-foot{display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 24px 24px;font-size:12px;color:#64748b;text-align:center}
+.gt-foot b{color:#94a3b8;font-weight:600}
+/* 1.5 s scan between unlock and the choices */
+.gt-scan{position:fixed;inset:0;z-index:2;display:grid;place-items:center;pointer-events:none;opacity:0}
+.gt-scanning .gt-scan{opacity:1;background:rgba(2,6,16,.55)}
+.gt-scan i{position:absolute;left:0;right:0;top:-30%;height:30%;background:linear-gradient(180deg,transparent,rgba(74,222,128,.10) 70%,rgba(74,222,128,.55) 98%,rgba(187,247,208,.9));box-shadow:0 2px 24px rgba(74,222,128,.6)}
+.gt-scanning .gt-scan i{animation:gtSweep 1.5s cubic-bezier(.5,0,.4,1) forwards}
+@keyframes gtSweep{to{top:100%}}
+.gt-scan p{display:flex;flex-direction:column;gap:6px;text-align:center;margin:0}
+.gt-scan b{font:700 clamp(18px,2.4vw,30px) ui-monospace,Menlo,monospace;color:#86efac;letter-spacing:.02em;text-shadow:0 0 18px rgba(74,222,128,.6)}
+.gt-scan span{font-size:13px;color:#bbf7d0}
+.gt-scanning .gt-scan p{animation:gtIn .3s .1s both}
+@media (max-width:640px){.gt-choices{grid-template-columns:1fr}.gt-event{display:none}.gt-top{padding:16px}}
+@media (prefers-reduced-motion:reduce){.gate,.gate::before,.gt-hint,.gt-knob::after,.gt-choices,.gt-scan i{animation:none}.gt-scan{display:none}}
+@media (max-height:820px){.gt-top{padding:14px 24px}.gate h1{font-size:clamp(30px,3.8vw,48px);margin:12px 0 8px}.gt-pos{margin-top:10px}.gt-tags{margin-top:16px}.gt-proof{margin-top:14px}.gt-stage{margin-top:20px}.gt-foot{padding:10px 24px 16px}}
