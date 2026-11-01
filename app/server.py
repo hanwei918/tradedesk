@@ -10,6 +10,7 @@ import io
 import ipaddress
 import json
 import re
+import secrets
 import socket
 import threading
 import time
@@ -37,6 +38,24 @@ STATIC = ROOT / "static"
 STATE = ROOT / "state"
 # What a phone on the venue Wi-Fi may reach. Everything else answers 403 to
 # non-loopback clients, so visitors can never trigger paid model calls.
+# The browser extension (extension/) may call only these endpoints, and only with this machine's pairing code,
+# so a web page can still never reach the local API. The code lives in state/ and is shown on the 开摊自检 page.
+PLUGIN_PATHS = ("/api/check", "/api/plugin/meta")
+EXTENSION_ORIGIN = re.compile(r"^(chrome|moz)-extension://[\w.-]+$")
+
+
+def plugin_code(state=None):
+    """This machine's pairing code for the browser extension, created once (e.g. "3F9A-0C1D")."""
+    path = Path(state or STATE) / "plugin_code.txt"
+    if path.exists():
+        return path.read_text(encoding="utf-8").strip()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    raw = secrets.token_hex(4).upper()
+    code = f"{raw[:4]}-{raw[4:]}"
+    path.write_text(code, encoding="utf-8")
+    return code
+
+
 LAN_ALLOWED = re.compile(r"^/(play(\.html)?|play\.js|style\.css|icons\.svg|vendor/[\w-]+(?:\.[\w-]+)+|api/play/[\w-]+)(\?.*)?$")
 
 
@@ -55,6 +74,14 @@ class App:
             self.kb.products[p["id"]] = p
         self.play_lock = threading.Lock()
         self.lan_url = None
+
+    def plugin_meta(self):
+        """What the browser extension needs to fill its menus: products and the model mode, nothing secret."""
+        return {"products": [{"id": p["id"], "name_zh": p.get("name_zh"), "name_en": p.get("name_en")} for p in self.kb.products.values()],
+                "markets": ["US", "MX", "EU", "JP"], "llm": {"mode": self.llm.mode, "model": self.llm.model}}
+
+    def plugin_pairing(self):
+        return {"code": plugin_code()}
 
     def meta(self):
         return {
@@ -388,7 +415,11 @@ class Handler(SimpleHTTPRequestHandler):
         host = self.headers.get("Host", "")
         origin = self.headers.get("Origin")
         bad = not local.match(host)
-        if origin is not None and not re.match(r"^http://(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$", origin):
+        if origin is not None and EXTENSION_ORIGIN.match(origin):
+            # the browser extension: only its endpoints, only with this machine's pairing code
+            if urlparse(self.path).path not in PLUGIN_PATHS or self.headers.get("X-TradeDesk-Code") != plugin_code():
+                bad = True
+        elif origin is not None and not re.match(r"^http://(127\.0\.0\.1|localhost|\[::1\])(:\d+)?$", origin):
             bad = True
         if self.command == "POST" and not (self.headers.get("Content-Type") or "").startswith("application/json"):
             bad = True
@@ -419,7 +450,8 @@ class Handler(SimpleHTTPRequestHandler):
         routes = {"/api/meta": APP.meta, "/api/kb": APP.kb_rules, "/api/logs": APP.logs, "/api/board": APP.board_view,
                   "/api/inbox": APP.inbox_view, "/api/eval": APP.eval_view, "/api/settings": APP.settings_view,
                   "/api/redteam": APP.redteam_preset, "/api/savings": APP.savings_view,
-                  "/api/agents": APP.agents_view, "/api/selfcheck": APP.selfcheck_view}
+                  "/api/agents": APP.agents_view, "/api/selfcheck": APP.selfcheck_view,
+                  "/api/plugin/meta": APP.plugin_meta, "/api/plugin/pairing": APP.plugin_pairing}
         if url.path in routes:
             return self._json(200, routes[url.path]())
         if url.path == "/api/baseline":

@@ -344,7 +344,8 @@ async function renderOverview() {
   const reds = all.filter((f) => f.severity === "red").length;
   const dropped = reviews.reduce((n, e) => n + (e.dropped || []).length, 0);
   const calls = entries.filter((e) => e.meta).length;
-  const verified = kb.rules.filter((r) => r.verified).length;
+  const active = kb.rules.filter((r) => r.check?.kind !== "reference");  // reference rules are shown in the rule base, not checked
+  const verified = active.filter((r) => r.verified).length;
   const domains = new Set(kb.rules.map((r) => host(r.url))).size;
   const cats = new Set(kb.rules.map((r) => r.category)).size;
   const byWf = {};
@@ -353,9 +354,9 @@ async function renderOverview() {
   const wfRest = wfTop.slice(3).reduce((k, [, n]) => k + n, 0);
   const kpi = (tone, iconName, k, v, viz, d) => `<div class="card kpi ${tone}"><div class="k">${ic(iconName)}${esc(k)}</div><div class="v">${v}</div><div class="viz">${viz}</div><div class="d">${d}</div></div>`;
   $("#ov-stats").innerHTML =
-    kpi("", "book-open-check", "已核实规则", `${verified}<small> / ${kb.rules.length}</small>`,
-      sbar([{ n: verified, cls: "s-c1", label: "已核实" }, { n: kb.rules.length - verified, cls: "s-none", label: "待核实" }]),
-      `${cats} 类 · ${domains} 个公开来源，每条带原文与链接`) +
+    kpi("", "book-open-check", "已核实规则", `${verified}<small> / ${active.length}</small>`,
+      sbar([{ n: verified, cls: "s-c1", label: "已核实" }, { n: active.length - verified, cls: "s-none", label: "待核实" }]),
+      `${cats} 类 · ${domains} 个公开来源，每条带原文与链接${kb.rules.length > active.length ? ` · 另有 ${kb.rules.length - active.length} 条参考` : ""}`) +
     kpi("", "zap", "运行次数", runs.length,
       `<div class="pills">${wfTop.slice(0, 3).map(([k, n]) => `<span>${esc(k)}<b>${n}</b></span>`).join("")}${wfRest ? `<span>其他<b>${wfRest}</b></span>` : ""}</div>`,
       `模型调用 ${calls} 次`) +
@@ -1324,7 +1325,17 @@ function downloadAgents() {
 }
 
 // ------------------------------------------------------------------ booth self-check
+// Browser extension (extension/ in the repo): the pairing code it needs and how to load it.
+async function renderPluginCard() {
+  let code = "—";
+  try { code = (await api("/api/plugin/pairing")).code; } catch (e) { /* shown as a dash */ }
+  $("#sc-plugin").innerHTML = `<div class="card-h"><div><h3>${ic("scan-search")}浏览器插件 · 在 WhatsApp / Facebook 里直接检查</h3><p>原型：在任何网页选中一段回复，右键“TradeDesk 发出前检查”，用本机的规则检查，不会替你发送消息</p></div><div class="plugin-code"><span>配对码</span><b>${esc(code)}</b></div></div>
+    <div class="card-b"><ol class="plugin-steps"><li>Chrome 或 Edge 打开 <code>chrome://extensions</code>，打开右上角“开发者模式”</li><li>点“加载已解压的扩展程序”，选仓库里的 <code>extension</code> 文件夹</li><li>点浏览器右上角的插件图标 → “设置”，填上面的配对码</li><li>在 WhatsApp 网页版、Facebook 或任何网页选中回复，右键“TradeDesk 发出前检查”</li></ol>
+    <p class="small muted" style="margin:8px 0 0">只有填了本机配对码的插件能调用检查接口，别的网页调用不了。默认只跑代码规则（不花额度）；勾选“加上模型审核”且工作台在实时模式时才调用模型。</p></div>`;
+}
+
 async function renderSelfcheck() {
+  renderPluginCard();
   $("#sc-out").innerHTML = loadingCard(["回放每一条演示路径", "检查模型、知识库和本地数据"]);
   let r;
   try { r = await api("/api/selfcheck"); } catch (e) { $("#sc-out").innerHTML = ""; return toast(e.message); }

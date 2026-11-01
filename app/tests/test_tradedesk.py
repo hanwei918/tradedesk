@@ -739,11 +739,11 @@ class GatewayTests(unittest.TestCase):
 
 
 class CrossSiteTests(unittest.TestCase):
-    def gate(self, path, method="POST", host="127.0.0.1:8765", origin=None, ctype="application/json"):
+    def gate(self, path, method="POST", host="127.0.0.1:8765", origin=None, ctype="application/json", code=None):
         import server
         h = server.Handler.__new__(server.Handler)
         h.client_address, h.path, h.command = ("127.0.0.1", 5555), path, method
-        h.headers = {k: v for k, v in {"Host": host, "Origin": origin, "Content-Type": ctype}.items() if v is not None}
+        h.headers = {k: v for k, v in {"Host": host, "Origin": origin, "Content-Type": ctype, "X-TradeDesk-Code": code}.items() if v is not None}
         sent = []
         h._json = lambda code, obj: sent.append(code)
         return h._cross_site(), sent
@@ -760,6 +760,25 @@ class CrossSiteTests(unittest.TestCase):
 
     def test_game_is_exempt(self):
         self.assertEqual(self.gate("/api/play/score", host="192.168.0.3:8765")[0], False)
+
+    def test_browser_extension_needs_the_pairing_code_and_reaches_only_its_endpoints(self):
+        import server
+        ext, code = "chrome-extension://abcdefghijklmnop", server.plugin_code()
+        self.assertEqual(self.gate("/api/check", origin=ext), (True, [403]))                         # no code
+        self.assertEqual(self.gate("/api/check", origin=ext, code="0000-0000")[0], True)              # wrong code
+        self.assertEqual(self.gate("/api/check", origin=ext, code=code), (False, []))
+        self.assertEqual(self.gate("/api/plugin/meta", method="GET", ctype=None, origin=ext, code=code)[0], False)
+        self.assertEqual(self.gate("/api/settings", origin=ext, code=code)[0], True)                  # not its endpoint
+        self.assertEqual(self.gate("/api/plugin/pairing", method="GET", ctype=None, origin=ext, code=code)[0], True)
+        self.assertEqual(self.gate("/api/check", origin=ext, code=code, host="evil.example:8765")[0], True)
+        self.assertEqual(self.gate("/api/check", origin=ext, code=code, ctype="text/plain")[0], True)
+
+    def test_pairing_code_is_created_once_and_kept(self):
+        import server
+        with tempfile.TemporaryDirectory() as t:
+            first = server.plugin_code(t)
+            self.assertRegex(first, r"^[0-9A-F]{4}-[0-9A-F]{4}$")
+            self.assertEqual(server.plugin_code(t), first)
 
 
 class CompareAndRedTeamTests(unittest.TestCase):

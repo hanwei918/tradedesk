@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TradeDesk 发出前检查</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<header>
+  <img src="icon128.png" alt="">
+  <div><b>TradeDesk 发出前检查</b><small id="status">正在连接本机 TradeDesk…</small></div>
+  <button id="toggle-settings" type="button" title="连接设置">设置</button>
+</header>
+
+<section id="settings" hidden>
+  <label>TradeDesk 地址<input id="server" type="text" placeholder="http://127.0.0.1:8765"></label>
+  <label>配对码<input id="code" type="text" placeholder="开摊自检页上的 8 位配对码，如 3F9A-0C1D" autocomplete="off"></label>
+  <button id="save" type="button">保存并连接</button>
+  <p class="hint">配对码在 TradeDesk 工作台的“开摊自检”页。只有填了本机配对码，插件才能调用本机的检查接口；其他网页调用不了。</p>
+</section>
+
+<main>
+  <div class="row">
+    <label>产品<select id="product"></select></label>
+    <label>目标市场<select id="market"><option value="">自动</option><option value="US">美国</option><option value="MX">墨西哥</option><option value="EU">欧盟</option><option value="JP">日本</option></select></label>
+  </div>
+  <textarea id="text" rows="7" placeholder="在网页里选中一段回复，右键选“TradeDesk 发出前检查”；也可以直接粘贴到这里。"></textarea>
+  <label class="check"><input id="model" type="checkbox"> 加上模型审核（TradeDesk 在实时模式时才会调用模型，会花额度）</label>
+  <button id="run" type="button" class="primary">检查这段回复</button>
+  <div id="result" aria-live="polite"></div>
+</main>
+<footer>只做检查，不会替你发送消息。结果来自本机 TradeDesk 的代码规则和规则库，每条都附出处。</footer>
+<script src="panel.js"></script>
+</body>
+</html>

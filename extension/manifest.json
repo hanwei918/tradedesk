@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "TradeDesk 发出前检查",
+  "version": "0.1.0",
+  "description": "在 WhatsApp 网页版、Facebook 或任何网页里选中一段回复，右键用本机的 TradeDesk 检查虚假承诺。不会替你发送任何消息。",
+  "permissions": ["contextMenus", "storage"],
+  "host_permissions": ["http://127.0.0.1/*", "http://localhost/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "TradeDesk 发出前检查", "default_popup": "panel.html", "default_icon": { "128": "icon128.png" } },
+  "icons": { "128": "icon128.png" }
+}

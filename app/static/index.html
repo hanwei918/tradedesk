@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=41">
+<link rel="stylesheet" href="style.css?v=42">
 <link rel="stylesheet" href="welcome.css?v=6">
 <script>/* dark (the poster palette) unless this browser chose light */ try{document.documentElement.dataset.theme=localStorage.getItem("td-theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 </head>
@@ -225,6 +225,7 @@
           <div class="row"><button class="btn" id="sc-test" title="发一次很小的真实请求，确认 key 和网络（会产生极少费用）"><svg class="ic"><use href="#i-zap"/></svg>测试模型连接</button>
             <button class="btn" id="sc-warm" title="把演示路径回放进看板、收件箱和调用日志（不联网）"><svg class="ic"><use href="#i-history"/></svg>一键预热</button>
             <button class="btn primary" id="sc-run"><svg class="ic"><use href="#i-circle-check-big"/></svg>重新检查</button></div></div>
+        <div class="card plugin-card" id="sc-plugin"></div>
         <div id="sc-out"></div>
       </section>
 
@@ -241,7 +242,7 @@
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
 <script src="flow-bg.js?v=2"></script>
-<script src="app.js?v=38"></script>
+<script src="app.js?v=39"></script>
 <script src="welcome.js?v=8"></script>
 </body>
 </html>
