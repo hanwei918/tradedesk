@@ -76,13 +76,16 @@
     document.body.appendChild(gate);
     document.body.classList.add("gt-lock");
     const knob = gate.querySelector(".gt-knob"), track = gate.querySelector(".gt-track");
-    let start = 0, x = 0, max = 0, dragging = false, unlocked = false;
+    let start = 0, x = 0, max = 0, dragging = false, unlocked = false, pointer = null;
     // the slider drives the ship: it sails forward and the waves run back as the knob moves
     const place = (v) => { x = v; knob.style.transform = `translateX(${v}px)`; const r = max ? v / max : 0; track.style.setProperty("--p", r); gate.style.setProperty("--sail", r); };
 
     function unlock() {
       if (unlocked) return;
       unlocked = true;
+      // let go of the mouse: a capture left on the hidden knob would swallow every later click
+      try { if (pointer !== null && knob.hasPointerCapture(pointer)) knob.releasePointerCapture(pointer); } catch (e) { /* already released */ }
+      knob.style.pointerEvents = "none";
       max = track.clientWidth - knob.offsetWidth - 8;
       place(max);
       track.classList.add("done");
@@ -97,7 +100,9 @@
     knob.addEventListener("pointerdown", (e) => {
       if (unlocked) return;
       dragging = true; max = track.clientWidth - knob.offsetWidth - 8; start = e.clientX - x;
-      knob.setPointerCapture(e.pointerId); track.classList.add("drag");
+      pointer = e.pointerId;
+      try { knob.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
+      track.classList.add("drag");
     });
     knob.addEventListener("pointermove", (e) => {
       if (!dragging) return;
