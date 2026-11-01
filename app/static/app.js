@@ -1692,7 +1692,7 @@ function showRolePicker() {
       <span class="rp-meta">约 1 分钟 · ${r.steps.length} 步 · 适合${esc(r.fit)}</span>
       <span class="rp-path">${r.steps.map((s, i) => `<span><i>${i + 1}</i>${esc(s.t)}</span>`).join("")}</span>
       <span class="rp-out">产出：${esc(r.out)}</span></button>`).join("")}</div>
-    <div class="rp-foot"><button class="rp-all" data-role="">进入完整工作台（全部功能）</button><button class="rp-all" id="rp-selfcheck">开摊前自检</button></div></div>`;
+    <div class="rp-foot"><button class="rp-all" data-role="">进入完整工作台（全部功能）</button><button class="rp-all" id="rp-selfcheck">开摊前自检</button><a class="rp-all" href="sandbox.html">Sandbox 演练（模拟情境）</a></div></div>`;
   el.hidden = false;
   $$("#rolepick [data-role]").forEach((b) => b.addEventListener("click", () => setRole(b.dataset.role)));
   $("#rp-selfcheck").addEventListener("click", () => { setRole(""); go("selfcheck"); });

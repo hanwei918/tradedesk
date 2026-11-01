@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f4f6f8">
+<title>Sandbox 演练 · TradeDesk</title>
+<link rel="stylesheet" href="style.css?v=33">
+<link rel="stylesheet" href="sandbox.css?v=2">
+<link rel="stylesheet" href="sandbox-flow.css?v=1">
+<link rel="stylesheet" href="sandbox-responsive.css?v=1">
+<link rel="stylesheet" href="sandbox-theme.css?v=1">
+<script>try{const t=localStorage.getItem("td-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body class="sandbox-body">
+<div class="sb-app">
+  <header class="sb-header">
+    <div class="sb-brand">
+      <a class="sb-logo" href="index.html" aria-label="返回 TradeDesk 工作台"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7.5" y="4.5" width="9" height="6" rx="1.5"/><rect x="2.5" y="13" width="9" height="6" rx="1.5" opacity=".72"/><rect x="12.5" y="13" width="9" height="6" rx="1.5"/></svg></a>
+      <div><b>TradeDesk <span>Sandbox</span></b><small>不帮你写更像的文案，只帮你拦下最贵的错误。</small></div>
+    </div>
+    <div class="sb-header-right">
+      <div class="sb-view-switch" role="tablist" aria-label="演示视角">
+        <button class="on" type="button" role="tab" aria-selected="true" data-view="business">商业</button>
+        <button type="button" role="tab" aria-selected="false" data-view="industry">行业</button>
+        <button type="button" role="tab" aria-selected="false" data-view="technical">技术</button>
+      </div>
+      <a class="sb-back" href="index.html">返回工作台</a>
+      <button class="sb-reset" id="sb-reset" type="button" title="重置演练" aria-label="重置演练"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4.8 10a7.5 7.5 0 0 1 13-3L20 12M4 17v-5h5m10.2 2a7.5 7.5 0 0 1-13 3L4 12"/></svg></button>
+    </div>
+  </header>
+  <div class="sb-notice"><span class="sb-live-dot"></span><b>本地演示模式</b><span>资料来自当前工作台；文案为预置脚本。不会调用外部模型，也不会发送邮件。</span></div>
+
+  <div class="sb-layout">
+    <aside class="sb-rail">
+      <section class="sb-rail-section sb-factory">
+        <div class="sb-section-title"><span class="sb-kicker">CONTEXT</span><span class="sb-fictitious">虚构示例</span></div>
+        <h1 id="sb-factory-name">正在读取工厂资料…</h1>
+        <p class="sb-location" id="sb-factory-location">本地产品资料卡</p>
+        <div class="sb-product-head"><div><span class="sb-label">当前产品</span><b id="sb-product-name">空气炸锅</b></div><span class="sb-product-id" id="sb-product-id">AF-45D</span></div>
+        <div class="sb-facts">
+          <div class="sb-fact"><span>最低起订量</span><b id="sb-moq">1,000 件</b></div>
+          <div class="sb-fact"><span>标准交期</span><b id="sb-lead">35 天</b></div>
+          <div class="sb-fact sb-fact-wide"><span>资料卡已登记认证</span><div class="sb-tags" id="sb-held"></div></div>
+          <div class="sb-fact sb-fact-wide"><span>资料卡未登记认证</span><div class="sb-tags muted-tags" id="sb-not-held"></div></div>
+        </div>
+        <div class="sb-data-note" id="sb-data-note">示例工厂与产品资料均为虚构数据，不代表真实企业或认证。</div>
+      </section>
+      <section class="sb-rail-section sb-tasks">
+        <div class="sb-section-title"><span class="sb-kicker">WALKTHROUGH</span><button id="sb-task-toggle" type="button" aria-expanded="true" title="折叠任务清单">收起</button></div>
+        <h2>通关任务</h2>
+        <ol id="sb-task-list">
+          <li data-task="listing"><span class="sb-task-check"></span><span>生成双平台 Listing</span></li>
+          <li data-task="risk"><span class="sb-task-check"></span><span>抓出虚假承诺</span></li>
+          <li data-task="market"><span class="sb-task-check"></span><span>切换市场看资料差异</span></li>
+          <li data-task="rewrite"><span class="sb-task-check"></span><span>生成安全改稿</span></li>
+        </ol>
+        <div class="sb-progress"><span id="sb-progress-fill"></span></div>
+        <div class="sb-progress-label" id="sb-progress-label">0 / 4 已完成</div>
+      </section>
+      <div class="sb-rail-foot"><span class="sb-live-dot"></span><span id="sb-data-status">正在连接本地资料卡…</span></div>
+    </aside>
+
+    <main class="sb-main">
+      <div class="sb-main-heading">
+        <div><span class="sb-kicker">INTERACTIVE DEMO</span><h2>出海文案安全演练</h2><p>从产品事实出发，体验“发现冲突 → 按资料改稿 → 模拟闭环”。</p></div>
+        <div class="sb-view-insight" id="sb-view-insight" aria-live="polite"></div>
+      </div>
+      <div class="sb-scene-tabs" role="tablist" aria-label="演练场景">
+        <button class="on" type="button" role="tab" aria-selected="true" data-scene="listing"><span>01</span>多平台商品上架</button>
+        <button type="button" role="tab" aria-selected="false" data-scene="inquiry"><span>02</span>AI 询盘合规审查</button>
+      </div>
+
+      <section class="sb-scene on" id="sb-scene-listing" role="tabpanel">
+        <div class="sb-scene-head"><div><h3>同一份资料，两种渠道表达</h3><p>对照固定演示稿与资料卡，不会调用模型生成内容。</p></div><span class="sb-step-state" id="sb-listing-state">等待启动</span></div>
+        <div class="sb-channel-grid">
+          <article class="sb-channel" data-channel="amazon">
+            <div class="sb-channel-head"><div><span class="sb-market-mark amazon-mark">a</span><div><b>Amazon 美国站</b><small>英语 · Listing</small></div></div><span class="sb-channel-index">US / EN</span></div>
+            <div class="sb-copy-block sb-copy-risk"><span class="sb-copy-label">待审演示稿</span><p>UL Listed 4.5L Smart Air Fryer. Order as few as 100 units and get guaranteed delivery in 15 days.</p></div>
+            <div class="sb-listing-result" hidden></div>
+          </article>
+          <article class="sb-channel" data-channel="tiktok">
+            <div class="sb-channel-head"><div><span class="sb-market-mark tiktok-mark">♪</span><div><b>TikTok Shop 墨西哥</b><small>西班牙语 · 短视频</small></div></div><span class="sb-channel-index">MX / ES</span></div>
+            <div class="sb-copy-block sb-copy-risk"><span class="sb-copy-label">待审演示稿</span><p>Freidora de aire UL Listed. Pide solo 100 unidades y recíbela garantizada en 15 días.</p></div>
+            <div class="sb-listing-result" hidden></div>
+          </article>
+        </div>
+        <div class="sb-inline-actions"><button class="btn primary sb-primary-action" id="sb-listing-run" type="button">启动资料对照</button><span>将用当前卡片比对认证、MOQ 与交期</span></div>
+        <div class="sb-demo-disclaimer" id="sb-listing-disclaimer" hidden>风险项来自本地固定演示脚本与产品资料卡的字段比对；不是模型生成或实时合规结论。真实检查请回工作台「文案体检」。</div>
+        <div class="sb-chat-area" id="sb-listing-chat" hidden>
+          <div class="sb-chat-title"><div><b>按资料卡生成安全版本</b><small>预置双语模板 · 可再次修改演示指令</small></div><span class="sb-badge-ok">事实字段已对齐</span></div>
+          <div class="sb-chat-grid" id="sb-safe-listings"></div>
+          <div class="sb-prompt-row"><button type="button" class="sb-prompt" data-prompt="把两个渠道的文案改得更简洁，保留已登记的认证和准确起订量。">简洁改写</button><button type="button" class="sb-prompt" data-prompt="突出空气炸锅的实际功能，不增加资料卡没有的承诺。">突出真实卖点</button></div>
+          <form class="sb-composer" id="sb-listing-form"><label class="sr-only" for="sb-listing-input">演示修改指令</label><input id="sb-listing-input" type="text" placeholder="输入一条修改指令，体验本地预置回复" autocomplete="off"><button class="btn" type="submit">预览修改</button></form>
+          <p class="sb-helper">这里展示固定的本地演示结果；真实生成请回到工作台的“多平台上架”。</p>
+        </div>
+      </section>
+
+      <section class="sb-scene" id="sb-scene-inquiry" role="tabpanel" hidden>
+        <div class="sb-scene-head"><div><h3>一封回复，先核对事实底线</h3><p>选择目标市场；产品事实不因市场切换而改变，缺少的市场资料会明确转人工确认。</p></div><span class="sb-step-state" id="sb-inquiry-state">等待检查</span></div>
+        <div class="sb-market-row"><label for="sb-market">目标市场</label><select id="sb-market"><option value="US">🇺🇸 美国</option><option value="MX">🇲🇽 墨西哥</option><option value="EU">🇪🇺 欧盟（德国）</option><option value="JP">🇯🇵 日本</option></select><span class="sb-market-scope" id="sb-market-scope">资料核对范围：美国站产品事实</span></div>
+        <div class="sb-inquiry-layout">
+          <div class="sb-inquiry-column">
+            <article class="sb-inquiry-card">
+              <div class="sb-inquiry-label"><span>待审询盘回复</span><span>固定演示稿</span></div>
+              <p id="sb-bad-reply">Dear John, thanks for your inquiry. Yes, our Air Fryers are definitely <mark>UL Listed</mark>. We can support your request for <mark>50 units</mark> and guarantee delivery by <mark>next week</mark>. Best regards.</p>
+              <button class="btn primary" id="sb-audit-run" type="button">启动资料核对</button>
+            </article>
+            <div class="sb-findings" id="sb-findings" hidden></div>
+            <details class="sb-terminal-wrap" id="sb-terminal-wrap" hidden><summary>查看本地核对日志</summary><div class="sb-terminal"><div class="sb-terminal-head"><span></span><span></span><span></span><b>LOCAL DEMO TRACE</b></div><pre id="sb-terminal-log"></pre></div></details>
+          </div>
+          <aside class="sb-market-insight" id="sb-market-insight"><span class="sb-kicker">MARKET SCOPE</span><h4>资料边界</h4><p>当前只核对产品资料卡已记录的事实，不把未配置的法规或文化判断包装成结论。</p><div class="sb-market-detail" id="sb-market-detail"></div></aside>
+        </div>
+        <div class="sb-copilot" id="sb-copilot" hidden>
+          <div class="sb-chat-title"><div><b>TradeDesk 改稿预览</b><small>本地预置模板 · 不会发送给客户</small></div><span class="sb-badge-ok">资料卡约束</span></div>
+          <div class="sb-chat-history" id="sb-chat-history" aria-live="polite"></div>
+          <div class="sb-prompt-row"><button type="button" class="sb-prompt" data-inquiry-prompt="客户只要 50 件，请按资料卡 MOQ 写一段专业、友好的回复。">处理低于 MOQ 的询盘</button><button type="button" class="sb-prompt" data-inquiry-prompt="询问日本市场时，只陈述产品卡已登记的信息，并标出待核实事项。">说明市场资料边界</button></div>
+          <form class="sb-composer" id="sb-inquiry-form"><label class="sr-only" for="sb-inquiry-input">改稿演示指令</label><input id="sb-inquiry-input" type="text" placeholder="输入修改方向，生成本地模板预览" autocomplete="off"><button class="btn" type="submit">生成预览</button></form>
+          <div class="sb-send-row"><span>仅演示界面，不会连接邮件服务。</span><button class="btn primary" id="sb-simulate-send" type="button" disabled>模拟发送并完成演练</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<dialog class="sb-finale" id="sb-finale">
+  <button class="sb-finale-close" id="sb-finale-close" type="button" aria-label="关闭">×</button>
+  <span class="sb-kicker">WALKTHROUGH COMPLETE</span>
+  <div class="sb-finale-mark">✓</div>
+  <h2>本轮演练完成</h2>
+  <p>发现资料冲突，基于真实字段生成预览，并完成了模拟闭环。</p>
+  <div id="sb-finale-view"></div>
+  <div class="sb-finale-actions"><button class="btn" id="sb-finale-back" type="button">回到演练</button><button class="btn primary" id="sb-finale-reset" type="button">重新体验</button></div>
+  <small>演示数据为虚构样例；金额、罚金、转化率未作估算或承诺。</small>
+</dialog>
+<script src="sandbox.js?v=2"></script>
+</body>
+</html>

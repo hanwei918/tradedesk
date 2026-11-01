@@ -1,4 +1,5 @@
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -1401,3 +1402,38 @@ class ProductEditBoardTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SandboxTests(unittest.TestCase):
+    """The Sandbox page runs a fixed script over the AF-45D card; what it hard-codes must stay true to the data."""
+    STATIC = ROOT / "static"
+
+    def setUp(self):
+        self.kb = KnowledgeBase()
+        self.product = self.kb.product("AF-45D")
+        self.js = (self.STATIC / "sandbox.js").read_text(encoding="utf-8")
+
+    def test_fallback_facts_match_the_product_card(self):
+        fallback = self.js.split("const fallback = ", 1)[1].split(";\n", 1)[0]
+        self.assertIn(f"moq_units: {self.product['moq_units']}", fallback)
+        self.assertIn(f"standard_lead_time_days: {self.kb.factory['standard_lead_time_days']}", fallback)
+        for cert in self.product["certifications_held"] + self.product["certifications_not_held"]:
+            self.assertIn(json.dumps(cert), fallback)
+
+    def test_hard_coded_features_and_market_notes_exist_in_the_data(self):
+        # safeListingCards writes these four features into the EN / ES copy
+        self.assertEqual(set(self.product["specs"]["features"]),
+                         {"8 presets", "digital touch panel", "60-min timer", "dishwasher-safe basket"})
+        self.assertIn("60-minute timer", self.js)
+        # the Japan finding cites markets.json: 120V only, no PSE; Mexico and the EU have no AF-45D notes
+        jp = self.kb.market_profile("JP", "AF-45D")
+        self.assertIn("PSE", jp["certifications_not_held"])
+        self.assertIn("120V", jp["notes_zh"])
+        self.assertIsNone(self.kb.markets["EU"]["products"].get("AF-45D"))
+        self.assertNotIn("MX", self.kb.markets)
+
+    def test_sandbox_loads_the_same_stylesheet_version_as_the_workbench(self):
+        def version(name):
+            return re.search(r"style\.css\?v=(\d+)", (self.STATIC / name).read_text(encoding="utf-8")).group(1)
+        self.assertEqual(version("sandbox.html"), version("index.html"))
+        self.assertIn('href="sandbox.html"', (self.STATIC / "index.html").read_text(encoding="utf-8"))

@@ -1,0 +1,37 @@
+/* Sandbox in the workbench palette: the hard-coded light greens / reds become theme tokens so dark mode works,
+   accents follow the poster (cyan -> blue), and the smallest text is raised for a booth screen. */
+.sb-logo{background:linear-gradient(140deg,hsl(221 83% 58%),hsl(194 92% 44%));box-shadow:0 8px 20px -8px hsl(205 90% 50% / .8),inset 0 1px 0 rgb(255 255 255 / .25)}
+.sb-live-dot{background:hsl(var(--green))}
+.sb-kicker,.sb-scene-tabs button>span{color:hsl(var(--brand))}
+.sb-fictitious{background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+.sb-tags span{border-color:hsl(var(--green) / .35);background:hsl(var(--green-soft));color:hsl(var(--green))}
+.sb-tasks li.done .sb-task-check{background:hsl(var(--green));border-color:hsl(var(--green))}
+.sb-progress span{background:linear-gradient(90deg,#48e2db,#74a0ff)}
+.sb-view-insight{border-left-color:hsl(var(--brand))}
+.sb-scene-tabs button.on{border-color:hsl(var(--brand))}
+.sb-channel.scanned{border-color:hsl(var(--amber));box-shadow:0 0 0 2px hsl(var(--amber) / .15)}
+.amazon-mark{background:hsl(var(--amber-soft));color:hsl(var(--amber))}
+.tiktok-mark{background:hsl(var(--brand-soft));color:hsl(var(--brand))}
+.sb-copy-risk p{color:hsl(var(--red))}
+.sb-risk-line,.sb-risk-line b,.sb-demo-disclaimer{color:hsl(var(--amber))}
+.sb-safe-listing{background:hsl(var(--green-soft));border-top-color:hsl(var(--green) / .25)}
+.sb-safe-listing .sb-copy-label,.sb-safe-card h4,.sb-badge-ok{color:hsl(var(--green))}
+.sb-safe-listing p,.sb-safe-card p{color:hsl(var(--foreground))}
+.sb-badge-ok{background:hsl(var(--green-soft))}
+.sb-safe-card,.sb-message.assistant{border-color:hsl(var(--green) / .3);background:hsl(var(--green-soft));color:hsl(var(--foreground))}
+.sb-message.user{background:hsl(var(--muted));color:hsl(var(--foreground))}
+.sb-message-label{color:hsl(var(--muted-foreground))}
+.sb-typing::after{background:hsl(var(--brand))}
+.sb-prompt:hover{border-color:hsl(var(--brand) / .5);background:hsl(var(--accent))}
+.sb-inquiry-card mark{background:hsl(var(--red-soft));color:hsl(var(--red));text-decoration-color:hsl(var(--red))}
+.sb-finding{border-color:hsl(var(--red) / .3);background:hsl(var(--red-soft))}
+.sb-finding-icon{background:hsl(var(--red) / .15);color:hsl(var(--red))}
+.sb-finding b{color:hsl(var(--red))}
+.sb-finding p{color:hsl(var(--foreground))}
+.sb-finding small{color:hsl(var(--muted-foreground))}
+.sb-finale{background:#070e25;border-color:rgba(148,163,255,.24)}
+.sb-finale-metrics b{color:#48e2db}
+/* readable on a booth screen */
+.sb-tags span,.sb-fictitious,.sb-badge-ok,.sb-message-label,.sb-finding small,.sb-finale-metrics span,.sb-finale>small{font-size:11.5px}
+.sb-risk-line,.sb-demo-disclaimer,.sb-finding p,.sb-safe-card h4,.sb-view-insight{font-size:12.5px}
+.sb-finding b,.sb-safe-card p,.sb-safe-listing p,.sb-finale>p{font-size:13px}

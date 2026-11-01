@@ -1,0 +1,1 @@
+@media(max-width:700px){.sb-header{display:grid;grid-template-columns:minmax(0,1fr);align-items:center;gap:8px;padding:9px 13px;min-height:0}.sb-header-right{display:flex;width:100%;min-width:0;flex-wrap:nowrap;justify-content:space-between;gap:6px}.sb-view-switch{flex:none}.sb-back{margin-left:auto}}
