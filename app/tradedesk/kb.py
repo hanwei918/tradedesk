@@ -58,6 +58,7 @@ class KnowledgeBase:
         self.inquiries = _load(inquiries_path, {"inquiries": []}).get("inquiries", [])
         self.check_map = _load(check_map_path, {})
         self.markets = _load(markets_path, {"markets": {}}).get("markets", {})
+        self.paused = set()  # rule ids whose hits are set aside (see pauses.py); prompts still list them
 
     def product(self, product_id):
         if product_id not in self.products:

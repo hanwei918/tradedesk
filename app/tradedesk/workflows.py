@@ -19,6 +19,7 @@ from .inbox import Inbox, guard_tasks, priority
 from .kb import PLATFORM_MARKET, PLATFORM_NAMES
 from .listing_catalog import LANGUAGES, LISTING_PLATFORMS
 from .llm import LLMError
+from .pauses import split_paused
 
 TEXT_KINDS = ["regex", "length", "llm"]
 
@@ -30,7 +31,8 @@ MAX_ROUNDS = 5
 MODEL_CALLS = {"inquiry_first": 3,       # understand, write, review
                "inquiry_revision": 2,    # write, review (the understanding is reused)
                "listing_per_platform": 2,  # write, review
-               "triage": 1, "image": 1}
+               "triage": 1, "image": 1,
+               "follow_up": 3}           # understand (shared cache, skipped when the inbox has it), write, review
 
 
 def check_round(rnd):
@@ -154,13 +156,14 @@ class Runner:
             except LLMError as exc:
                 # Rule checks still stand; the result can never be green without the review.
                 skipped = {"reason_zh": str(exc), "rules": [r["id"] for r in llm_rules]}
+        findings, paused_hits = split_paused(findings, self.kb.paused)
         risk = checks.risk_level(findings)
         if skipped and risk == "green":
             risk = "amber"
         self._log({"run_id": run_id, "ts": time.strftime("%Y-%m-%d %H:%M:%S"), "workflow": workflow,
-                   "step": f"校验结果 · {platform}", "trigger": trigger,
-                   "findings": findings, "dropped": dropped, "review_skipped": skipped, "risk": risk})
-        return {"findings": findings, "dropped": dropped, "risk": risk, "review_skipped": skipped,
+                   "step": f"校验结果 · {platform}", "trigger": trigger, "findings": findings, "dropped": dropped,
+                   "paused_hits": paused_hits, "review_skipped": skipped, "risk": risk})
+        return {"findings": findings, "dropped": dropped, "paused_hits": paused_hits, "risk": risk, "review_skipped": skipped,
                 "rules_checked": [r["id"] for r in self.kb.rules_for(platform, kinds=TEXT_KINDS, market=market)]}
 
     # ------------------------------------------------------------ workflow A
@@ -213,6 +216,39 @@ class Runner:
             "diff": word_diff(previous.get("reply", ""), reply) if previous else None,
             "trace": trace, **review,
         }
+
+    # ------------------------------------------------------------ follow-up (from the daily digest)
+    def follow_up(self, payload):
+        """A short nudge to a buyer who has not answered: same facts, same checks as the first reply."""
+        run_id = uuid.uuid4().hex[:8]
+        trace = []
+        record = next((q for q in self.kb.inquiries if q["id"] == payload.get("inquiry_id")), None)
+        if not record:
+            raise ValueError("找不到这条询盘")
+        sent = (payload.get("sent") or "").strip()
+        if not sent:
+            raise ValueError("这条询盘还没有记录过发出的回复，没有可跟进的内容")
+        product = self.kb.product(payload.get("product_id") or record["product_id"])
+        market = record.get("market")
+        trigger = "每日摘要 · 跟进"
+        understanding = payload.get("understanding") or self._understand(
+            trace, run_id, "跟进", record["text"].strip(), product, trigger, market)
+        language = (understanding.get("buyer") or {}).get("language") or record.get("language") or "en"
+        language = language if language in LANGUAGE_NAMES else "en"
+        market = market or MARKET_BY_LANGUAGE.get(language, "US")
+        parts = [f"## 询盘原文\n{record['text'].strip()}", f"## 询盘分析\n{dumps(understanding)}",
+                 f"## 工厂与产品资料\n{dumps(self._facts(product, market))}",
+                 f"## 上次发出的回复（{int(payload.get('days') or 0)} 天前）\n{sent}",
+                 f"## 业务员补充\n{(payload.get('instruction_zh') or '').strip() or '（无）'}",
+                 f"## 平台与沟通规则（知识库）\n{dumps(self._guidance('alibaba_rfq', market))}"]
+        draft = self._step(trace, run_id, "跟进", "生成跟进", "sales",
+                           prompt("follow_up", language_name=LANGUAGE_NAMES[language],
+                                  factory_kind=self.kb.factory_for(product).get("category_zh", "小家电")),
+                           "\n\n".join(parts), trigger)
+        reply = draft.get("reply", "")
+        review = self.review(trace, run_id, "跟进", "alibaba_rfq", {"reply": reply}, product, trigger, market)
+        return {"run_id": run_id, "inquiry_id": record["id"], "language": language, "market": market,
+                "reply": reply, "notes_zh": draft.get("notes_zh", ""), "trace": trace, **review}
 
     def _understand(self, trace, run_id, workflow, inquiry_text, product, trigger, market=None):
         """Shared by replies and inbox triage, so both reuse the same cached answer."""
@@ -374,10 +410,12 @@ class Runner:
             description = data.get("description_zh", "")
         except LLMError as exc:
             skipped = {"reason_zh": str(exc), "rules": [r["id"] for r in vision_rules]}
+        findings, paused_hits = split_paused(findings, self.kb.paused)
         risk = checks.risk_level(findings)
         if (skipped or pixel_skipped) and risk == "green":
             risk = "amber"
         result = {"run_id": run_id, "metrics": metrics, "findings": findings, "dropped": dropped, "risk": risk,
+                  "paused_hits": paused_hits,
                   "review_skipped": skipped or pixel_skipped, "description_zh": description,
                   "rules_checked": [r["id"] for r in rules], "trace": trace, "image_name": payload.get("name", "")}
         self._log({"run_id": run_id, "ts": time.strftime("%Y-%m-%d %H:%M:%S"), "workflow": "C 主图检查",

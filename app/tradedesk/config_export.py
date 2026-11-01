@@ -74,6 +74,15 @@ WORKFLOWS = [
          {"step_zh": "规则校验 + 模型审核（按平台分别进行）", "agent": "compliance"},
          {"step_zh": "反馈", "agent": None, "detail_zh": "逐字段高亮 + 风险等级 + 前后对比"},
      ]},
+    {"id": "F", "name_zh": "每日摘要 + 跟进提醒", "trigger_zh": "每天定时 / 点“立即发送” / 点“生成跟进草稿”",
+     "steps": [
+         {"step_zh": "汇总新询盘、待确认的回复、积压任务、该跟进的买家（代码）", "agent": None,
+          "detail_zh": "只读本地记录，不调用模型；“该跟进”只算业务员记录为已发出、且超过设定天数没有回音的"},
+         {"step_zh": "推送到企业微信群机器人（代码）", "agent": None,
+          "detail_zh": "官方 webhook，markdown 不超过 4096 字节；只发标题、优先级、待办，不发询盘原文和回复；每天只尝试一次"},
+         {"step_zh": "生成跟进草稿（人点了才跑）", "agent": "sales", "kb_zh": "注入 alibaba_rfq 平台的规则摘要和上次发出的回复"},
+         {"step_zh": "规则校验 + 模型审核", "agent": "compliance", "guard_zh": "和第一次回复一样：没有的认证、没检测的材料宣称都会标出"},
+     ]},
     {"id": "E", "name_zh": "询盘 → 上架交接", "trigger_zh": "回完询盘后，给在线上卖货的买家附上架文案",
      "steps": [
          {"step_zh": "回复询盘（工作流 A）", "agent": "analyst / sales / compliance"},
@@ -96,6 +105,7 @@ def orchestration():
             "模型回答不是合法 JSON 不重试：理解或生成那一步失败，整条请求报错停下；审核那一步失败，保留代码规则的结果并标为需要人工确认。",
             "每个智能体的输出先过代码护栏：没有出处、规则编号不在白名单、引用的原文对不上，这一条就被丢弃，不回传给模型重写，所以不会来回拉扯。",
             "风险等级由代码算：模型审核没跑成功时，结果不会显示绿色。",
+            "每日摘要每天只尝试推送一次：失败会记录并显示，不会每分钟重试；跟进草稿只在人点按钮时生成，定时任务从不调用模型。",
         ],
         "calls_per_round_zh": {
             "A": f"第 1 轮最多 {c['inquiry_first']} 次模型调用（理解、生成、审核）；之后每轮最多 {c['inquiry_revision']} 次（理解复用第 1 轮）",
@@ -103,6 +113,7 @@ def orchestration():
             "C": f"批量生成 = 每个产品跑一遍 B；每张主图看图审核 {c['image']} 次",
             "D": f"每条询盘 {c['triage']} 次，和 A 的“理解询盘”共用同一份缓存",
             "E": "= A + B；交接核对是代码，不调用模型",
+            "F": f"摘要和推送不调用模型；跟进草稿每次最多 {c['follow_up']} 次（理解，有收件箱结果时跳过；生成；审核）",
         },
         "max_rounds": MAX_ROUNDS, "timeout_seconds": {"default": TIMEOUT, "claude": CLAUDE_TIMEOUT},
         "attempts": ATTEMPTS, "model_calls": MODEL_CALLS,

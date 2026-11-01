@@ -96,6 +96,8 @@ function riskPanel(r) {
   const skipped = r.review_skipped ? `<div class="callout warn">${ic("triangle-alert")}<div><b>模型审核没有运行</b>：${esc(r.review_skipped.reason_zh)}。下面只是代码规则的结果，规则 ${esc(r.review_skipped.rules.join("、"))} 需要人工检查。</div></div>` : "";
   const dropped = r.dropped && r.dropped.length ? `<div class="callout">${ic("ban")}<div><details><summary><b>已丢弃 ${r.dropped.length} 条模型提示</b>：没有规则编号或原文对不上，不作为风险展示</summary><pre class="json" style="margin-top:8px">${esc(JSON.stringify(r.dropped, null, 1))}</pre></details></div></div>`
     : `<div class="callout">${ic("shield-check")}<div>出处守卫：模型的每条提示都核对了规则编号和原文，本轮没有需要丢弃的。</div></div>`;
+  const paused = r.paused_hits && r.paused_hits.length ? `<div class="callout">${ic("ban")}<div><details><summary><b>已暂停的规则命中 ${r.paused_hits.length} 处</b>，不计入风险：${esc([...new Set(r.paused_hits.map((f) => f.source?.rule_id))].join("、"))}（在规则知识库里可以恢复）</summary>
+    ${r.paused_hits.map((f) => `<div class="small" style="margin-top:6px">${esc(f.problem_zh)}${f.quote ? ` · “${esc(f.quote)}”` : ""}</div>`).join("")}</details></div></div>` : "";
   return `
     <div class="risk-hero"><div class="risk-ring ${r.risk}">${ic(RISK_ICON[r.risk])}</div>
       <div><b>${title}</b><span>${RISK[r.risk]} · 检查了 ${(r.rules_checked || []).length} 条知识库规则 + 资料卡</span></div>
@@ -103,7 +105,7 @@ function riskPanel(r) {
     <div class="sep" style="margin:0 0 12px"></div>
     ${skipped}
     <div class="findings">${list || `<div class="empty">${ic("circle-check-big")}<div>没有发现问题</div></div>`}</div>
-    ${dropped}`;
+    ${paused}${dropped}`;
 }
 
 // The product card as the evidence the code checks read: fields a finding cites light up,
@@ -1013,7 +1015,71 @@ const taskOpen = new Set();  // task groups the user opened ("_" marks that they
 function showInboxTab(v) {
   inboxTab = v;
   $$("#inbox-tabs button").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
-  $("#inbox-list").hidden = v !== "list"; $("#inbox-tasks").hidden = v !== "tasks";
+  $("#inbox-list").hidden = v !== "list"; $("#inbox-tasks").hidden = v !== "tasks"; $("#inbox-digest").hidden = v !== "digest";
+  if (v === "digest") renderDigest();
+}
+
+// ------------------------------------------------------------------ daily digest + follow-ups
+// Building the digest reads local records only (no model). Pushing goes to a WeCom group robot and
+// carries titles, priorities and to-dos, never inquiry text or replies. A follow-up draft is
+// generated only when someone clicks, and goes through the same checks as the first reply.
+async function renderDigest() {
+  const el = $("#inbox-digest");
+  let d;
+  try { d = await api("/api/digest"); } catch (e) { el.innerHTML = emptyCard("triangle-alert", "读不到摘要", [e.message]); return; }
+  const s = d.settings, p = d.preview, f = p.sections.follow;
+  const last = s.last ? `<span class="badge ${s.last.ok ? "green" : "red"}">${esc(s.last.ts)} ${s.last.ok ? "已推送" : "推送失败"}</span><span class="small muted">${esc(s.last.detail)}</span>`
+    : `<span class="small muted">还没推送过</span>`;
+  el.innerHTML = `
+    <div class="grid g2 dg">
+      <div class="card"><div class="card-h"><div><h3>${ic("send")}推送到企业微信群</h3><p>每天定时把摘要发到群里。生成摘要不调用模型；只发标题、优先级和待办，不发询盘原文和回复。</p></div></div>
+        <div class="card-b dg-form">
+          <label class="toggle"><span>每天推送</span><input type="checkbox" id="dg-on" ${s.enabled ? "checked" : ""}><span class="switch"></span></label>
+          <label><span class="fieldlab">发送时间（这台电脑开着、TradeDesk 在运行时才会发）</span><input type="time" id="dg-time" value="${esc(s.time)}"></label>
+          <label><span class="fieldlab">回复发出后几天没回音，算“该跟进”</span><input type="number" id="dg-days" min="1" max="30" value="${s.follow_days}"></label>
+          <label><span class="fieldlab">群机器人 webhook 地址</span><input type="password" id="dg-hook" autocomplete="off" placeholder="${s.has_webhook ? `已保存 ${esc(s.webhook_hint)}（留空不改）` : "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=…"}"></label>
+          <p class="small muted">在企业微信群里点右上角“…”→ 添加群机器人 → 复制 webhook 地址。地址只存在这台电脑的 app/state 里，页面上不再显示完整的 key。</p>
+          <div class="row"><button class="btn primary" id="dg-save">保存</button>${s.has_webhook ? `<button class="btn ghost" id="dg-clear">清除 webhook</button>` : ""}<div style="flex:1"></div>${last}</div>
+        </div></div>
+      <div class="card"><div class="card-h"><div><h3>${ic("file-text")}今天的摘要（预览）</h3><p>这就是会发到群里的内容 · ${p.bytes} / 4096 字节</p></div>
+          <button class="btn sm" id="dg-send" ${s.has_webhook ? "" : 'disabled title="先填 webhook 地址"'}>${ic("send", "sm")}立即发送</button></div>
+        <div class="card-b"><pre class="dg-pre">${esc(p.markdown)}</pre></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><div class="card-h"><div><h3>${ic("history")}该跟进的买家（${f.length}）</h3>
+        <p>只算在“业务员确认”里记为已发出、超过 ${s.follow_days} 天还没标“买家已回复”的询盘。跟进草稿点了才生成，会调用模型，生成后同样过规则校验和合规审核。</p></div></div>
+      <div class="card-b">${f.length ? f.map((x) => `<div class="dg-f" data-q="${esc(x.inquiry_id)}"><div class="dg-fh"><b>${esc(x.label_zh)}</b><span class="badge amber">已发出 ${x.days} 天</span><span class="small muted">${esc(x.sent)}</span><div style="flex:1"></div>
+          <button class="btn sm primary" data-draft>${ic("sparkles", "sm")}生成跟进草稿</button><button class="btn sm" data-fs="买家已回复">买家已回复</button><button class="btn sm ghost" data-fs="已关闭">已关闭</button></div><div class="dg-out"></div></div>`).join("")
+        : `<div class="empty small">现在没有该跟进的买家。</div>`}</div></div>`;
+  const save = async (extra) => {
+    const body = { enabled: $("#dg-on").checked, time: $("#dg-time").value, follow_days: +$("#dg-days").value, ...extra };
+    if ($("#dg-hook").value.trim()) body.webhook = $("#dg-hook").value.trim();
+    try { await api("/api/digest/settings", body); toast("已保存", "ok"); renderDigest(); } catch (e) { toast(e.message); }
+  };
+  $("#dg-save").addEventListener("click", () => save({}));
+  $("#dg-clear")?.addEventListener("click", () => save({ clear_webhook: true, enabled: false }));
+  $("#dg-send").addEventListener("click", async () => {
+    busy($("#dg-send"), true, "发送中…");
+    try { await api("/api/digest/send", {}); toast("已发到企业微信群", "ok"); } catch (e) { toast(e.message); }
+    renderDigest();
+  });
+  $$(".dg-f", el).forEach((row) => {
+    const qid = row.dataset.q;
+    $$("[data-fs]", row).forEach((b) => b.addEventListener("click", async () => {
+      try { await api("/api/inbox/follow", { inquiry_id: qid, status: b.dataset.fs }); toast(`已标为“${b.dataset.fs}”`, "ok"); renderDigest(); } catch (e) { toast(e.message); }
+    }));
+    $("[data-draft]", row).addEventListener("click", async (ev) => {
+      const btn = ev.currentTarget, out = $(".dg-out", row);
+      busy(btn, true, "生成并校验…");
+      try {
+        const r = await api("/api/followup", { inquiry_id: qid });
+        out.innerHTML = `<div class="dg-draft"><div class="doc">${highlight(r.reply, r.findings, "reply")}</div>
+          ${r.notes_zh ? `<div class="small muted">写法：${esc(r.notes_zh)}</div>` : ""}<div class="row"><button class="btn sm" data-copy>${ic("copy", "sm")}复制</button><span class="small muted">TradeDesk 不会替你发送</span></div>
+          <div class="card" style="margin-top:8px">${riskPanel(r)}</div></div>`;
+        $("[data-copy]", out).addEventListener("click", () => navigator.clipboard.writeText(r.reply).then(() => toast("已复制", "ok"), () => toast("复制失败，请手动选中")));
+      } catch (e) { out.innerHTML = `<div class="callout warn">${ic("triangle-alert")}<div>${esc(e.message)}</div></div>`; }
+      busy(btn, false);
+    });
+  });
 }
 
 async function renderInbox() {
@@ -1146,7 +1212,10 @@ async function renderUsage() {
     tile("每条用时", s.minutes_median == null ? "—" : `${s.minutes_median} <small>分钟</small>`, s.minutes_n ? `中位数，${s.minutes_n} 条；从出结果到记录` : "还没有填用时"),
     tile("改了几轮", s.rounds_median ?? "—", "中位数"),
   ].join("");
-  const rules = s.rules.length ? `<table class="tbl"><thead><tr><th>规则 / 出处</th><th>名称</th><th>有用</th><th>误报</th><th>有用率</th></tr></thead><tbody>${s.rules.map((r) => `<tr><td class="mono small">${esc(r.key)}</td><td>${esc(r.label)}</td><td>${r.useful}</td><td>${r.false_alarm ? `<span class="badge amber">${r.false_alarm}</span>` : 0}</td><td>${pct(r.useful_rate)}</td></tr>`).join("")}</tbody></table>`
+  KB = KB || (await api("/api/kb").catch(() => null));
+  const isRule = (k) => KB?.rules.some((r) => r.id === k && r.verified && r.check && r.check.kind !== "reference");
+  const rules = s.rules.length ? `<table class="tbl"><thead><tr><th>规则 / 出处</th><th>名称</th><th>有用</th><th>误报</th><th>有用率</th><th></th></tr></thead><tbody>${s.rules.map((r) => `<tr><td class="mono small">${esc(r.key)}${KB?.paused?.[r.key] ? ' <span class="badge red">已暂停</span>' : ""}</td><td>${esc(r.label)}</td><td>${r.useful}</td><td>${r.false_alarm ? `<span class="badge amber">${r.false_alarm}</span>` : 0}</td><td>${pct(r.useful_rate)}</td>
+      <td>${isRule(r.key) ? `<button class="btn sm ghost" data-rule="${esc(r.key)}">去规则库${KB.paused?.[r.key] ? "恢复" : "暂停"}</button>` : `<span class="small muted" title="资料卡上的事实不是规则，不能暂停">资料卡</span>`}</td></tr>`).join("")}</tbody></table>`
     : `<div class="empty small">还没有判过提示</div>`;
   const top = Math.max(1, ...s.missing.map((m) => m.n));
   const missing = s.missing.length ? s.missing.map((m) => `<div class="us-bar"><span>${esc(m.item)}</span><i style="width:${(m.n / top) * 100}%"></i><b>${m.n}</b></div>`).join("")
@@ -1159,6 +1228,7 @@ async function renderUsage() {
       <div class="card"><div class="card-h"><div><h3>${ic("package")}资料卡最常缺的信息</h3><p>业务员回复时缺、要去问别人的信息；补进资料卡，下次就不用问</p></div></div><div class="card-b">${missing}</div></div></div>
     <div class="card" style="margin-top:16px"><div class="card-h"><div><h3>${ic("history")}全部记录</h3><p>最新的在上面；草稿和实际发出的全文在导出的 CSV 里</p></div><a class="btn sm" href="/api/feedback/export.csv">${ic("file-text", "sm")}导出 CSV</a></div>
       <div class="board-wrap"><table class="tbl"><thead><tr><th>时间</th><th>询盘</th><th>处理</th><th>改动</th><th>用时</th><th>误报</th><th>资料卡缺</th><th>备注</th><th></th></tr></thead><tbody>${recs}</tbody></table></div></div>`;
+  $$("[data-rule]", el).forEach((b) => b.addEventListener("click", () => openRule(b.dataset.rule)));
   // two clicks to delete, no browser dialog
   $$("[data-del]", el).forEach((b) => b.addEventListener("click", async () => {
     if (!b.classList.contains("arm")) { b.classList.add("arm"); b.textContent = "确认删除"; return; }
@@ -1251,7 +1321,7 @@ async function renderSavings() {
 let swStart = null, swTimer = null;
 function timingCard() {
   const T = SV.timings || { tasks: {}, records: [] }, t = T.tasks || {};
-  const col = (k) => { const x = t[k] || {}; return `<div class="sv-t"><span>${esc(x.label || "")}</span><b>${x.median != null ? `${x.median} 分钟` : "还没测"}</b><small>${x.n ? `中位数 · n=${x.n}` : "点“开始计时”现场测一次"}</small></div>`; };
+  const col = (k) => { const x = t[k] || {}; return `<div class="sv-t"><span>${esc(x.label || "")}</span><b>${x.median != null ? `${x.median} 分钟` : "还没测"}</b><small>${x.n ? `中位数 · n=${x.n}${x.n_feedback ? `（其中 ${x.n_feedback} 条来自“业务员确认”）` : ""}` : "点“开始计时”现场测一次"}</small></div>`; };
   const both = t.manual?.n && t.tradedesk?.n;
   $("#sv-time").innerHTML = `<div class="card-h"><div><h3>${ic("history")}现场实测：人工 vs 用 TradeDesk</h3><p>请人当场计时：手写一条回复，再用 TradeDesk 生成 + 复核一条。只记真实测到的数，样本少就照实写 n</p></div><span class="badge brand">实测</span></div>
     <div class="card-b"><div class="sv-tcols">${col("manual")}${col("tradedesk")}</div>
@@ -1352,7 +1422,9 @@ async function renderKB() {
   const CAT = catNames();
   const verified = KB.rules.filter((r) => r.verified).length;
   const refs = KB.rules.filter((r) => r.check?.kind === "reference").length;
-  $("#kb-note").innerHTML = `<span class="kb-updated">${ic("history", "sm")}规则库更新于 ${esc(KB.version)}</span>${verified}/${KB.rules.length} 条已对照原文逐字核实 · ${KB.rules.length - refs} 条参与自动检查${refs ? ` · ${refs} 条参考（原文已核对，暂未接入检查）` : ""} · 未核实的规则不参与检查`;
+  const nPaused = Object.keys(KB.paused || {}).length;
+  $("#kb-note").innerHTML = `<span class="kb-updated">${ic("history", "sm")}规则库更新于 ${esc(KB.version)}</span>${verified}/${KB.rules.length} 条已对照原文逐字核实 · ${KB.rules.length - refs} 条参与自动检查${refs ? ` · ${refs} 条参考（原文已核对，暂未接入检查）` : ""} · 未核实的规则不参与检查${nPaused ? ` · <b class="hf-bad">已暂停 ${nPaused} 条</b>` : ""}`
+    + ((KB.pause_log || []).length ? `<details class="kb-plog"><summary>暂停 / 恢复记录（${KB.pause_log.length}）</summary>${KB.pause_log.map((l) => `<div><span class="mono">${esc(l.ts)}</span> ${esc(l.action)} <b class="mono">${esc(l.rule_id)}</b>：${esc(l.reason)}</div>`).join("")}</details>` : "");
   const SC = KB.source_check, scBy = Object.fromEntries((SC?.results || []).map((x) => [x.id, x]));
   $("#kb-src").innerHTML = SC ? `${ic("globe", "sm")}<span><b>出处自检 ${esc(SC.checked_at)}</b>：程序重新抓取 ${SC.total} 条规则的官方页面 ·
       <span class="hf-ok">${SC.summary.found} 条原文仍在</span> · ${SC.summary.browser} 条${esc(SC.status_zh.browser)}（${esc(SC.detail_zh.browser)}） ·
@@ -1370,13 +1442,36 @@ async function renderKB() {
       <td><span class="badge">${esc(CAT[r.category] || r.category)}</span></td>
       <td>${r.check?.kind === "reference" ? `<span class="badge amber" title="${esc(r.check.note_zh || "")}">${ic("book-open-check", "sm")}参考</span>` : r.check && r.check.kind === "llm" ? `<span class="badge">${ic("sparkles", "sm")}模型判断</span>` : `<span class="badge">${ic("cpu", "sm")}代码</span>`}</td>
       <td class="small"><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(host(r.url))}</a><div class="muted">${esc(r.source_type)}${r.fetched ? ` · 抓取 ${esc(r.fetched)}` : ""}</div></td>
-      <td>${r.verified ? `<span class="badge green">${ic("circle-check-big", "sm")}已核实</span>` : `<span class="badge amber">未核实</span>`}${scBy[r.id] ? `<div class="small ${scBy[r.id].status === "found" ? "hf-ok" : scBy[r.id].status === "missing" ? "hf-bad" : "muted"}" style="margin-top:4px">${esc(SC.status_zh[scBy[r.id].status])}</div>` : ""}</td></tr>
+      <td>${KB.paused?.[r.id] ? `<span class="badge red">${ic("ban", "sm")}已暂停</span> ` : ""}${r.verified ? `<span class="badge green">${ic("circle-check-big", "sm")}已核实</span>` : `<span class="badge amber">未核实</span>`}${scBy[r.id] ? `<div class="small ${scBy[r.id].status === "found" ? "hf-ok" : scBy[r.id].status === "missing" ? "hf-bad" : "muted"}" style="margin-top:4px">${esc(SC.status_zh[scBy[r.id].status])}</div>` : ""}</td></tr>
     <tr class="detail" data-for="${esc(r.id)}" hidden><td></td><td colspan="5"><div class="src" style="border:0;margin:0;padding:0"><blockquote>“${esc(r.excerpt)}”</blockquote>
-      <div>${r.check ? `<code>${esc(JSON.stringify(r.check))}</code>` : ""}</div></div></td></tr>`).join("") || `<tr><td colspan="6"><div class="empty">没有匹配的规则</div></td></tr>`;
+      <div>${r.check ? `<code>${esc(JSON.stringify(r.check))}</code>` : ""}</div></div>${pauseHtml(r)}</td></tr>`).join("") || `<tr><td colspan="6"><div class="empty">没有匹配的规则</div></td></tr>`;
+  $$("#kb-body [data-pause]").forEach((b) => b.addEventListener("click", async () => {
+    const box = b.closest(".kb-pause"), reason = $("input", box).value.trim();
+    if (reason.length < 2) { $("input", box).focus(); return toast("写一句原因再提交"); }
+    try {
+      const v = await api("/api/rules/pause", { rule_id: b.dataset.pause, paused: b.dataset.to === "1", reason });
+      KB = { ...KB, ...v }; kbOpen = b.dataset.pause; renderKB();
+      toast(`${b.dataset.pause} 已${b.dataset.to === "1" ? "暂停" : "恢复"}`, "ok");
+    } catch (e) { toast(e.message); }
+  }));
+  if (kbOpen) { const d = $(`#kb-body tr[data-for="${kbOpen}"]`); if (d) { d.hidden = false; d.previousElementSibling.scrollIntoView({ block: "center" }); } kbOpen = null; }
   $$("#kb-body tr[data-id]").forEach((tr) => tr.addEventListener("click", (e) => {
     if (e.target.closest("a")) return;
     const d = $(`#kb-body tr[data-for="${tr.dataset.id}"]`); d.hidden = !d.hidden;
   }));
+}
+
+// A rule that keeps raising false alarms can be paused: it stays in every prompt (recorded answers still
+// replay), its hits are listed apart and never count towards the risk. Card facts are not rules.
+let kbOpen = null;
+function pauseHtml(r) {
+  if (!r.verified || !r.check || r.check.kind === "reference") return "";
+  const p = KB.paused?.[r.id];
+  return p ? `<div class="kb-pause on">${ic("ban", "sm")}<span>${esc(p.ts)} 暂停：${esc(p.reason)}。命中会单独列出，不计入风险。</span><input type="text" maxlength="200" placeholder="恢复原因"><button class="btn sm" data-pause="${esc(r.id)}" data-to="0">恢复</button></div>`
+    : `<div class="kb-pause"><span>业务员常判误报，可以先暂停：照样写进提示词，命中单独列出、不计入风险。</span><input type="text" maxlength="200" placeholder="原因，例如：连续 5 次判为误报"><button class="btn sm" data-pause="${esc(r.id)}" data-to="1">暂停这条规则</button></div>`;
+}
+function openRule(id) {
+  go("kb"); kbCat = "all"; $("#kb-q").value = id; kbOpen = id; renderKB();
 }
 
 // ------------------------------------------------------------------ logs
@@ -1606,6 +1701,41 @@ function openImport() {
   });
   $("#imp-clear").addEventListener("click", async () => {
     try { await api("/api/inbox/import/clear", {}); await reloadMeta(); renderInbox(); toast("已清除导入的询盘", "ok"); } catch (e) { toast(e.message); }
+  });
+}
+
+// Product cards from the merchant's own spreadsheet: preview every row first, save only the valid ones.
+const toB64 = (buf) => { let s = ""; const a = new Uint8Array(buf); for (let i = 0; i < a.length; i += 0x8000) s += String.fromCharCode(...a.subarray(i, i + 0x8000)); return btoa(s); };
+function openProductImport() {
+  let file = null;
+  openSheet(`<div class="thumb" style="width:40px;height:40px">${ic("package")}</div><div><h3>导入资料卡（Excel / CSV）</h3><p>一行一个商品，先预览，确认后才保存</p></div>`,
+    `<div class="stack imp">
+      <p>用模板里的列：中文名、英文名、MOQ、FOB 价格阶梯（<code>500-1999: 9.8; 2000-4999: 9.2</code>）必填；已有认证、没有的认证、规格、包装、卖点可选，一格里多项用分号隔开。
+        “BPA 无检测报告”这类列<b>填了就表示没有成品检测报告</b>，文案里写 BPA-free 会被标出。</p>
+      <div class="row"><a class="btn sm" href="samples/products-template.xlsx" download>${ic("file-text", "sm")}下载 Excel 模板</a><a class="btn sm ghost" href="samples/products-template.csv" download>下载 CSV 模板</a></div>
+      <label><span class="fieldlab">选择文件（.xlsx 或 .csv，Excel 默认的 GBK 编码 CSV 也可以）</span><input type="file" id="pi-file" accept=".xlsx,.csv,.txt"></label>
+      <div class="callout">${ic("info")}<div>导入的商品没有录好的结果：生成文案、回复询盘要在实时模式下进行。示例商品不会被改动。</div></div>
+      <div id="pi-out"></div></div>`,
+    `<div style="flex:1"></div><button class="btn primary" id="pi-run" disabled>${ic("database", "sm")}导入</button>`);
+  $("#pi-file").addEventListener("change", async () => {
+    const f = $("#pi-file").files[0];
+    if (!f) return;
+    file = toB64(await f.arrayBuffer());
+    try {
+      const r = await api("/api/products/import/preview", { file_b64: file });
+      $("#pi-out").innerHTML = `<table class="tbl pi-tbl"><thead><tr><th>行</th><th>商品</th><th>结果</th></tr></thead><tbody>${r.rows.map((x) => `<tr><td class="mono small">${x.line}</td><td>${esc(x.name)}</td>
+        <td>${x.product ? `<span class="badge green">可以导入</span> <span class="small muted">MOQ ${x.product.moq_units} · ${esc(Object.entries(x.product.fob_ningbo_usd).map(([k, v]) => `${k}: ${v}`).join(" / "))}</span>` : `<span class="badge red">跳过</span> <span class="small">${esc(x.error)}</span>`}</td></tr>`).join("") || '<tr><td colspan="3"><div class="empty small">表格里只有示例行</div></td></tr>'}</tbody></table>`;
+      $("#pi-run").disabled = !r.ok;
+      $("#pi-run").innerHTML = `${ic("database", "sm")}导入 ${r.ok} 个${r.errors ? `（跳过 ${r.errors} 行）` : ""}`;
+    } catch (e) { $("#pi-out").innerHTML = `<div class="callout warn">${ic("triangle-alert")}<div>${esc(e.message)}</div></div>`; $("#pi-run").disabled = true; }
+  });
+  $("#pi-run").addEventListener("click", async () => {
+    busy($("#pi-run"), true, "导入中…");
+    try {
+      const r = await api("/api/products/import", { file_b64: file });
+      await reloadMeta(); closeSheet(); renderBoard();
+      toast(`已导入 ${r.added.length} 个商品${r.skipped.length ? `，跳过 ${r.skipped.length} 行` : ""}`, "ok");
+    } catch (e) { toast(e.message); busy($("#pi-run"), false); }
   });
 }
 
@@ -1958,6 +2088,7 @@ async function boot() {
   $("#log-refresh").addEventListener("click", renderLogs);
   $("#board-batch").addEventListener("click", runBatch);
   $("#board-add").addEventListener("click", () => openProductForm());
+  $("#board-import").addEventListener("click", openProductImport);
   $("#ov-roles").addEventListener("click", showRolePicker);
   // One-click samples on the check page (the texts the demo cache was recorded with).
   const SAMPLE_NAMES = { "KET-17S": "水壶标题：埋了 6 个问题", "TMB-50V": "保温杯标题（另一家工厂）" };

@@ -140,19 +140,29 @@ class TimingLog:
         del items[index]
         self._write(items)
 
-    def summary(self):
+    def summary(self, extra=None):
+        """extra: {task: [minutes]} measured elsewhere, i.e. the time a salesperson recorded under a reply."""
         items = self.load()
         out = {}
         for task, label in TIMING_TASKS.items():
-            values = [e["minutes"] for e in items if e["task"] == task]
-            out[task] = {"label": label, "n": len(values), "median": round(median(values), 1) if values else None}
+            more = list((extra or {}).get(task) or [])
+            values = [e["minutes"] for e in items if e["task"] == task] + more
+            out[task] = {"label": label, "n": len(values), "n_feedback": len(more),
+                         "median": round(median(values), 1) if values else None}
         return {"tasks": out, "records": items}
 
 
-def view(values=None, timings=None):
+def view(values=None, timings=None, feedback=None):
     m = measured()
     a = validate(values)
     return {"measured": m,
             "assumptions": [{"key": k, "label": s[0], "unit": s[1], "value": a[k], "example": s[2]} for k, s in ASSUMPTIONS.items()],
             "estimate": estimate(a, m), "replaces": REPLACES, "not_replaced": NOT_REPLACED, "unmeasured": UNMEASURED,
-            "timings": timings.summary() if timings else {"tasks": {}, "records": []}}
+            "timings": timings.summary({"tradedesk": feedback_minutes(feedback)}) if timings else {"tasks": {}, "records": []}}
+
+
+def feedback_minutes(feedback):
+    """Minutes salespeople recorded under replies they sent (as is or edited); "not used" is no reply."""
+    if not feedback:
+        return []
+    return [e["minutes"] for e in feedback.load() if e.get("minutes") is not None and e["outcome"] != "unused"]

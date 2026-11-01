@@ -1724,5 +1724,238 @@ class StopConditionTests(unittest.TestCase):
                          set(o["calls_per_round_zh"]))
 
 
+
+class RulePauseTests(unittest.TestCase):
+    """A paused rule stays in the prompts; only its hits are set aside and never count towards the risk."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.kb = make_kb(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_pause_needs_a_checkable_rule_and_a_reason_and_is_logged(self):
+        from tradedesk.pauses import RulePauses
+        store = RulePauses(Path(self.tmp.name) / "p.json")
+        for rid, reason in [("AMZ-03", "unverified"), ("NOPE-1", "x x"), ("AMZ-02", ""), ("fact_cert", "card fact")]:
+            with self.assertRaises(ValueError):
+                store.set(self.kb, rid, True, reason)
+        store.set(self.kb, "AMZ-02", True, "连续判为误报")
+        with self.assertRaises(ValueError):
+            store.set(self.kb, "AMZ-02", True, "again")                  # already paused
+        data = store.set(self.kb, "AMZ-02", False, "规则改好了")
+        self.assertEqual(data["paused"], {})
+        self.assertEqual([l["action"] for l in data["log"]], ["暂停", "恢复"])
+
+    def test_paused_hits_leave_the_risk_but_the_prompt_is_unchanged(self):
+        amazon = {"title": "Best Seller Kettle", "bullets": ["A"], "description": "d", "search_terms": "s"}
+        tiktok = {"hook": "h", "script": [], "caption": "c", "hashtags": []}
+        transport = FakeTransport({"Amazon US": amazon, "TikTok Shop": tiktok, "合规审核员": {"findings": []}})
+        runner = Runner(LLM(api_key="k", mode="live", cache_dir=self.tmp.name, transport=transport, provider="openai"),
+                        self.kb, log_path=Path(self.tmp.name) / "c.jsonl", board=Board(Path(self.tmp.name) / "s"))
+        before = runner.listing({"product_id": "KET-17S", "platforms": ["amazon_us"]})["platforms"]["amazon_us"]
+        self.assertIn("AMZ-02", [f["source"].get("rule_id") for f in before["findings"]])
+        prompts_before = [c["messages"] for c in transport.calls]
+        self.kb.paused = {"AMZ-02"}
+        transport.calls.clear()
+        after = runner.listing({"product_id": "KET-17S", "platforms": ["amazon_us"]})["platforms"]["amazon_us"]
+        self.assertNotIn("AMZ-02", [f["source"].get("rule_id") for f in after["findings"]])
+        self.assertEqual([f["source"]["rule_id"] for f in after["paused_hits"]], ["AMZ-02"])
+        self.assertEqual([c["messages"] for c in transport.calls], prompts_before)   # recorded answers still replay
+
+
+class SavingsFeedbackTests(unittest.TestCase):
+    def test_review_minutes_recorded_under_replies_join_the_tradedesk_timing(self):
+        from tradedesk import savings
+        from tradedesk.feedback import FeedbackLog
+        with tempfile.TemporaryDirectory() as t:
+            log, fb = savings.TimingLog(Path(t) / "t.json"), FeedbackLog(Path(t) / "f.json")
+            log.add({"task": "tradedesk", "minutes": 4})
+            fb.add({"outcome": "as_is", "draft": "Hello there buyer", "minutes": 6})
+            fb.add({"outcome": "unused", "draft": "Hello there buyer", "minutes": 30})   # not a reply anyone sent
+            fb.add({"outcome": "as_is", "draft": "Hello there buyer"})                   # no minutes
+            t_ = savings.view(None, log, fb)["timings"]["tasks"]["tradedesk"]
+            self.assertEqual((t_["n"], t_["n_feedback"], t_["median"]), (2, 1, 5.0))
+            self.assertEqual(savings.view(None, log, fb)["assumptions"][3]["value"], 5)  # assumptions untouched
+
+
+class ProductImportTests(unittest.TestCase):
+    HEADER = "中文名,英文名,MOQ,FOB 价格阶梯,已有认证,没有的认证,规格,BPA 无检测报告"
+
+    def setUp(self):
+        self.kb = KnowledgeBase()
+
+    def b64(self, data):
+        import base64
+        return base64.b64encode(data if isinstance(data, bytes) else data.encode("utf-8")).decode()
+
+    def test_csv_rows_become_the_same_cards_the_form_makes(self):
+        from tradedesk.product_import import parse
+        text = (self.HEADER + "\n"
+                "示例：模板里的示例行,Example,1,1-2: 1,,,,\n"
+                "保温杯 500ml,500ml Vacuum Mug,300,300-999: 4.2; 1000-4999: 3.9,LFGB,FDA,容量: 500ml; 材质: 304,只有原料声明\n"
+                "坏行,Bad Row,abc,1-2: 1,,,,\n"
+                "同名,Same,10,10-20: 1,UL,UL,,\n")
+        rows = parse(self.b64(text), self.kb)
+        self.assertEqual([r["line"] for r in rows], [3, 4, 5])                          # example row skipped
+        ok = rows[0]["product"]
+        self.assertEqual((ok["moq_units"], ok["fob_ningbo_usd"], ok["specs"]["容量"]), (300, {"300-999": 4.2, "1000-4999": 3.9}, "500ml"))
+        self.assertEqual((ok["certifications_held"], ok["certifications_not_held"]), (["LFGB"], ["FDA"]))
+        self.assertEqual(ok["material_tests"], {"BPA": "只有原料声明"})                 # filled in = cannot claim BPA-free
+        self.assertIn("MOQ", rows[1]["error"])
+        self.assertIn("既“已有”又“没有”", rows[2]["error"])
+
+    def test_gbk_csv_from_windows_excel_and_semicolons(self):
+        from tradedesk.product_import import parse
+        text = self.HEADER.replace(",", ";") + "\n电热水壶 2L;2L Kettle;500;500-999: 9.5;CB;UL;容量: 2L;\n"
+        rows = parse(self.b64(text.encode("gb18030")), self.kb)
+        self.assertEqual(rows[0]["product"]["name_zh"], "电热水壶 2L")
+
+    def test_xlsx_template_round_trips_and_files_are_current(self):
+        import zipfile, io
+        from tradedesk import product_import as pi
+        samples = ROOT / "static" / "samples"
+        self.assertEqual((samples / "products-template.csv").read_bytes().decode("utf-8"), pi.template_csv(),
+                         "run python3 tools/make_product_template.py")
+        self.assertEqual((samples / "products-template.xlsx").read_bytes(), pi.template_xlsx())
+        self.assertEqual(pi.xlsx_rows(pi.template_xlsx())[0], pi.TEMPLATE_HEADER)
+        self.assertEqual(pi.parse(self.b64(pi.template_xlsx()), self.kb), [])                 # only the example row
+        # a filled-in sheet: replace the example row with a real one, numbers stored as numbers
+        z = zipfile.ZipFile(io.BytesIO(pi.template_xlsx()))
+        parts = {n: z.read(n) for n in z.namelist()}
+        sheet = parts["xl/worksheets/sheet1.xml"].decode()
+        sheet = sheet.replace("示例：1.7L 不锈钢电热水壶", "养生壶 1.5L").replace(
+            '<c r="C2" t="inlineStr"><is><t>500</t></is></c>', '<c r="C2"><v>800.0</v></c>')
+        parts["xl/worksheets/sheet1.xml"] = sheet.encode()
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as out:
+            for n, d in parts.items():
+                out.writestr(n, d)
+        rows = pi.parse(self.b64(buf.getvalue()), self.kb)
+        self.assertEqual((rows[0]["product"]["name_zh"], rows[0]["product"]["moq_units"]), ("养生壶 1.5L", 800))
+
+    def test_unusable_files_are_refused_with_a_reason(self):
+        from tradedesk.product_import import parse
+        for data in [b"", "中文名,英文名\nA,B\n".encode(), b"PK\x03\x04broken"]:
+            with self.assertRaises(ValueError):
+                parse(self.b64(data), self.kb)
+        existing = next(iter(self.kb.products.values()))
+        rows = parse(self.b64(f"{self.HEADER}\n{existing['name_zh']},{existing['name_en']},1,1-9: 1,,,,\n"), self.kb)
+        self.assertIn("同名", rows[0]["error"])
+        # only the exact material header counts: "BPA 检测" could hold "有报告" and be read backwards
+        rows = parse(self.b64(self.HEADER.replace("BPA 无检测报告", "BPA 检测") + "\n杯子,Cup,1,1-9: 1,,,,有第三方报告\n"), self.kb)
+        self.assertEqual(rows[0]["product"]["material_tests"], {})
+
+
+class DigestTests(unittest.TestCase):
+    """The daily digest: built from local records only, pushed once a day, never carrying inquiry text."""
+
+    def kb(self):
+        kb = KnowledgeBase()
+        kb.inquiries = [{"id": "Q1", "label_zh": "美国买家 · 要空运", "text": "SECRET INQUIRY TEXT 9.80", "product_id": "KET-17S"},
+                        {"id": "Q2", "label_zh": "墨西哥分销商", "text": "otro texto", "product_id": "KET-17S"},
+                        {"id": "Q3", "label_zh": "日本买家", "text": "テキスト", "product_id": "KET-17S"}]
+        return kb
+
+    def test_sections_follow_ups_and_no_inquiry_text(self):
+        from datetime import datetime
+        from tradedesk import digest
+        now = datetime(2026, 11, 6, 11, 0)
+        inbox = {"Q1": {"priority": {"score": 72, "level": "高"},
+                        "understanding": {"conflicts": [{"topic_zh": "UL 认证", "severity": "red"}]}},
+                 "Q2": {"reply": {"run_id": "r2", "round": 2, "risk": "red"}},
+                 "Q3": {"reply": {"run_id": "r3", "round": 1, "risk": "amber"}}}
+        sent = [{"inquiry_id": "Q3", "run_id": "r3", "outcome": "edited", "ts": "2026-11-02 10:00", "sent": "x"}]
+        tasks = [{"role_zh": "采购", "task_zh": "问 UL 费用", "status": "待处理", "created": "2026-11-01 09:00"},
+                 {"role_zh": "生产", "task_zh": "排产", "status": "待处理", "created": "2026-11-05 18:00"},
+                 {"role_zh": "美工", "task_zh": "logo", "status": "已完成", "created": "2026-10-01 09:00"}]
+        d = digest.build(self.kb(), inbox, tasks, sent, {}, now, 3)
+        sec = d["sections"]
+        self.assertEqual([x["label_zh"] for x in sec["new"]], ["美国买家 · 要空运"])
+        self.assertEqual(sec["new"][0]["conflicts"], ["UL 认证"])
+        self.assertEqual([x["label_zh"] for x in sec["pending"]], ["墨西哥分销商"])     # Q3 was confirmed (sent)
+        self.assertEqual([t["task_zh"] for t in sec["stale_tasks"]], ["问 UL 费用"])
+        self.assertEqual([(f["inquiry_id"], f["days"]) for f in sec["follow"]], [("Q3", 4)])
+        self.assertNotIn("SECRET", d["markdown"])
+        self.assertNotIn("9.80", d["markdown"])
+        self.assertIn("回复已发出 4 天", d["markdown"])
+        # marking the buyer as replied removes the reminder; a newer send re-opens it
+        follow = {"Q3": {"status": "买家已回复", "updated": "2026-11-03 08:00"}}
+        self.assertEqual(digest.build(self.kb(), inbox, tasks, sent, follow, now, 3)["sections"]["follow"], [])
+        newer = sent + [{"inquiry_id": "Q3", "run_id": "r4", "outcome": "as_is", "ts": "2026-11-03 09:00", "sent": "y"}]
+        self.assertEqual([f["days"] for f in digest.build(self.kb(), inbox, tasks, newer, follow, now, 3)["sections"]["follow"]], [3])
+        self.assertEqual(digest.build(self.kb(), inbox, tasks, sent, {}, now, 5)["sections"]["follow"], [])  # not yet 5 days
+
+    def test_markdown_stays_under_the_wecom_limit(self):
+        from datetime import datetime
+        from tradedesk import digest
+        kb = self.kb()
+        kb.inquiries = [{"id": f"Q{i}", "label_zh": "很长的询盘标题" * 60, "text": "t", "product_id": "KET-17S"} for i in range(40)]
+        d = digest.build(kb, {}, [], [], {}, datetime(2026, 11, 6, 9, 0), 3)
+        self.assertGreater(5 * len(("很长的询盘标题" * 60).encode()), digest.MAX_BYTES)   # five lines alone would not fit
+        self.assertLessEqual(d["bytes"], digest.MAX_BYTES)
+        self.assertIn("其余在 TradeDesk 里看", d["markdown"])
+        self.assertEqual(len(d["markdown"].encode("utf-8")), d["bytes"])
+
+    def test_send_settings_and_once_a_day(self):
+        from datetime import datetime
+        from tradedesk import digest
+        hook = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa"
+        sent = []
+        ok = lambda url, body: sent.append((url, json.loads(body))) or {"errcode": 0, "errmsg": "ok"}
+        digest.send(hook, "**hi**", transport=ok)
+        self.assertEqual(sent[0][1], {"msgtype": "markdown", "markdown": {"content": "**hi**"}})
+        with self.assertRaises(digest.DigestError):
+            digest.send(hook, "x", transport=lambda url, body: {"errcode": 93000, "errmsg": "invalid webhook url"})
+        with self.assertRaises(digest.DigestError):
+            digest.send("https://evil.example/hook?key=12345678", "x", transport=ok)
+        with tempfile.TemporaryDirectory() as t:
+            store = digest.DigestStore(t)
+            for bad in [{"webhook": "https://evil.example/cgi-bin/webhook/send?key=12345678"}, {"time": "8:30"},
+                        {"time": "24:00"}, {"follow_days": 0}, {"enabled": True}]:
+                with self.assertRaises(ValueError):
+                    store.save(bad)
+            pub = store.save({"webhook": hook, "enabled": True, "time": "08:30"})
+            self.assertNotIn("0ec2sifa5aaa", json.dumps(pub))                          # key never goes back whole
+            self.assertEqual(pub["webhook_hint"], "key=693a…5aaa")
+            s = store.settings()
+            self.assertFalse(digest.due(s, datetime(2026, 11, 6, 8, 29)))
+            self.assertTrue(digest.due(s, datetime(2026, 11, 6, 8, 30)))
+            store.record("2026-11-06", False, "企业微信拒绝了")                         # a failure also counts as today's try
+            self.assertFalse(digest.due(store.settings(), datetime(2026, 11, 6, 18, 0)))
+            self.assertTrue(digest.due(store.settings(), datetime(2026, 11, 7, 8, 31)))
+            self.assertFalse(store.save({"clear_webhook": True})["enabled"])
+
+    def test_follow_up_draft_costs_the_documented_calls_and_gets_the_same_checks(self):
+        from tradedesk.workflows import MODEL_CALLS
+        with tempfile.TemporaryDirectory() as t:
+            kb = make_kb(t)
+            q = kb.inquiries[0]
+            understanding = {"buyer": {"language": "en"}, "requests": [], "signals": [], "conflicts": [], "summary_zh": "x"}
+            transport = FakeTransport({"询盘分析员": understanding,
+                                       "跟进邮件": {"reply": "Hi Mark, just checking in. Our kettle is UL listed.", "notes_zh": "n"},
+                                       "合规审核员": {"findings": []}})
+            runner = Runner(LLM(api_key="k", mode="live", cache_dir=t, transport=transport, provider="openai"),
+                            kb, log_path=Path(t) / "c.jsonl", board=Board(Path(t) / "s"))
+            with self.assertRaises(ValueError):
+                runner.follow_up({"inquiry_id": q["id"], "sent": ""})
+            r = runner.follow_up({"inquiry_id": q["id"], "sent": "Dear Mark, price USD 9.80.", "days": 4})
+            self.assertEqual(len(transport.calls), MODEL_CALLS["follow_up"])
+            self.assertIn("fact_cert", [f["check"] for f in r["findings"]])               # a made-up UL claim is still caught
+            self.assertEqual(r["risk"], "red")
+            self.assertIn("4 天前", transport.calls[1]["messages"][1]["content"])
+            transport.calls.clear()
+            runner.follow_up({"inquiry_id": q["id"], "sent": "x", "understanding": understanding})
+            self.assertEqual(len(transport.calls), MODEL_CALLS["follow_up"] - 1)        # inbox already understood it
+
+    def test_server_wires_the_new_endpoints(self):
+        src = (ROOT / "server.py").read_text(encoding="utf-8")
+        for route in ['"/api/digest": APP.digest_view', '"/api/digest/send": APP.digest_send', '"/api/followup": APP.follow_up',
+                      '"/api/rules/pause": APP.rule_pause', '"/api/products/import": APP.products_import',
+                      "threading.Thread(target=digest_loop"]:
+            self.assertIn(route, src)
+
+
 if __name__ == "__main__":
     unittest.main()

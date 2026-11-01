@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TradeDesk 出海工作台</title>
-<link rel="stylesheet" href="style.css?v=45">
+<link rel="stylesheet" href="style.css?v=46">
 <link rel="stylesheet" href="welcome.css?v=6">
 <script>/* dark (the poster palette) unless this browser chose light */ try{document.documentElement.dataset.theme=localStorage.getItem("td-theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 </head>
@@ -107,6 +107,7 @@
         <div class="page-head">
           <div><h1>商品看板</h1><p>所有产品在每个渠道的最新状态：主图、Amazon 美国站、TikTok 墨西哥。运营每天从这里开始。</p></div>
           <div class="row">
+            <button class="btn" id="board-import" title="从 Excel 或 CSV 一次导入多张资料卡"><svg class="ic"><use href="#i-database"/></svg>导入资料卡</button>
             <button class="btn" id="board-add" title="填一张新的商品资料卡"><svg class="ic"><use href="#i-package"/></svg>新增商品</button>
             <a class="btn" href="/api/board/export.csv"><svg class="ic"><use href="#i-file-text"/></svg>导出 CSV</a>
             <button class="btn primary" id="board-batch"><svg class="ic"><use href="#i-zap"/></svg><span id="board-batch-label">批量生成全部 Listing</span></button>
@@ -124,12 +125,13 @@
       <!-- ================= inbox ================= -->
       <section class="page" id="page-inbox">
         <div class="page-head"><div><h1>询盘收件箱</h1><p>先回最值得跟的买家。优先级由代码按公开的公式计算，每一分都能看到依据。</p></div>
-          <div class="row"><div class="seg" id="inbox-tabs"><button class="on" data-v="list">收件箱</button><button data-v="tasks">协同任务 <span id="task-count"></span></button></div>
+          <div class="row"><div class="seg" id="inbox-tabs"><button class="on" data-v="list">收件箱</button><button data-v="tasks">协同任务 <span id="task-count"></span></button><button data-v="digest">每日摘要</button></div>
           <button class="btn" id="inbox-import" title="从 CSV 文件导入询盘"><svg class="ic"><use href="#i-database"/></svg>导入 CSV</button>
           <button class="btn primary" id="inbox-triage"><svg class="ic"><use href="#i-sparkles"/></svg>整理收件箱</button></div></div>
         <div id="inbox-progress"></div>
         <div id="inbox-list"></div>
         <div id="inbox-tasks" hidden></div>
+        <div id="inbox-digest" hidden></div>
       </section>
 
       <!-- ================= inquiry ================= -->
@@ -245,7 +247,7 @@
 <div class="toasts" id="toasts"></div>
 <script src="vendor/qrcode.js"></script>
 <script src="flow-bg.js?v=2"></script>
-<script src="app.js?v=41"></script>
+<script src="app.js?v=42"></script>
 <script src="welcome.js?v=8"></script>
 </body>
 </html>

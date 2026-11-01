@@ -27,6 +27,9 @@ from tradedesk.config_export import build as build_config
 from tradedesk.importer import ImportStore, parse as parse_csv
 from tradedesk.catalog_edit import CustomProducts, KNOWN_NOT_HELD, MATERIALS, validate as validate_product
 from tradedesk.live_check import LiveChecks
+from tradedesk.pauses import RulePauses
+from tradedesk import digest, product_import
+from datetime import datetime
 from tradedesk.board import Board, CHANNELS
 from tradedesk.evaluate import evaluate, LABEL_ZH
 from tradedesk.inbox import TASK_STATUS
@@ -71,6 +74,9 @@ class App:
         self.live_checks = LiveChecks(STATE / "live_checks.json")
         self.timings = savings.TimingLog(STATE / "timings.json")
         self.feedback = feedback.FeedbackLog(STATE / "feedback.json")
+        self.pauses = RulePauses(STATE / "rule_pauses.json")
+        self.kb.paused = self.pauses.paused_ids()
+        self.digest = digest.DigestStore(STATE)
         for p in self.custom.load():
             self.kb.products[p["id"]] = p
         self.play_lock = threading.Lock()
@@ -109,7 +115,16 @@ class App:
                 "rules": [dict(KnowledgeBase.public(r), verified=r.get("verified"), check=r.get("check"),
                                platforms=r.get("platforms"), markets=r.get("markets"))
                           for r in self.kb.all_rules],
-                "check_map": self.kb.check_map, "source_check": sources.load()}
+                "check_map": self.kb.check_map, "source_check": sources.load(), **self._pause_view()}
+
+    def _pause_view(self, data=None):
+        data = data or self.pauses.load()
+        return {"paused": data["paused"], "pause_log": data["log"][-50:][::-1]}
+
+    def rule_pause(self, payload):
+        data = self.pauses.set(self.kb, payload.get("rule_id"), payload.get("paused") is True, payload.get("reason"))
+        self.kb.paused = set(data["paused"])
+        return self._pause_view(data)
 
     def source_check(self, payload=None):
         """Re-fetch every rule's source page (needs internet, no model call)."""
@@ -159,6 +174,69 @@ class App:
         if pid:  # the card changed, so checks made against the old card no longer hold
             self.board.forget(pid)
         return {"product": saved}
+
+    # ---------------------------------------------------------- daily digest + follow-ups
+    def _digest(self, now=None):
+        s = self.digest.settings()
+        return digest.build(self.kb, self.runner.inbox.inbox(), self.runner.inbox.tasks(), self.feedback.load(),
+                            self.digest.follow(), now or datetime.now(), s["follow_days"])
+
+    def digest_view(self):
+        return {"settings": self.digest.public(), "preview": self._digest(), "follow_status": digest.FOLLOW_STATUS}
+
+    def digest_settings(self, payload):
+        self.digest.save(payload or {})
+        return self.digest_view()
+
+    def digest_send(self, payload=None, now=None):
+        now = now or datetime.now()
+        d = self._digest(now)
+        try:
+            digest.send(self.digest.settings()["webhook"], d["markdown"])
+        except digest.DigestError as exc:
+            self.digest.record(f"{now:%Y-%m-%d}", False, exc)
+            raise ValueError(str(exc)) from None
+        self.digest.record(f"{now:%Y-%m-%d}", True, f"{d['bytes']} 字节")
+        return self.digest_view()
+
+    def digest_tick(self, now=None):
+        """Called by the scheduler thread; pushes at most once a day."""
+        now = now or datetime.now()
+        if digest.due(self.digest.settings(), now):
+            try:
+                self.digest_send(now=now)
+            except ValueError:
+                pass  # already recorded and shown on the page
+
+    def follow_status(self, payload):
+        self.digest.set_follow(payload.get("inquiry_id"), payload.get("status"))
+        return self.digest_view()
+
+    def follow_up(self, payload):
+        qid = payload.get("inquiry_id")
+        sent = [e for e in self.feedback.load() if e.get("inquiry_id") == qid and e["outcome"] in ("as_is", "edited")]
+        if not sent:
+            raise ValueError("这条询盘还没有记录过发出的回复：先在询盘回复结果下方的“业务员确认”里记一条")
+        last = max(sent, key=lambda e: e["ts"])
+        st = self.runner.inbox.inbox().get(qid, {})
+        return self.runner.follow_up({"inquiry_id": qid, "sent": last["sent"], "product_id": last.get("product_id"),
+                                      "days": (datetime.now() - digest._date(last["ts"])).days,
+                                      "understanding": st.get("understanding"), "instruction_zh": payload.get("instruction_zh")})
+
+    def products_import_preview(self, payload):
+        rows = product_import.parse(payload.get("file_b64"), self.kb)
+        return {"rows": rows, "ok": sum(1 for r in rows if "product" in r), "errors": sum(1 for r in rows if "error" in r)}
+
+    def products_import(self, payload):
+        """Saves only the rows that pass, exactly as the preview showed them."""
+        rows = product_import.parse(payload.get("file_b64"), self.kb)
+        added = []
+        for r in rows:
+            if "product" in r:
+                saved = self.custom.save(r["product"])
+                self.kb.products[saved["id"]] = saved
+                added.append({"id": saved["id"], "name_zh": saved["name_zh"]})
+        return {"added": added, "skipped": [{"line": r["line"], "name": r["name"], "error": r["error"]} for r in rows if "error" in r]}
 
     def product_delete(self, payload):
         pid = payload.get("id")
@@ -255,7 +333,7 @@ class App:
     # ---------------------------------------------------------- red team (citation guard, no model call)
     def savings_view(self, payload=None):
         """Measured model cost and latency from the repo's records, plus editable example assumptions."""
-        return savings.view((payload or {}).get("assumptions"), self.timings)
+        return savings.view((payload or {}).get("assumptions"), self.timings, self.feedback)
 
     def timing_add(self, payload):
         self.timings.add(payload)
@@ -467,7 +545,7 @@ class Handler(SimpleHTTPRequestHandler):
                   "/api/redteam": APP.redteam_preset, "/api/savings": APP.savings_view,
                   "/api/agents": APP.agents_view, "/api/selfcheck": APP.selfcheck_view,
                   "/api/plugin/meta": APP.plugin_meta, "/api/plugin/pairing": APP.plugin_pairing,
-                  "/api/feedback": APP.feedback_view}
+                  "/api/feedback": APP.feedback_view, "/api/digest": APP.digest_view}
         if url.path in routes:
             return self._json(200, routes[url.path]())
         if url.path == "/api/baseline":
@@ -520,7 +598,11 @@ class Handler(SimpleHTTPRequestHandler):
                   "/api/products/save": APP.product_save, "/api/products/delete": APP.product_delete,
                   "/api/selfcheck/live": APP.live_check, "/api/savings/timing": APP.timing_add,
                   "/api/savings/timing/delete": APP.timing_delete,
-                  "/api/feedback": APP.feedback_add, "/api/feedback/delete": APP.feedback_delete}
+                  "/api/feedback": APP.feedback_add, "/api/feedback/delete": APP.feedback_delete,
+                  "/api/rules/pause": APP.rule_pause,
+                  "/api/products/import/preview": APP.products_import_preview, "/api/products/import": APP.products_import,
+                  "/api/digest/settings": APP.digest_settings, "/api/digest/send": APP.digest_send,
+                  "/api/inbox/follow": APP.follow_status, "/api/followup": APP.follow_up}
         fn = routes.get(self.path)
         if not fn:
             return self._json(404, {"error": "not found"})
@@ -580,7 +662,18 @@ def main():
         print(f"游园会找茬页面：{APP.lan_url}")
     print(f"TradeDesk 出海工作台 · http://{args.host}:{args.port} · {APP.llm.describe()} · "
           f"规则 {len(APP.kb.rules)}/{len(APP.kb.all_rules)} 条已核实")
+    threading.Thread(target=digest_loop, daemon=True).start()
     ThreadingHTTPServer((args.host, args.port), Handler).serve_forever()
+
+
+def digest_loop():
+    """Checks every 30 seconds whether today's digest is due; digest_tick pushes at most once a day."""
+    while True:
+        try:
+            APP.digest_tick()
+        except Exception:  # never let the scheduler take the server down
+            traceback.print_exc()
+        time.sleep(30)
 
 
 if __name__ == "__main__":
