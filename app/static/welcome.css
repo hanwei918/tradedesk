@@ -95,3 +95,19 @@ body.gt-lock{overflow:hidden}
 .gt-sailing .gt-boat{left:112%;transition:left 1.5s cubic-bezier(.55,0,.8,.3)}
 .gt-sailing .gt-wake{width:420px;opacity:1}
 @media (prefers-reduced-motion:reduce){.gt-sailing .gt-boat,.gt-return .gt-boat{transition:none}}
+/* the sky: clouds drift back and a plane flies with the slider (sea and air freight) */
+.gt-sky{position:fixed;left:0;right:0;top:0;height:230px;pointer-events:none;z-index:0;overflow:hidden}
+.gt-cloud{position:absolute;left:0;right:-320px;background-repeat:repeat-x;animation:linear infinite;translate:calc(var(--sail, 0) * var(--drift, -80px)) 0}
+.gt-cloud.c1{top:52px;height:120px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='120'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='7'/%3E%3C/filter%3E%3Cg fill='white' fill-opacity='.10' filter='url(%23b)'%3E%3Cellipse cx='140' cy='70' rx='95' ry='22'/%3E%3Cellipse cx='190' cy='56' rx='55' ry='24'/%3E%3Cellipse cx='250' cy='72' rx='70' ry='18'/%3E%3Cellipse cx='560' cy='60' rx='80' ry='20'/%3E%3Cellipse cx='610' cy='48' rx='48' ry='22'/%3E%3Cellipse cx='660' cy='64' rx='60' ry='17'/%3E%3C/g%3E%3C/svg%3E");background-size:900px 120px;animation-name:gtCloud1;animation-duration:70s;--drift:-160px}
+.gt-cloud.c2{top:118px;height:110px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1300' height='110'%3E%3Cfilter id='b'%3E%3CfeGaussianBlur stdDeviation='7'/%3E%3C/filter%3E%3Cg fill='white' fill-opacity='.06' filter='url(%23b)'%3E%3Cellipse cx='260' cy='60' rx='120' ry='20'/%3E%3Cellipse cx='330' cy='48' rx='70' ry='22'/%3E%3Cellipse cx='900' cy='58' rx='110' ry='18'/%3E%3Cellipse cx='960' cy='46' rx='60' ry='20'/%3E%3C/g%3E%3C/svg%3E");background-size:1300px 110px;animation-name:gtCloud2;animation-duration:110s;--drift:-70px}
+@keyframes gtCloud1{to{background-position-x:-900px}}
+@keyframes gtCloud2{to{background-position-x:-1300px}}
+.gt-plane{position:absolute;top:88px;left:calc(7% + var(--sail, 0) * 30%);width:140px;animation:gtFloat 4.2s ease-in-out infinite}
+.gt-plane svg{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 12px rgba(116,160,255,.3))}
+@keyframes gtFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}
+.gt-trail{position:absolute;right:94%;top:47%;height:3px;width:calc(170px + var(--sail, 0) * 220px);border-radius:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4))}
+.gt-return .gt-plane,.gt-return .gt-cloud,.gt-return .gt-trail{transition:left .3s cubic-bezier(.2,1.2,.4,1),translate .3s ease,width .3s ease}
+.gt-sailing .gt-plane{left:115%;transition:left 1.1s cubic-bezier(.55,0,.8,.3)}
+.gt-sailing .gt-trail{width:520px}
+@media (max-width:900px),(max-height:700px){.gt-plane{display:none}}
+@media (prefers-reduced-motion:reduce){.gt-cloud,.gt-plane{animation:none}.gt-sailing .gt-plane,.gt-return .gt-plane{transition:none}}

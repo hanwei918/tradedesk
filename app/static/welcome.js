@@ -34,6 +34,16 @@
       </div>
     </div>
   </main>
+  <div class="gt-sky" aria-hidden="true">
+    <div class="gt-cloud c2"></div>
+    <div class="gt-plane"><span class="gt-trail"></span><svg viewBox="0 0 160 60">
+      <path d="M20 24 L8 5 H21 L42 24Z" fill="#74a0ff"/><path d="M70 28 L57 13 H65 L93 27Z" fill="#94a3b8"/>
+      <path d="M8 30 C8 26 14 24 24 24 H128 C142 24 152 27 156 30 C152 33 142 36 128 36 H24 C14 36 8 34 8 30Z" fill="#e2e8f0"/>
+      <rect x="40" y="27" width="84" height="2.6" rx="1.3" fill="#48e2db"/><path d="M145 27 C150 28 153 29 154.5 30 L145 30Z" fill="#0f172a"/>
+      <path d="M68 32 L48 55 H63 L98 33Z" fill="#cbd5e1"/>
+    </svg></div>
+    <div class="gt-cloud c1"></div>
+  </div>
   <div class="gt-sea" aria-hidden="true">
     <div class="gt-wave w3"></div>
     <div class="gt-boat"><span class="gt-wake"></span><svg class="gt-ship" viewBox="0 0 240 96">
